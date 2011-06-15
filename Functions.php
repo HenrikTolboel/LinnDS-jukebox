@@ -69,19 +69,23 @@ function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
     $i++)
     {
         $str .= '<li class="onepreset">';
+        $str .= '<a href="PlayDialog.php?preset=' . $i . "&frompage=" . $FromPage . "&firstpreset=" . $FirstPreset . "&count=" . $PresetCount . '" data-rel="dialog">';
         $str .= '<img class="onepreset" src="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
         $str .= '<h3>';
-        $str .= '<a href="PlayDialog.php?preset=' . $i . "&frompage=" . $FromPage . "&firstpreset=" . $FirstPreset . "&count=" . $PresetCount . '" data-rel="dialog">';
         //$str .= '0' . $i . '<br />';
         if ($manifest->PresetArtist[$i] == "Various")
         {
-            $str .= $manifest->PresetAlbum[$i] . '</a></h3>';
+            $str .= $manifest->PresetAlbum[$i];
+            $str .= '</h3>';
             $str .= '<p>' . ' (' . $manifest->PresetYear[$i] . ')</p>';  
+            $str .= '</a>';
         }
         else
         {
-            $str .= $manifest->PresetArtist[$i] . '</a></h3>';
+            $str .= $manifest->PresetArtist[$i];
+            $str .= '</h3>';
             $str .= '<p>' . $manifest->PresetAlbum[$i] . ' (' . $manifest->PresetYear[$i] . ')</p>';  
+            $str .= '</a>';
         }
         //$str .= '<p class="ui-li-aside"><strong>0' . $i .'</strong></p>';
         $str .= '<a href="album.php?preset=' . $i . '"></a>';
@@ -146,7 +150,8 @@ function MakeArtistIndex2(&$manifest, $id, $Category)
 
       $str .= '<li class="artistindex">';
       //$str .= '<img class="artistindex" src="' . $manifest->ImageBase . "/" . $manifest->PresetImage80x80[$fp] . '" />';
-      $str .= '<a href="../../presets.php?firstpreset=' . $fp . '&count=' . $cnt . '">';
+      //$str .= '<a href="../../presets.php?firstpreset=' . $fp . '&count=' . $cnt . '">';
+      $str .= '<a href="presets.php?firstpreset=' . $fp . '&count=' . $cnt . '">';
       $str .= '0' . $fp . ' -- ' . $manifest->PresetArtist[$fp] . '</a>';
 
       $str .= "</li>\n";

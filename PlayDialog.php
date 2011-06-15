@@ -1,3 +1,4 @@
+<?php
 /*!
 * LinnDS-jukebox
 *
@@ -7,8 +8,7 @@
 * http://www.opensource.org/licenses/mit-license.php
 */
 
-<?php
-    require_once("Functions.php");
+   require_once("Functions.php");
 
    $preset = $_GET["preset"];
    $frompage = $_GET["frompage"];

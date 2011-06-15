@@ -1,3 +1,4 @@
+<?php
 /*!
 * LinnDS-jukebox
 *
@@ -7,7 +8,6 @@
 * http://www.opensource.org/licenses/mit-license.php
 */
 
-<?php
     require_once("setup.php");
     $FirstPreset = $_GET["firstpreset"];
     $PresetCount = $_GET["count"];

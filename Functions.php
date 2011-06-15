@@ -1,3 +1,4 @@
+<?php
 /*!
 * LinnDS-jukebox
 *
@@ -8,7 +9,6 @@
 */
 
 
-<?php
 
 function Page($id, $title, $content, $footer)
 {

@@ -1,3 +1,4 @@
+<?php
 /*!
 * LinnDS-jukebox
 *
@@ -7,14 +8,10 @@
 * http://www.opensource.org/licenses/mit-license.php
 */
 
-<?php
-    require_once("setup.php");
+   require_once("setup.php");
 
    $preset = $_GET["preset"];
    
-   //file_put_contents($LPEC_QUEUE_FILE, "Jukebox PlayNow \"". $preset . "\"\n", FILE_APPEND | LOCK_EX);
-   //
-
    $HOST = "127.0.0.1";
    $PORT = 9050;
 

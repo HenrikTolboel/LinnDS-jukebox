@@ -1,3 +1,4 @@
+<?php
 /*!
 * LinnDS-jukebox
 *
@@ -8,9 +9,9 @@
 */
 
 
-<?php
 require_once("setup.php");
 require_once("Functions.php");
+
    $preset = $_GET["preset"];
 
    $cachefilename = $CACHE_DIR . "/album-" . $preset;

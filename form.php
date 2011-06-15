@@ -1,3 +1,4 @@
+<?php
 /*!
 * LinnDS-jukebox
 *
@@ -7,7 +8,6 @@
 * http://www.opensource.org/licenses/mit-license.php
 */
 
-<?php
    require("Manifest.php");
    require("Functions.php");
    $volume = $_POST["volume"];

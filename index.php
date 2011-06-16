@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<!--
+<?php
 /*!
 * LinnDS-jukebox
 *
@@ -7,19 +6,9 @@
 *
 * Licensed under the MIT license:
 * http://www.opensource.org/licenses/mit-license.php
-*/ -->
+*/
 
-<html>
-<head>
-    <meta charset="utf-8">
-
-	<title>LinnDS-jukebox</title> 
-
-<?php require("header.inc"); ?>
-</head>
-<body>
-
-<?php
+   require("header.inc");
    require_once("setup.php");
    require_once("Manifest.php");
    require_once("Functions.php");
@@ -60,9 +49,6 @@
     file_put_contents($cachefilename, $str);
     echo $str;
     }
-?>
         
-<?php require("footer.inc"); ?>
-
-</body>
-</html>
+    require("footer.inc");
+?>

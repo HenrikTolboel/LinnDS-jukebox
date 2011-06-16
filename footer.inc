@@ -10,3 +10,5 @@
 
     <script type="text/javascript" src="actions.js"></script>
 
+</body>
+</html>

@@ -12,18 +12,21 @@
 
 function Page($id, $title, $content, $footer)
 {
-    $str = '<div data-role="page" id="' . $id . '">';
+    $str = '<div data-role="page" id="' . $id . '">' . "\n";
 
-    $str .= '<div data-role="header"> <h1>' . $title . '</h1>';
+    $str .= '<div data-role="header">' . "\n";
+    $str .= '<h1>' . $title . '</h1>'. "\n";
     if ($id != "page_options" && $id != "dialog_play")
-        $str .= '<a href="#page_options" data-icon="gear" class="ui-btn-right">Options</a>';
+        $str .= '<a href="#page_options" data-icon="gear" class="ui-btn-right">Options</a>' . "\n";
     $str .= '</div><!-- /header -->' ."\n";
 
     $str .= '<div data-role="content">' . "\n";
     $str .= $content;
     $str .= "\n" . '</div><!-- /content -->' ."\n";
 
-    $str .= '<div data-role="footer"> <h4>' . $footer . "</h4> </div><!-- /footer -->\n";
+    $str .= '<div data-role="footer">' . "\n";
+    $str .= '<h4>' . $footer . "</h4>\n";
+    $str .= "</div><!-- /footer -->\n";
 
     $str .= "</div><!-- /page -->\n\n";
     return $str;
@@ -31,9 +34,10 @@ function Page($id, $title, $content, $footer)
 
 function Dialog($id, $title, $content)
 {
-    $str = '<div data-role="page" id="' . $id . '">';
+    $str = '<div data-role="page" id="' . $id . '">'. "\n";
 
-    $str .= '<div data-role="header" data-position="inline"> <h1>' . $title . '</h1>';
+    $str .= '<div data-role="header" data-position="inline">' . "\n";
+    $str .= '<h1>' . $title . '</h1>' . "\n";
     $str .= '</div><!-- /header -->' ."\n";
 
     $str .= '<div data-role="content">' . "\n";
@@ -62,7 +66,7 @@ function CategoryList($id, &$manifest)
 
 function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
 {
-    $str = '<ul id="' . $id . '" class="presets" data-role="listview" data-filter="false">' ."\n";
+    $str = '<ul id="' . $id . '" class="presets" data-role="listview" data-filter="false">' . "\n";
 
     for ($i = $FirstPreset; 
     $i < $FirstPreset + $PresetCount;

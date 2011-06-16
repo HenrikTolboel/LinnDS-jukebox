@@ -9,6 +9,7 @@
 */
 
 
+require("header.inc");
 require_once("setup.php");
 require_once("Functions.php");
 
@@ -153,9 +154,9 @@ require_once("Functions.php");
          */
 
          if ($first) {
-            $cont .= '<img class="album" width="250" src="' . str_replace($LINN_JUKEBOX_URL, "..", $AlbumArt) . '" />';
-            $cont .= '<h3 class="album">0' . $preset . '<br />' . $Artist_Performer . '</h3>';
-            $cont .= '<p>' . $ALBUM . ' ('. $YEAR . ')</p>';
+            $cont .= '<img class="album" width="250" src="' . str_replace($LINN_JUKEBOX_URL, "..", $AlbumArt) . '" />' . "\n";
+            $cont .= '<h3 class="album">0' . $preset . '<br />' . $Artist_Performer . '</h3>' . "\n";
+            $cont .= '<p>' . $ALBUM . ' ('. $YEAR . ')</p>' . "\n";
             $cont .= '<ul id="' . $id . '" class="album" data-role="listview" data-inset="true" data-filter="false">' ."\n";
             $first = false;
          }
@@ -175,4 +176,5 @@ require_once("Functions.php");
       file_put_contents($cachefilename, $str);
       echo $str;
    }
+require("footer.inc");
 ?>

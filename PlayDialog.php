@@ -8,6 +8,7 @@
 * http://www.opensource.org/licenses/mit-license.php
 */
 
+   require("header.inc");
    require_once("Functions.php");
 
    $preset = $_GET["preset"];
@@ -31,4 +32,5 @@
    //$str .= "<script>\n<!--\n$('#PlayDialog-a').attr('href', 'abekat');\n//-->\n</script>\n";
    echo $str;
    
+   require("footer.inc");
 ?>

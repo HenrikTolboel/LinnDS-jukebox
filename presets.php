@@ -8,6 +8,7 @@
 * http://www.opensource.org/licenses/mit-license.php
 */
 
+    require("header.inc");
     require_once("setup.php");
     $FirstPreset = $_GET["firstpreset"];
     $PresetCount = $_GET["count"];
@@ -33,4 +34,5 @@
         file_put_contents($cachefilename, $str);
         echo $str;
     }
+    require("footer.inc");
 ?>

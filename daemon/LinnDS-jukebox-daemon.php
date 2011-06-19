@@ -1,5 +1,5 @@
-<?php
 #!/usr/bin/php
+<?php
 /*!
 * LinnDS-jukebox-daemon
 *

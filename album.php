@@ -9,9 +9,9 @@
 */
 
 
-require("header.inc");
-require_once("setup.php");
-require_once("Functions.php");
+   require("header.inc");
+   require_once("setup.php");
+   require_once("Functions.php");
 
    $preset = $_GET["preset"];
 
@@ -129,7 +129,6 @@ require_once("Functions.php");
                         }
                      }
                   }
-
                }
             }
          }
@@ -176,5 +175,6 @@ require_once("Functions.php");
       file_put_contents($cachefilename, $str);
       echo $str;
    }
-require("footer.inc");
+
+   require("footer.inc");
 ?>

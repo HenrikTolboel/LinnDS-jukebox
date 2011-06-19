@@ -10,9 +10,10 @@
 $(function() {
     $('.play,body,div.ui-dialog,ul.presets').delegate("a.onepreset", "click", function() {
             var preset = $(this).data("musik").preset;
+            var playfunction = $(this).data("musik").playfunction;
             //alert("click " +preset);
             //jQuery.get("http://192.168.0.105/cgi-bin/musik.cgi/=/jukebox/play_now/"+preset);
-            jQuery.get("PlayNow.php", { preset: preset } , function (data) {
+            jQuery.get("PlayNow.php", { playfunction: playfunction, preset: preset } , function (data) {
                 //alert('Load OK' + data);
             });
             //$('.ui-dialog').dialog('close');

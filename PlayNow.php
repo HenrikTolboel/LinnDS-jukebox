@@ -11,6 +11,7 @@
    require_once("setup.php");
 
    $preset = $_GET["preset"];
+   $playfunction = $_GET["playfunction"];
    
    $HOST = "127.0.0.1";
    $PORT = 9050;
@@ -18,7 +19,15 @@
    $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
    socket_connect($socket, $HOST, $PORT);
 
-   $Str = "Jukebox PlayNow \"" . $preset . "\"";
+   if ($playfunction == "PlayNow") {
+      $Str = "Jukebox PlayNow \"" . $preset . "\"";
+   }
+   elseif ($playfunction == "PlayNext") {
+      $Str = "Jukebox PlayNext \"" . $preset . "\"";
+   }
+   elseif ($playfunction == "PlayLater") {
+      $Str = "Jukebox PlayLater \"" . $preset . "\"";
+   }
    socket_write($socket, $Str . "\n");
 
    socket_close($socket);

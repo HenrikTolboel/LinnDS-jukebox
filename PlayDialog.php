@@ -12,18 +12,17 @@
    require_once("Functions.php");
 
    $preset = $_GET["preset"];
-   $frompage = $_GET["frompage"];
-   $firstpreset = $_GET["firstpreset"];
-   $count = $_GET["count"];
-   $href= "#" . $frompage . "?firstpreset=" . $firstpreset . "&count=" . $count;
+   //$frompage = $_GET["frompage"];
+   //$firstpreset = $_GET["firstpreset"];
+   //$count = $_GET["count"];
+   //$href= "#" . $frompage . "?firstpreset=" . $firstpreset . "&count=" . $count;
    $href = "#";
 
    $cont = "";
    $cont .= '<div class="play">' . "\n";
-   $cont .= '<a href="' . $href . '" data-rel="back" class="onepreset" data-role="button" data-theme="b" data-musik=' . "'" . '{"preset":' . $preset . "}'>" . 'Play Now</a>' . "\n";
-   $cont .= '<a href="' . $href . '" data-rel="back" data-role="button" data-theme="b">Play Next</a>' . "\n";
-   $cont .= '<a href="' . $href . '" data-rel="back" data-role="button" data-theme="b">Play Later</a>' . "\n";
-   //$cont .= '<a id="PlayDialog-a" href="#" data-role="button" data-theme="d">Henrik</a>' ."\n";
+   $cont .= '<a href="' . $href . '" data-rel="back" class="onepreset" data-role="button" data-theme="b" data-musik=' . "'" . '{"playfunction": "PlayNow", "preset":' . $preset . "}'>" . 'Play Now</a>' . "\n";
+   $cont .= '<a href="' . $href . '" data-rel="back" class="onepreset" data-role="button" data-theme="b" data-musik=' . "'" . '{"playfunction": "PlayNext", "preset":' . $preset . "}'>" . 'Play Next</a>' . "\n";
+   $cont .= '<a href="' . $href . '" data-rel="back" class="onepreset" data-role="button" data-theme="b" data-musik=' . "'" . '{"playfunction": "PlayLater", "preset":' . $preset . "}'>" . 'Play Later</a>' . "\n";
    $cont .= '<a href="' . $href . '" data-rel="back" data-role="button" data-theme="c">Cancel</a>' . "\n";
    $cont .= '</div>' ."\n";
 

@@ -8,7 +8,7 @@
 */
 
 $(function() {
-    $('.play,body,div.ui-dialog,ul.presets').delegate("a.onepreset", "click", function() {
+    $('.play,body,div.ui-dialog,ul.presets').delegate("a.onepreset", "vclick", function() {
             var preset = $(this).data("musik").preset;
             var playfunction = $(this).data("musik").playfunction;
             //alert("click " +preset);

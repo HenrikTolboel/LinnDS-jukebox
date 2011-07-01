@@ -275,6 +275,8 @@ while (true) {
              if (preg_match("/Jukebox PlayNow \"(\d+)\"/m", $data, $matches) > 0)
              {
                 $JukeBoxPlay = $matches[1];
+                $State[PlayNext] = -1;
+                $State[PlayLater] = array();
                 LogWrite("JukeBoxPlayNow: " . $JukeBoxPlay);
                 Send("ACTION Ds/Ds 1 Stop");
                 Send("ACTION Ds/Jukebox 1 SetCurrentPreset \"" . $JukeBoxPlay . "\"");
@@ -285,6 +287,7 @@ while (true) {
                 $JukeBoxPlay = $matches[1];
                 LogWrite("JukeBoxPlayNext: " . $JukeBoxPlay);
                 $State[PlayNext] = $JukeBoxPlay;
+                $State[PlayLater] = array();
                 if ($DEBUG > 0)
                 {
                    //LogWrite($data);
@@ -295,6 +298,7 @@ while (true) {
              {
                 $JukeBoxPlay = $matches[1];
                 LogWrite("JukeBoxPlayLater: " . $JukeBoxPlay);
+                $State[PlayNext] = -1;
                 array_push($State[PlayLater], $JukeBoxPlay);
                 if ($DEBUG > 0)
                 {

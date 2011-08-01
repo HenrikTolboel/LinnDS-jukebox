@@ -53,7 +53,7 @@ function CategoryList($id, &$manifest)
     $str= '<ul id="' . $id . '" data-role="listview" data-filter="false">' . "\n";
     foreach ($manifest->Category as $cat => $catName) 
     {
-        $str .= '<li><a href="#page_cat-' . $cat . '">' . $catName .'</a>';
+        $str .= '<li><a href="pagecategory.php?category=' . $cat . '">' . $catName .'</a>';
 
         $str .= '<span class="ui-li-count">' . $manifest->GetCategoryCount($cat) .'</span>';
         $str .= '</li>' . "\n";
@@ -103,7 +103,7 @@ function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
     return $str;
 }
 
-function MakeArtistIndex(&$manifest, $id, $Category)
+function MakeArtistIndex1(&$manifest, $id, $Category)
 {
     $str = '<ul id="' . $id . '" class="artistindex" data-role="listview" data-filter="false">' . "\n";
 

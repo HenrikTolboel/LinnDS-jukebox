@@ -8,31 +8,32 @@
 * http://www.opensource.org/licenses/mit-license.php
 */
 
-    require("header.inc");
-    require_once("setup.php");
-    $FirstPreset = $_GET["firstpreset"];
-    $PresetCount = $_GET["count"];
+require("header.inc");
+require_once("setup.php");
+$FirstPreset = $_GET["firstpreset"];
+$PresetCount = $_GET["count"];
 
-    $id = "presets-" . $FirstPreset . "-" . $PresetCount;
+$id = "presets-" . $FirstPreset . "-" . $PresetCount;
 
-    $cachefilename = $CACHE_DIR . "/presets-" . $FirstPreset . "-" . $PresetCount;
+$cachefilename = $CACHE_DIR . "/presets-" . $FirstPreset . "-" . $PresetCount;
 
-    if ($DO_CACHE && file_exists($cachefilename) && filemtime($cachefilename) > filemtime($manifestfile))
-    {
-        echo file_get_contents($cachefilename);
-    }
-    else
-    {
-        require_once("Manifest.php");
-        require_once("Functions.php");
-        $manifest = new Manifest($manifestfile);
-        
-        $str .= Page("page_test-" . $FirstPreset . "-" . $PresetCount, "Artist / Album", 
-            MakePresetList($manifest, $id, "presets.php", $FirstPreset, $PresetCount),
-            "Page Footer");
+if ($DO_CACHE && file_exists($cachefilename) && filemtime($cachefilename) > filemtime($manifestfile))
+{
+    echo file_get_contents($cachefilename);
+}
+else
+{
+    require_once("Manifest.php");
+    require_once("Functions.php");
+    $manifest = new Manifest($manifestfile);
 
-        file_put_contents($cachefilename, $str);
-        echo $str;
-    }
-    require("footer.inc");
+    $str .= Page("page_test-" . $FirstPreset . "-" . $PresetCount, "Artist / Album", 
+	MakePresetList($manifest, $id, "presets.php", $FirstPreset, $PresetCount),
+	"Page Footer");
+
+    file_put_contents($cachefilename, $str);
+    echo $str;
+}
+require("footer.inc");
+
 ?>

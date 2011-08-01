@@ -17,7 +17,7 @@ function Page($id, $title, $content, $footer)
     $str .= '<div data-role="header">' . "\n";
     $str .= '<h1>' . $title . '</h1>'. "\n";
     if ($id != "page_options" && $id != "dialog_play")
-        $str .= '<a href="#page_options" data-icon="gear" class="ui-btn-right">Options</a>' . "\n";
+        $str .= '<a href="options.php" data-icon="gear" class="ui-btn-right">Options</a>' . "\n";
     $str .= '</div><!-- /header -->' ."\n";
 
     $str .= '<div data-role="content">' . "\n";
@@ -158,6 +158,43 @@ function MakeArtistIndex2(&$manifest, $id, $Category)
       //$str .= '<a href="../../presets.php?firstpreset=' . $fp . '&count=' . $cnt . '">';
       $str .= '<a href="presets.php?firstpreset=' . $fp . '&count=' . $cnt . '">';
       $str .= '0' . $fp . ' -- ' . $manifest->PresetArtist[$fp] . '</a>';
+
+      $str .= "</li>\n";
+
+      $fp += $cnt;
+   }
+
+   $str .= "</ul>";
+
+   return $str;
+}
+
+function MakeArtistIndex3(&$manifest, $id, $Category)
+{
+   // Keep artist after first letter on same page
+   //
+   $str = '<ul id="' . $id . '" class="artistindex" data-role="listview" data-filter="false">' . "\n";
+
+   $c = 1;
+
+   $end = $manifest->CategoryFirstPreset[$Category] + $manifest->GetCategoryCount($Category);
+
+   $fp = $manifest->CategoryFirstPreset[$Category]; 
+   while ($fp < $end)
+   {
+      $cnt = $c;
+      if ($fp + $c > $end)
+         $cnt = $end - $fp;
+      else
+      {
+         $tmp = $cnt;
+         while (strcmp(strtoupper($manifest->PresetArtist[$fp+$tmp-1][0]), strtoupper($manifest->PresetArtist[$fp+$cnt][0])) == 0 && $fp + $cnt < $end)
+            $cnt++;
+      }
+
+      $str .= '<li class="artistindex">';
+      $str .= '<a href="presets.php?firstpreset=' . $fp . '&count=' . $cnt . '">';
+      $str .= strtoupper($manifest->PresetArtist[$fp][0]) . '</a>';
 
       $str .= "</li>\n";
 

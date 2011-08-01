@@ -30,7 +30,7 @@
         if (strpos($catName, " / Album") > 3 && $manifest->GetCategoryCount($cat) > 15)
         {
             $str .= Page("page_cat-" . $cat, "Artist Index",
-                MakeArtistIndex2($manifest, "artistindex", $cat),
+                MakeArtistIndex3($manifest, "artistindex", $cat),
                 "Page Footer");
         }
         else
@@ -42,9 +42,6 @@
                  "Page Footer");
         }
     }
-
-    $str .= Page("page_options", "Options", "<h2>Options</h2>\n<p>I'm only shown when selecting options.</p>\n<p><a href=\"#page_musik\">Back to Musik</a></p>" . '<p><form action="form.php" method="post"><div data-role="fieldcontain"><label for="volume">Volume:</label><input type="range" name="volume" id="volume" value="35" min="0" max="60"  /></form></div></p>', "Page Footer");
-
 
     file_put_contents($cachefilename, $str);
     echo $str;

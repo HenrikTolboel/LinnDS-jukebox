@@ -196,6 +196,7 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
       $str .= '<a href="presets.php?firstpreset=' . $fp . '&count=' . $cnt . '">';
       $str .= strtoupper($manifest->PresetArtist[$fp][0]) . '</a>';
 
+      $str .= '<span class="ui-li-count">' . $cnt .'</span>';
       $str .= "</li>\n";
 
       $fp += $cnt;

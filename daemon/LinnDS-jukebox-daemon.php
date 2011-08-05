@@ -24,10 +24,6 @@ socket_connect($lpec_socket, $LINN_HOST, $LINN_PORT);
 // Create a socket for clients to register on - listen on port
 $port = 9050;
 
-
-// Special values
-$MAX_VOLUME = 60;
-
 // create a streaming socket, of type TCP/IP
 $sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 
@@ -51,6 +47,7 @@ $AwaitResponse = 0;
 
 // State contains the "accumulated" state of the linn device.
 $State = array();
+$State[MAX_VOLUME] = 60;
 $State[PlayNext] = -1;
 $State[PlayLater] = array();
 
@@ -398,15 +395,18 @@ while (true) {
             if (preg_match("/Volume Set \"(\d+)\"/m", $data, $matches) > 0)
             {
                $value = $matches[1];
-	       if ($value > $MAX_VOLUME)
-		   $value = $MAX_VOLUME;
-               LogWrite("VolumeSet: " . $value);
-               Send("ACTION Ds/Preamp 4 SetVolume \"" . $value . "\"");
+	       if ($value > $State[MAX_VOLUME])
+		   $value = $State[MAX_VOLUME];
+	       if ($value != $State[Volume])
+	       {
+		   LogWrite("VolumeSet: " . $value);
+		   Send("ACTION Ds/Preamp 4 SetVolume \"" . $value . "\"");
+	       }
                $DataHandled = true;
             }
             if (preg_match("/Volume Incr/m", $data, $matches) > 0)
             {
-		if ($State[Volume] < $MAX_VOLUME)
+		if ($State[Volume] < $State[MAX_VOLUME])
 		{
 		    LogWrite("VolumeIncr: ");
 		    Send("ACTION Ds/Preamp 4 VolumeInc");

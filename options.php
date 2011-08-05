@@ -12,25 +12,35 @@ require("header.inc");
 require_once("setup.php");
 require_once("Functions.php");
 
-$cachefilename = $CACHE_DIR . "/options";
+$HOST = "127.0.0.1";
+$PORT = 9050;
 
-if ($DO_CACHE && file_exists($cachefilename) && filemtime($cachefilename) > filemtime($manifestfile))
-{
-    echo file_get_contents($cachefilename);
-}
-else
-{
-    $cont = "";
+$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+socket_connect($socket, $HOST, $PORT);
+$string = socket_read($socket, 10000); // Remove connection info sent from server...
 
-    $cont .= "<h2>Options</h2>"; 
-    $cont .= '<p><form action="form.php" method="post"><div data-role="fieldcontain"><label for="volume">Volume:</label><input type="range" name="volume" id="volume" value="35" min="0" max="60"  /></form></div></p>';
+socket_write($socket, "State\n");
+$string = socket_read($socket, 10000);
 
+$State = unserialize($string);
 
-    $str = Page("page_options", "Options", $cont, "Page Footer");
+$cont = "";
 
-    file_put_contents($cachefilename, $str);
-    echo $str;
-}
+$cont .= "<h2>Options</h2>"; 
+
+//$cont .= '<p><form action="form.php" method="post"><div data-role="fieldcontain">';
+$cont .= '<p><div data-role="fieldcontain">';
+$cont .= '<label for="volume">Volume:</label>';
+$cont .= '<input type="range" name="volume" id="volume" value="' . $State[Volume] . '" min="0" max="' . $State[MAX_VOLUME] . '" />';
+//$cont .= '</form></div></p>';
+$cont .= '</div></p>';
+
+$str = Page("page_options", "Options", $cont, "Page Footer");
+
+file_put_contents($cachefilename, $str);
+echo $str;
+
+socket_close($socket);
 
 require("footer.inc");
 

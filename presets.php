@@ -27,7 +27,7 @@ else
     require_once("Functions.php");
     $manifest = new Manifest($manifestfile);
 
-    $str .= Page("page_test-" . $FirstPreset . "-" . $PresetCount, "Artist / Album", 
+    $str .= Page("page_presets-" . $FirstPreset . "-" . $PresetCount, "Artist / Album", 
 	MakePresetList($manifest, $id, "presets.php", $FirstPreset, $PresetCount),
 	"Page Footer");
 

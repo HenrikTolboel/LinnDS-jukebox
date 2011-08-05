@@ -8,7 +8,6 @@
 * http://www.opensource.org/licenses/mit-license.php
 */ -->
 
-    <script type="text/javascript" src="actions.js"></script>
 
 </body>
 </html>

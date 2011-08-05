@@ -12,7 +12,7 @@
 
 function Page($id, $title, $content, $footer)
 {
-    $str = '<div data-role="page" id="' . $id . '">' . "\n";
+    $str = '<div data-role="page" data-dom-cache="true" id="' . $id . '">' . "\n";
 
     $str .= '<div data-role="header">' . "\n";
     $str .= '<h1>' . $title . '</h1>'. "\n";
@@ -180,6 +180,11 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
    $end = $manifest->CategoryFirstPreset[$Category] + $manifest->GetCategoryCount($Category);
 
    $fp = $manifest->CategoryFirstPreset[$Category]; 
+   $FP = array();
+   $CNT = array();
+   $Index = 1;
+   $FP[0] = -1;
+   $CNT[0] = 0;
    while ($fp < $end)
    {
       $cnt = $c;
@@ -192,19 +197,37 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
             $cnt++;
       }
 
-      $str .= '<li class="artistindex">';
-      $str .= '<a href="presets.php?firstpreset=' . $fp . '&count=' . $cnt . '">';
-      $str .= strtoupper($manifest->PresetArtist[$fp][0]) . '</a>';
+      $FP[$Index] = $fp;
+      $CNT[$Index] = $cnt;
+      $Index = $Index + 1;
+      //$str .= '<li class="artistindex">';
+      //$str .= '<a href="presets.php?firstpreset=' . $fp . '&count=' . $cnt . '">';
+      //$str .= strtoupper($manifest->PresetArtist[$fp][0]) . '</a>';
 
-      $str .= '<span class="ui-li-count">' . $cnt .'</span>';
-      $str .= "</li>\n";
+      //$str .= '<span class="ui-li-count">' . $cnt .'</span>';
+      //$str .= "</li>\n";
 
       $fp += $cnt;
    }
+    $FP[$Index] = -1;
+    $CNT[$Index] = 0;
 
-   $str .= "</ul>";
+    for ($i = 1; $i < $Index; $i++)
+    {
+	$str .= '<li class="artistindex">';
+	$str .= '<a href="presets.php?firstpreset=' . $FP[$i] . '&count=' . $CNT[$i];
+	//$str .= '&prevfp=' . $FP[$i-1] . '&prevcnt=' . $CNT[$i-1];
+	//$str .= '&nextfp=' . $FP[$i+1] . '&nextcnt=' . $CNT[$i+1];
+	$str .= '">';
+	$str .= strtoupper($manifest->PresetArtist[$FP[$i]][0]) . '</a>';
 
-   return $str;
+	$str .= '<span class="ui-li-count">' . $CNT[$i] .'</span>';
+	$str .= "</li>\n";
+    }
+
+    $str .= "</ul>";
+
+    return $str;
 }
 
 ?>

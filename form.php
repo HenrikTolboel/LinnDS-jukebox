@@ -14,6 +14,16 @@ $volume = $_POST["volume"];
 $PresetCount = $_POST["count"];
 $id = $_GET["id"];
 $id = "presets";
+
+$HOST = "127.0.0.1";
+$PORT = 9050;
+
+$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+socket_connect($socket, $HOST, $PORT);
+$string = socket_read($socket, 10000); // Remove connection info sent from server...
+
+socket_write($socket, "Volume Set \"" . $volume . "\"\n");
+socket_close($socket);
 file_put_contents("/tmp/log.txt", $volume);
 
 return;

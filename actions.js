@@ -8,61 +8,52 @@
 */
 
 $(function() {
-    $('.play,body,div.ui-dialog,ul.presets').delegate("a.onepreset", "vclick", function() {
-            var preset = $(this).data("musik").preset;
-            var playfunction = $(this).data("musik").playfunction;
-            //alert("click " +preset);
-            //jQuery.get("http://192.168.0.105/cgi-bin/musik.cgi/=/jukebox/play_now/"+preset);
-            jQuery.get("PlayNow.php", { playfunction: playfunction, preset: preset } , function (data) {
-                //alert('Load OK' + data);
-            });
-            //$('.ui-dialog').dialog('close');
-            return true;
-            });
+    //$('.play,body,div.ui-dialog,ul.presets').delegate("a.onepreset", "click", function() {
+    $('body').delegate("a.onepreset", "click", function() {
+	var value = $(this).data("musik").preset;
+	var action = $(this).data("musik").action;
+	//alert("click " +value);
+	console.log(action + " = " + value);
+	jQuery.get("Send.php", { action: action, value: value } , function (data) {
+	    //alert('Load OK' + data);
+	});
+	//$('.ui-dialog').dialog('close');
+	return true;
+    });
 
+    //$('ul.presets').delegate("a.onepreset", "swipeleft", function() {
     /*
-    $('a.onepreset').live("click", function() {
-            var preset = $(this).data("musik").preset;
-            //alert("click " +preset);
-            //jQuery.get("http://192.168.0.105/cgi-bin/musik.cgi/=/jukebox/play_now/"+preset);
-            jQuery.get("PlayNow.php", { preset: preset } , function (data) {
-                //alert('Load OK' + data);
-            });
-            //$('.ui-dialog').dialog('close');
-            return false;
-            });
-            */
-
-    /*
-    $('ul.presets,#artist_album').delegate("a.onepreset2", "click", function() {
-            var preset = $(this).data("musik").preset;
-            jQuery.get("album.php", { preset: preset } , function (data) {
-                $("#album_content").empty().append(data);
-            });
-            return true;
-            });
-            */
-
-    /*
-    $('ul.artistindex').delegate("a.artistindex", "click", function() {
-            var firstpreset = $(this).data("musik").firstpreset;
-            var count = $(this).data("musik").count;
-            var id = $(this).data("musik").id;
-            $("#artist_album").empty().append("");
-            jQuery.get("presets.php", { firstpreset: firstpreset, count: count, id: id } , function (data) {
-                $("#artist_album").empty().append(data);
-                //$('#presets').listview('refresh');
-                $('#presets').listview();
-            });
-            return true;
-            });
-            */
-
-    $('ul.presets').delegate("a.onepreset", "swipeleft", function() {
+    $('.play,body,div.ui-dialog,ul.presets').delegate("a.onepreset", "swipeleft", function() {
             var preset = $(this).data("musik").preset;
             alert("swipeleft " +preset);
-            return false;
+            return true;
             });
+	    */
+
+    $('div.ui-page').live("swipeleft", function(){
+	alert("swipeleft ");
+	var nextpage = $(this).next('div[data-role="page"]');
+	// swipe using id of next page if exists
+	if (nextpage.length > 0) {
+	    $.mobile.changePage(nextpage, 'slide');
+	}
+    });
+    $('div.ui-page').live("swiperight", function(){
+	alert("swiperight ");
+	var prevpage = $(this).prev('div[data-role="page"]');
+	// swipe using id of next page if exists
+	if (prevpage.length > 0) {
+	    $.mobile.changePage(prevpage, 'slide', true);
+	}
+    });
+    
+    $("input#volume").live("change", function() {
+	console.log("volume = " + $(this).val());
+	jQuery.get("Send.php", { action: "SetVolume", value: $(this).val() } , function (data) {
+	    //alert('Load OK' + data);
+	});
+    });
+
 
     //$("img.onepreset").lazyload({placeholder : "webapp/tuupola-jquery_lazyload-3f123e9/img/grey.gif"});
 });

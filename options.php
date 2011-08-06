@@ -31,9 +31,11 @@ $cont .= "<h2>Options</h2>";
 //$cont .= '<p><form action="form.php" method="post"><div data-role="fieldcontain">';
 $cont .= '<p><div data-role="fieldcontain">';
 $cont .= '<label for="volume">Volume:</label>';
-$cont .= '<input type="range" name="volume" id="volume" value="' . $State[Volume] . '" min="0" max="' . $State[MAX_VOLUME] . '" />';
+$cont .= '<input type="range" name="volume" id="volume" value="' . $State['Volume'] . '" min="0" max="' . $State['MAX_VOLUME'] . '" />';
 //$cont .= '</form></div></p>';
 $cont .= '</div></p>';
+
+$cont .= '<p><a href="' . $State['ProductUrl'] . '">' . $State['ProductName'] .'-' . $State['ProductRoom'] . '</a></p>';
 
 $str = Page("page_options", "Options", $cont, "Page Footer");
 

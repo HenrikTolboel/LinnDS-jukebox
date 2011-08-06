@@ -11,7 +11,7 @@
 
 
 // Debug write out.... Higher number 1,2,3,.. means more output
-$DEBUG = 1;
+$DEBUG = 2;
 
 // This is where your linn is in the network.
 $LINN_HOST = "192.168.0.108";
@@ -47,13 +47,13 @@ $AwaitResponse = 0;
 
 // State contains the "accumulated" state of the linn device.
 $State = array();
-$State[MAX_VOLUME] = 60;
-$State[PlayNext] = -1;
-$State[PlayLater] = array();
+$State['MAX_VOLUME'] = 60;
+$State['PlayNext'] = -1;
+$State['PlayLater'] = array();
 
 // SubscribeType tells the mapping between "EVENT <digits> XXX" subscribed
-// to protokol (e.g. "Ds/Ds")
-// <digits> -> "Ds/Ds"
+// to protokol (e.g. "Ds/Playlist")
+// <digits> -> "Ds/Playlist"
 // Used to make fewer regular expressions in the EVENT section
 $SubscribeType = array();
 
@@ -80,6 +80,7 @@ function Send($Str)
    if ($AwaitResponse == 0 && count($Queue) > 0)
    {
       $S = array_shift($Queue);
+      LogWrite("Send: " .$S);
       socket_write($lpec_socket, $S . "\n");
       array_unshift($Queue, $S); // We leave the sent item in Queue - removed when we get the response
       $AwaitResponse = 1;
@@ -142,18 +143,12 @@ while (true) {
             LogWrite($data);
          if (strpos($data, "ALIVE Ds") !== false)
          {
-            Send("SUBSCRIBE Ds/Ds");
-            Send("SUBSCRIBE Ds/Preamp");
+            Send("SUBSCRIBE Ds/Product");
+            Send("SUBSCRIBE Ds/Volume");
             Send("SUBSCRIBE Ds/Jukebox");
             Send("SUBSCRIBE Ds/Playlist");
-            Send("SUBSCRIBE Ds/Product");
             $DataHandled = true;
          }
-         //elseif (strpos($data, "ALIVE Preamp") !== false)
-         //{
-            //Send("SUBSCRIBE Preamp");
-            //$DataHandled = true;
-         //}
          elseif (strpos($data, "ALIVE") !== false)
          {
             LogWrite("ALIVE ignored : " . $data);
@@ -186,19 +181,14 @@ while (true) {
             if ($DEBUG > 0)
                LogWrite("Command: " . $front . " -> " . $data);
 
-            if (preg_match("/ACTION Ds\/Product 3 SourceType \"(\d+)\"/m", $front, $matches) > 0)
+            if (preg_match("/ACTION Ds\/Product 1 Source \"(\d+)\"/m", $front, $matches) > 0)
             {
-               if (preg_match("/RESPONSE \"(\w+)\"/m", $data, $match) > 0)
+               if (preg_match("/RESPONSE \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"/m", $data, $match) > 0)
                {
-                  $State[SourceType][$matches[1]] = $match[1];
-               }
-            }
-
-            if (preg_match("/ACTION Ds\/Product 3 SourceName \"(\d+)\"/m", $front, $matches) > 0)
-            {
-               if (preg_match("/RESPONSE \"(\w+)\"/m", $data, $match) > 0)
-               {
-                  $State[SourceName][$matches[1]] = $match[1];
+                  $State['Source_SystemName'][$matches[1]] = $match[1];
+                  $State['Source_Type'][$matches[1]] = $match[2];
+                  $State['Source_Name'][$matches[1]] = $match[3];
+                  $State['Source_Visible'][$matches[1]] = $match[4];
                }
             }
 
@@ -210,60 +200,72 @@ while (true) {
             // EVENTs are sent by Your linn - those that were subscribed
             // to. We think the below ones are interesting....
 
-            if (strpos($data, "EVENT " . $SubscribeType["Ds/Ds"]) !== false)
+            if (strpos($data, "EVENT " . $SubscribeType["Ds/Playlist"]) !== false)
             {
                if (preg_match("/TransportState \"(\w+)\"/m", $data, $matches) > 0)
                {
-                  if (count($State[PlayLater]) >= 1 && $matches[1] == "Stopped" && $State[TransportState] != $matches[1])
+                  if (count($State['PlayLater']) >= 1 && $matches[1] == "Stopped" && $State['TransportState'] != $matches[1])
                   {
-                     $front = array_shift($State[PlayLater]);
-                     Send("ACTION Ds/Jukebox 2 SetCurrentPreset \"" . $front . "\"");
-                     Send("ACTION Ds/Ds 1 Play");
+                     $front = array_shift($State['PlayLater']);
+                     Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $front . "\"");
+                     Send("ACTION Ds/Playlist 1 Play");
                   }
-                  $State[TransportState] = $matches[1];
+                  $State['TransportState'] = $matches[1];
                }
-               if (preg_match("/TrackId \"(\d+)\"/m", $data, $matches) > 0)
+               if (preg_match("/Id \"(\d+)\"/m", $data, $matches) > 0)
                {
-                  if ($State[PlayNext] != -1 && $State[TrackId] != $matches[1])
+                  if ($State['PlayNext'] != -1 && $State['Id'] != $matches[1])
                   {
-                     Send("ACTION Ds/Ds 1 Stop");
-                     Send("ACTION Ds/Jukebox 2 SetCurrentPreset \"" . $State[PlayNext] . "\"");
-                     Send("ACTION Ds/Ds 1 Play");
-                     $State[PlayNext] = -1;
+                     Send("ACTION Ds/Playlist 1 Stop");
+                     Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $State['PlayNext'] . "\"");
+                     Send("ACTION Ds/Playlist 1 Play");
+                     $State['PlayNext'] = -1;
                   }
-                  $State[TrackId] = $matches[1];
+                  $State['Id'] = $matches[1];
+               }
+               if (preg_match("/IdArray \"([[:graph:]]+)\"/m", $data, $matches) > 0)
+               {
+                  $State['IdArray'] = $matches[1];
+               }
+               if (preg_match("/Shuffle \"(\w+)\"/m", $data, $matches) > 0)
+               {
+                  $State['Shuffle'] = $matches[1];
+               }
+               if (preg_match("/Repeat \"(\w+)\"/m", $data, $matches) > 0)
+               {
+                  $State['Repeat'] = $matches[1];
                }
                if (preg_match("/TrackDuration \"(\d+)\"/m", $data, $matches) > 0)
                {
-                  $State[TrackDuration] = $matches[1];
+                  $State['TrackDuration'] = $matches[1];
                }
                if (preg_match("/TrackCodecName \"(\w+)\"/m", $data, $matches) > 0)
                {
-                  $State[TrackCodecName] = $matches[1];
+                  $State['TrackCodecName'] = $matches[1];
                }
                if (preg_match("/TrackSampleRate \"(\d+)\"/m", $data, $matches) > 0)
                {
-                  $State[TrackSampleRate] = $matches[1];
+                  $State['TrackSampleRate'] = $matches[1];
                }
                if (preg_match("/TrackBitRate \"(\d+)\"/m", $data, $matches) > 0)
                {
-                  $State[TrackBitRate] = $matches[1];
+                  $State['TrackBitRate'] = $matches[1];
                }
                if (preg_match("/TrackLossless \"(\w+)\"/m", $data, $matches) > 0)
                {
-                  $State[TrackLossless] = $matches[1];
+                  $State['TrackLossless'] = $matches[1];
                }
                $DataHandled = true;
             }
-            elseif (strpos($data, "EVENT " . $SubscribeType["Ds/Preamp"]) !== false)
+            elseif (strpos($data, "EVENT " . $SubscribeType["Ds/Volume"]) !== false)
             {
                if (preg_match("/Volume \"(\d+)\"/m", $data, $matches) > 0)
                {
-                  $State[Volume] = $matches[1];
+                  $State['Volume'] = $matches[1];
                }
                if (preg_match("/Mute \"(\w+)\"/m", $data, $matches) > 0)
                {
-                  $State[Mute] = $matches[1];
+                  $State['Mute'] = $matches[1];
                }
                $DataHandled = true;
             }
@@ -271,70 +273,61 @@ while (true) {
             {
                if (preg_match("/CurrentPreset \"(\d+)\"/m", $data, $matches) > 0)
                {
-                  $State[CurrentPreset] = $matches[1];
+                  $State['CurrentPreset'] = $matches[1];
                }
                if (preg_match("/CurrentBookmark \"(\d+)\"/m", $data, $matches) > 0)
                {
-                  $State[CurrentBookmark] = $matches[1];
-               }
-               $DataHandled = true;
-            }
-            elseif (strpos($data, "EVENT " . $SubscribeType["Ds/Playlist"]) !== false)
-            {
-               if (preg_match("/IdArray \"([[:graph:]]+)\"/m", $data, $matches) > 0)
-               {
-                  $State[IdArray] = $matches[1];
-               }
-               if (preg_match("/Shuffle \"(\w+)\"/m", $data, $matches) > 0)
-               {
-                  $State[Shuffle] = $matches[1];
-               }
-               if (preg_match("/Repeat \"(\w+)\"/m", $data, $matches) > 0)
-               {
-                  $State[Repeat] = $matches[1];
+                  $State['CurrentBookmark'] = $matches[1];
                }
                $DataHandled = true;
             }
             elseif (strpos($data, "EVENT " . $SubscribeType["Ds/Product"]) !== false)
             {
-               if (preg_match("/ProductSourceIndex \"(\d+)\"/m", $data, $matches) > 0)
+               if (preg_match("/SourceIndex \"(\d+)\"/m", $data, $matches) > 0)
                {
-                  $State[ProductSourceIndex] = $matches[1];
+                  $State['SourceIndex'] = $matches[1];
                }
                if (preg_match("/ProductModel \"([[:ascii:]]+?)\"/m", $data, $matches) > 0)
                {
-                  $State[ProductModel] = $matches[1];
+                  $State['ProductModel'] = $matches[1];
                }
                if (preg_match("/ProductName \"([[:ascii:]]+?)\"/m", $data, $matches) > 0)
                {
-                  $State[ProductName] = $matches[1];
+                  $State['ProductName'] = $matches[1];
                }
                if (preg_match("/ProductRoom \"([[:ascii:]]+?)\"/m", $data, $matches) > 0)
                {
-                  $State[ProductRoom] = $matches[1];
+                  $State['ProductRoom'] = $matches[1];
                }
                if (preg_match("/ProductType \"(\w+)\"/m", $data, $matches) > 0)
                {
-                  $State[ProductType] = $matches[1];
+                  $State['ProductType'] = $matches[1];
                }
-               if (preg_match("/ProductStandby \"(\w+)\"/m", $data, $matches) > 0)
+               if (preg_match("/Standby \"(\w+)\"/m", $data, $matches) > 0)
                {
-                  $State[ProductStandby] = $matches[1];
+                  $State['Standby'] = $matches[1];
+               }
+               if (preg_match("/ProductUrl \"([[:ascii:]]+?)\"/m", $data, $matches) > 0)
+               {
+                  $State['ProductUrl'] = $matches[1];
+               }
+               if (preg_match("/Attributes \"([[:ascii:]]+?)\"/m", $data, $matches) > 0)
+               {
+                  $State['Attributes'] = $matches[1];
                }
                //if (preg_match("/ProductSourceXml \"([[:graph:]]+)\"/m", $data, $matches) > 0)
                //{
-                  //$State[ProductSourceXml] = $matches[1];
+                  //$State['ProductSourceXml'] = $matches[1];
                //}
                //if (preg_match("/ProductAnySourceType \"(\w+)\"/m", $data, $matches) > 0)
                //{
-                  //$State[ProductAnySourceType] = $matches[1];
+                  //$State['ProductAnySourceType'] = $matches[1];
                //}
-               if (preg_match("/ProductSourceCount \"(\d+)\"/m", $data, $matches) > 0)
+               if (preg_match("/SourceCount \"(\d+)\"/m", $data, $matches) > 0)
                {
-                  $State[ProductSourceCount] = $matches[1];
-                  for ($i = 0; $i < $State[ProductSourceCount]; $i++) {
-                     Send("ACTION Ds/Product 3 SourceType \"" . $i . "\"");
-                     Send("ACTION Ds/Product 3 SourceName \"" . $i . "\"");
+                  $State['SourceCount'] = $matches[1];
+                  for ($i = 0; $i < $State['SourceCount']; $i++) {
+                     Send("ACTION Ds/Product 1 Source \"" . $i . "\"");
                   }
                }
                $DataHandled = true;
@@ -353,20 +346,20 @@ while (true) {
             if (preg_match("/Jukebox PlayNow \"(\d+)\"/m", $data, $matches) > 0)
             {
                $JukeBoxPlay = $matches[1];
-               $State[PlayNext] = -1;
-               $State[PlayLater] = array();
+               $State['PlayNext'] = -1;
+               $State['PlayLater'] = array();
                LogWrite("JukeBoxPlayNow: " . $JukeBoxPlay);
-               Send("ACTION Ds/Ds 1 Stop");
-               Send("ACTION Ds/Jukebox 2 SetCurrentPreset \"" . $JukeBoxPlay . "\"");
-               Send("ACTION Ds/Ds 1 Play");
+               Send("ACTION Ds/Playlist 1 Stop");
+               Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $JukeBoxPlay . "\"");
+               Send("ACTION Ds/Playlist 1 Play");
                $DataHandled = true;
             }
             elseif (preg_match("/Jukebox PlayNext \"(\d+)\"/m", $data, $matches) > 0)
             {
                $JukeBoxPlay = $matches[1];
                LogWrite("JukeBoxPlayNext: " . $JukeBoxPlay);
-               $State[PlayNext] = $JukeBoxPlay;
-               $State[PlayLater] = array();
+               $State['PlayNext'] = $JukeBoxPlay;
+               $State['PlayLater'] = array();
                if ($DEBUG > 0)
                {
                   //LogWrite($data);
@@ -378,8 +371,8 @@ while (true) {
             {
                $JukeBoxPlay = $matches[1];
                LogWrite("JukeBoxPlayLater: " . $JukeBoxPlay);
-               $State[PlayNext] = -1;
-               array_push($State[PlayLater], $JukeBoxPlay);
+               $State['PlayNext'] = -1;
+               array_push($State['PlayLater'], $JukeBoxPlay);
                if ($DEBUG > 0)
                {
                   //LogWrite($data);
@@ -395,21 +388,21 @@ while (true) {
             if (preg_match("/Volume Set \"(\d+)\"/m", $data, $matches) > 0)
             {
                $value = $matches[1];
-	       if ($value > $State[MAX_VOLUME])
-		   $value = $State[MAX_VOLUME];
-	       if ($value != $State[Volume])
+	       if ($value > $State['MAX_VOLUME'])
+		   $value = $State['MAX_VOLUME'];
+	       if ($value != $State['Volume'])
 	       {
 		   LogWrite("VolumeSet: " . $value);
-		   Send("ACTION Ds/Preamp 4 SetVolume \"" . $value . "\"");
+		   Send("ACTION Ds/Volume 1 SetVolume \"" . $value . "\"");
 	       }
                $DataHandled = true;
             }
             if (preg_match("/Volume Incr/m", $data, $matches) > 0)
             {
-		if ($State[Volume] < $State[MAX_VOLUME])
+		if ($State['Volume'] < $State['MAX_VOLUME'])
 		{
 		    LogWrite("VolumeIncr: ");
-		    Send("ACTION Ds/Preamp 4 VolumeInc");
+		    Send("ACTION Ds/Volume 1 VolumeInc");
 		}
 		else
 		{
@@ -420,7 +413,7 @@ while (true) {
             if (preg_match("/Volume Decr/m", $data, $matches) > 0)
             {
 		LogWrite("VolumeDecr: ");
-		Send("ACTION Ds/Preamp 4 VolumeDec");
+		Send("ACTION Ds/Volume 1 VolumeDec");
 		$DataHandled = true;
             }
 	 }

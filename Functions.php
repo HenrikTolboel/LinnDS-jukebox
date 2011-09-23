@@ -12,7 +12,8 @@
 
 function Page($id, $title, $content, $footer)
 {
-    $str = '<div data-role="page" data-dom-cache="true" id="' . $id . '">' . "\n";
+    //$str = '<div data-role="page" data-dom-cache="true" id="' . $id . '">' . "\n";
+    $str = '<div data-role="page" id="' . $id . '">' . "\n";
 
     $str .= '<div data-role="header">' . "\n";
     $str .= '<h1>' . $title . '</h1>'. "\n";

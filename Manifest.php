@@ -64,14 +64,22 @@
                    $image = $child->Image[0];
 
                    if (strlen($image) > 4) {
-                       $t = strpos($image, ".105/musik/");
+		       $t = strpos($image, "p://192.168.0.105/musik/");
                        if ($t === false)
                        {
-                           $url = $image;
+			   $t = strpos($image, ".105/musik/");
+			   if ($t === false)
+			   {
+			       $url = $image;
+			   }
+			   else
+			   {
+			       $url= substr($image, 11);
+			   }
                        }
                        else
                        {
-                           $url= substr($image, 11);
+			   $url= substr($image, 24);
                        }
 
                        $dir = dirname($url);

@@ -193,7 +193,7 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
       else
       {
          $tmp = $cnt;
-         while (strcmp(strtoupper($manifest->PresetArtist[$fp+$tmp-1][0]), strtoupper($manifest->PresetArtist[$fp+$cnt][0])) == 0 && $fp + $cnt < $end)
+         while (strcmp(strtoupper($manifest->PresetArtistSkip[$fp+$tmp-1][0]), strtoupper($manifest->PresetArtistSkip[$fp+$cnt][0])) == 0 && $fp + $cnt < $end)
             $cnt++;
       }
 
@@ -219,7 +219,7 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
 	//$str .= '&prevfp=' . $FP[$i-1] . '&prevcnt=' . $CNT[$i-1];
 	//$str .= '&nextfp=' . $FP[$i+1] . '&nextcnt=' . $CNT[$i+1];
 	$str .= '">';
-	$str .= strtoupper($manifest->PresetArtist[$FP[$i]][0]) . '</a>';
+	$str .= strtoupper($manifest->PresetArtistSkip[$FP[$i]][0]) . '</a>';
 
 	$str .= '<span class="ui-li-count">' . $CNT[$i] .'</span>';
 	$str .= "</li>\n";

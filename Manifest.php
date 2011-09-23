@@ -15,6 +15,7 @@
        public $PresetImage = array();
        public $PresetImage80x80 = array();
        public $PresetArtist = array();
+       public $PresetArtistSkip = array();
        public $PresetAlbum = array();
        public $PresetYear = array();
        public $PresetCategory = array();
@@ -22,6 +23,8 @@
        public $NumberOfPresets = 0;
 
        private $LastCategory = 0;
+
+       private $SkipList = array("The ", "the ");
 
        public function __construct($ManifestFile)
        {
@@ -83,9 +86,17 @@
                    $this->PresetImage[$this->NumberOfPresets] = $image;
                    $this->PresetImage80x80[$this->NumberOfPresets] = $url;
                    $this->PresetArtist[$this->NumberOfPresets] = $artist;
+                   $this->PresetArtistSkip[$this->NumberOfPresets] = $artist;
                    $this->PresetAlbum[$this->NumberOfPresets] = $album;
                    $this->PresetYear[$this->NumberOfPresets] = $year;
                    $this->PresetCategory[$this->NumberOfPresets] = $CurCategory;
+
+		   foreach ($this->SkipList as $w) {
+		       if (!strncmp($w, $artist, strlen($w))) {
+			   $this->PresetArtistSkip[$this->NumberOfPresets] = substr($artist, strlen($w));
+			   break;
+		       }
+		   }
 
                }
            }

@@ -26,28 +26,9 @@ else
 {
     $manifest = new Manifest($manifestfile);
 
-    foreach ($manifest->Category as $cat => $catName) 
-    {
-	if ($cat != $category)
-	    continue;
-	if (strpos($catName, " / Album") > 3 && $manifest->GetCategoryCount($cat) > 15)
-	{
-	    $str .= Page("page_cat-" . $cat, "Artist Index",
-		MakeArtistIndex3($manifest, "artistindex", $cat),
-		"Page Footer");
-	}
-	else
-	{
-	    $str .= Page("page_cat-" . $cat, $catName, 
-		MakePresetList($manifest, "presets-" . $cat, "#page-cat-" . $cat,
-		    $manifest->CategoryFirstPreset[$cat], 
-		    min(21, $manifest->GetCategoryCount($cat))), 
-		"Page Footer");
-	}
-    }
+    MakePageCategories($manifest);
 
-    file_put_contents($cachefilename, $str);
-    echo $str;
+    echo file_get_contents($cachefilename);
 }
 
 require("footer.inc");

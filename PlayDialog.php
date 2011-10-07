@@ -23,7 +23,6 @@ $cont .= '<a href="' . $href . '" data-rel="back" class="onepreset" data-role="b
 $cont .= '<a href="' . $href . '" data-rel="back" data-icon="delete" data-role="button" data-theme="c">Cancel</a>' . "\n";
 $cont .= '</div>' ."\n";
 
-//$str = Dialog("PlayDialog-" . $preset, "Dialog", $cont, "Page Footer");
 $str = Dialog("PlayDialog", "Dialog", $cont, "Page Footer");
 echo $str;
 

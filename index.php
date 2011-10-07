@@ -26,6 +26,7 @@ else
 
     file_put_contents($cachefilename, $str);
     echo $str;
+    MakePageCategories($manifest);
 }
     
 require("footer.inc");

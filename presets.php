@@ -13,8 +13,6 @@ require_once("setup.php");
 $FirstPreset = $_GET["firstpreset"];
 $PresetCount = $_GET["count"];
 
-$id = "presets-" . $FirstPreset . "-" . $PresetCount;
-
 $cachefilename = $CACHE_DIR . "/presets-" . $FirstPreset . "-" . $PresetCount;
 
 if ($DO_CACHE && file_exists($cachefilename) && filemtime($cachefilename) > filemtime($manifestfile))
@@ -25,14 +23,10 @@ else
 {
     require_once("Manifest.php");
     require_once("Functions.php");
+
     $manifest = new Manifest($manifestfile);
 
-    $str .= Page("page_presets-" . $FirstPreset . "-" . $PresetCount, "Artist / Album", 
-	MakePresetList($manifest, $id, "presets.php", $FirstPreset, $PresetCount),
-	"Page Footer");
-
-    file_put_contents($cachefilename, $str);
-    echo $str;
+    echo MakeOnePreset($manifest, $FirstPreset, $PresetCount);
 }
 require("footer.inc");
 

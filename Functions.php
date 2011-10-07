@@ -8,7 +8,7 @@
 * http://www.opensource.org/licenses/mit-license.php
 */
 
-
+require_once("setup.php");
 
 function Page($id, $title, $content, $footer)
 {
@@ -216,10 +216,50 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
 
 	$str .= '<span class="ui-li-count">' . $CNT[$i] .'</span>';
 	$str .= "</li>\n";
+        $tmp = MakeOnePreset($manifest, $FP[$i], $CNT[$i]);
     }
 
     $str .= "</ul>";
 
+    return $str;
+}
+
+function MakePageCategories($manifest)
+{
+    global $CACHE_DIR;
+
+    foreach ($manifest->Category as $cat => $catName) 
+    {
+	if (strpos($catName, " / Album") > 3 && $manifest->GetCategoryCount($cat) > 15)
+	{
+	    $str = Page("page_cat-" . $cat, "Artist Index",
+		MakeArtistIndex3($manifest, "artistindex", $cat),
+		"Page Footer");
+	}
+	else
+	{
+	    $str = Page("page_cat-" . $cat, $catName, 
+		MakePresetList($manifest, "presets-" . $cat, "#page-cat-" . $cat,
+		    $manifest->CategoryFirstPreset[$cat], 
+		    min(21, $manifest->GetCategoryCount($cat))), 
+		"Page Footer");
+	}
+	$cachefile = $CACHE_DIR . "/pagecategory-" . $cat;
+	file_put_contents($cachefile, $str);
+    }
+}
+
+function MakeOnePreset($manifest, $FirstPreset, $PresetCount)
+{
+    global $CACHE_DIR;
+
+    $id = "presets-" . $FirstPreset . "-" . $PresetCount;
+    $str .= Page("page_presets-" . $FirstPreset . "-" . $PresetCount, "Artist / Album", 
+	MakePresetList($manifest, $id, "presets.php", $FirstPreset, $PresetCount),
+	"Page Footer");
+
+    $cachefilename = $CACHE_DIR . "/presets-" . $FirstPreset . "-" . $PresetCount;
+    file_put_contents($cachefilename, $str);
     return $str;
 }
 

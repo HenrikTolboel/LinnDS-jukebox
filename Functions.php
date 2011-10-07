@@ -15,7 +15,7 @@ function Page($id, $title, $content, $footer)
     //$str = '<div data-role="page" data-dom-cache="true" id="' . $id . '">' . "\n";
     $str = '<div data-role="page" id="' . $id . '">' . "\n";
 
-    $str .= '<div data-role="header">' . "\n";
+    $str .= '<div data-role="header" data-position="fixed">' . "\n";
     $str .= '<h1>' . $title . '</h1>'. "\n";
     if ($id != "page_options" && $id != "dialog_play")
         $str .= '<a href="options.php" data-icon="gear" class="ui-btn-right">Options</a>' . "\n";
@@ -25,7 +25,7 @@ function Page($id, $title, $content, $footer)
     $str .= $content;
     $str .= "\n" . '</div><!-- /content -->' ."\n";
 
-    $str .= '<div data-role="footer">' . "\n";
+    $str .= '<div data-role="footer" data-position="fixed">' . "\n";
     $str .= '<h4>' . $footer . "</h4>\n";
     $str .= "</div><!-- /footer -->\n";
 
@@ -201,12 +201,6 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
       $FP[$Index] = $fp;
       $CNT[$Index] = $cnt;
       $Index = $Index + 1;
-      //$str .= '<li class="artistindex">';
-      //$str .= '<a href="presets.php?firstpreset=' . $fp . '&count=' . $cnt . '">';
-      //$str .= strtoupper($manifest->PresetArtist[$fp][0]) . '</a>';
-
-      //$str .= '<span class="ui-li-count">' . $cnt .'</span>';
-      //$str .= "</li>\n";
 
       $fp += $cnt;
    }
@@ -216,10 +210,8 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
     for ($i = 1; $i < $Index; $i++)
     {
 	$str .= '<li class="artistindex">';
-	$str .= '<a href="presets.php?firstpreset=' . $FP[$i] . '&count=' . $CNT[$i];
-	//$str .= '&prevfp=' . $FP[$i-1] . '&prevcnt=' . $CNT[$i-1];
-	//$str .= '&nextfp=' . $FP[$i+1] . '&nextcnt=' . $CNT[$i+1];
-	$str .= '">';
+	$href = 'presets.php?firstpreset=' . $FP[$i] . '&count=' . $CNT[$i];
+	$str .= '<a href="' . $href . '">';
 	$str .= strtoupper($manifest->PresetArtistSkip[$FP[$i]][0]) . '</a>';
 
 	$str .= '<span class="ui-li-count">' . $CNT[$i] .'</span>';

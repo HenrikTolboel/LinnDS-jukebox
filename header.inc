@@ -16,10 +16,11 @@
 
 	<title>LinnDS-jukebox</title> 
 
-<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0b3/jquery.mobile-1.0b3.min.css" />
-<script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+<link rel="stylesheet"
+href="http://code.jquery.com/mobile/1.0rc1/jquery.mobile-1.0rc1.min.css" />
+<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
 <script src="actions.js"></script>
-<script src="http://code.jquery.com/mobile/1.0b3/jquery.mobile-1.0b3.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.0rc1/jquery.mobile-1.0rc1.min.js"></script>
 
 </head>
 <body>

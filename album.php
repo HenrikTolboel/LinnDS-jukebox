@@ -171,7 +171,7 @@
       $cont .= "</ul>";
 
 
-      $str = Page("album-" . $preset, "Album", $cont, "Page Footer");
+      $str = Page("album-" . $preset, "Album", $cont, "Page Footer", "false");
       file_put_contents($cachefilename, $str);
       echo $str;
    }

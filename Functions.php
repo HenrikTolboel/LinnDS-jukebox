@@ -10,15 +10,15 @@
 
 require_once("setup.php");
 
-function Page($id, $title, $content, $footer)
+function Page($id, $title, $content, $footer, $cache)
 {
-    //$str = '<div data-role="page" data-dom-cache="true" id="' . $id . '">' . "\n";
-    $str = '<div data-role="page" id="' . $id . '">' . "\n";
+    $str = '<div data-role="page" data-dom-cache="' . $cache . '" id="' . $id . '">' . "\n";
+    //$str = '<div data-role="page" id="' . $id . '">' . "\n";
 
     $str .= '<div data-role="header" data-position="fixed">' . "\n";
     $str .= '<h1>' . $title . '</h1>'. "\n";
     if ($id != "page_options" && $id != "dialog_play")
-        $str .= '<a href="options.php" data-icon="gear" class="ui-btn-right">Options</a>' . "\n";
+        $str .= '<a href="options.php" data-icon="gear" data-prefetch class="ui-btn-right">Options</a>' . "\n";
     $str .= '</div><!-- /header -->' ."\n";
 
     $str .= '<div data-role="content">' . "\n";
@@ -54,7 +54,7 @@ function CategoryList($id, &$manifest)
     $str= '<ul id="' . $id . '" data-role="listview" data-filter="false">' . "\n";
     foreach ($manifest->Category as $cat => $catName) 
     {
-        $str .= '<li><a href="pagecategory.php?category=' . $cat . '">' . $catName .'</a>';
+        $str .= '<li><a href="pagecategory.php?category=' . $cat . '" data-prefetch>' . $catName .'</a>';
 
         $str .= '<span class="ui-li-count">' . $manifest->GetCategoryCount($cat) .'</span>';
         $str .= '</li>' . "\n";
@@ -234,7 +234,7 @@ function MakePageCategories($manifest)
 	{
 	    $str = Page("page_cat-" . $cat, "Artist Index",
 		MakeArtistIndex3($manifest, "artistindex", $cat),
-		"Page Footer");
+		"Page Footer", "true");
 	}
 	else
 	{
@@ -242,7 +242,7 @@ function MakePageCategories($manifest)
 		MakePresetList($manifest, "presets-" . $cat, "#page-cat-" . $cat,
 		    $manifest->CategoryFirstPreset[$cat], 
 		    min(21, $manifest->GetCategoryCount($cat))), 
-		"Page Footer");
+		"Page Footer", "true");
 	}
 	$cachefile = $CACHE_DIR . "/pagecategory-" . $cat;
 	file_put_contents($cachefile, $str);
@@ -256,7 +256,7 @@ function MakeOnePreset($manifest, $FirstPreset, $PresetCount)
     $id = "presets-" . $FirstPreset . "-" . $PresetCount;
     $str .= Page("page_presets-" . $FirstPreset . "-" . $PresetCount, "Artist / Album", 
 	MakePresetList($manifest, $id, "presets.php", $FirstPreset, $PresetCount),
-	"Page Footer");
+	"Page Footer", "false");
 
     $cachefilename = $CACHE_DIR . "/presets-" . $FirstPreset . "-" . $PresetCount;
     file_put_contents($cachefilename, $str);

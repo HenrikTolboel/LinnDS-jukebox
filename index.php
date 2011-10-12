@@ -22,7 +22,7 @@ else
 {
     $manifest = new Manifest($manifestfile);
     $str = '<div class="play"></div>';
-    $str .= Page("page_musik", "Musik", CategoryList("categorylist", $manifest), "Page Footer");
+    $str .= Page("page_musik", "Musik", CategoryList("categorylist", $manifest), "Page Footer", "true");
 
     file_put_contents($cachefilename, $str);
     echo $str;

@@ -30,6 +30,7 @@ $(function() {
             });
 	    */
 
+    /*
     $('div.ui-page').live("swipeleft", function(){
 	alert("swipeleft ");
 	var nextpage = $(this).next('div[data-role="page"]');
@@ -46,6 +47,7 @@ $(function() {
 	    $.mobile.changePage(prevpage, 'slide', true);
 	}
     });
+    */
     
     $("input#volume").live("change", function() {
 	console.log("volume = " + $(this).val());

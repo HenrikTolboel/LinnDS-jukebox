@@ -18,7 +18,7 @@ function Page($id, $title, $content, $footer, $cache)
     $str .= '<div data-role="header" data-position="fixed">' . "\n";
     $str .= '<h1>' . $title . '</h1>'. "\n";
     if ($id != "page_options" && $id != "dialog_play")
-        $str .= '<a href="options.php" data-icon="gear" data-prefetch class="ui-btn-right">Options</a>' . "\n";
+        $str .= '<a href="options.php" data-icon="gear" class="ui-btn-right" data-prefetch>Options</a>' . "\n";
     $str .= '</div><!-- /header -->' ."\n";
 
     $str .= '<div data-role="content">' . "\n";
@@ -55,7 +55,15 @@ function CategoryList($id, &$manifest)
     $str= '<ul id="' . $id . '" data-role="listview" data-filter="false">' . "\n";
     foreach ($manifest->Category as $cat => $catName) 
     {
-        $str .= '<li><a href="pagecategory.php?category=' . $cat . '" data-prefetch>' . $catName .'</a>';
+	if ($cat == "1") 
+	{
+	    $prefetch = " data-prefetch";
+	}
+	else
+	{
+	    $prefetch = "";
+	}
+        $str .= '<li><a href="pagecategory.php?category=' . $cat . '"' . $prefetch .'>' . $catName .'</a>';
 
         $str .= '<span class="ui-li-count">' . $manifest->GetCategoryCount($cat) .'</span>';
         $str .= '</li>' . "\n";
@@ -243,7 +251,7 @@ function MakePageCategories($manifest)
 		MakePresetList($manifest, "presets-" . $cat, "#page-cat-" . $cat,
 		    $manifest->CategoryFirstPreset[$cat], 
 		    min(21, $manifest->GetCategoryCount($cat))), 
-		"LinnDS-jukebox", "true");
+		"LinnDS-jukebox", "false");
 	}
 	$cachefile = $CACHE_DIR . "/pagecategory-" . $cat;
 	file_put_contents($cachefile, $str);

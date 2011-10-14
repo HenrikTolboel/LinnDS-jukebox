@@ -25,7 +25,8 @@ function Page($id, $title, $content, $footer, $cache)
     $str .= $content;
     $str .= "\n" . '</div><!-- /content -->' ."\n";
 
-    $str .= '<div data-role="footer" data-position="fixed">' . "\n";
+    //$str .= '<div data-role="footer" data-position="fixed">' . "\n";
+    $str .= '<div data-role="footer">' . "\n";
     $str .= '<h4>' . $footer . "</h4>\n";
     $str .= "</div><!-- /footer -->\n";
 
@@ -234,7 +235,7 @@ function MakePageCategories($manifest)
 	{
 	    $str = Page("page_cat-" . $cat, "Artist Index",
 		MakeArtistIndex3($manifest, "artistindex", $cat),
-		"Page Footer", "true");
+		"LinnDS-jukebox", "true");
 	}
 	else
 	{
@@ -242,7 +243,7 @@ function MakePageCategories($manifest)
 		MakePresetList($manifest, "presets-" . $cat, "#page-cat-" . $cat,
 		    $manifest->CategoryFirstPreset[$cat], 
 		    min(21, $manifest->GetCategoryCount($cat))), 
-		"Page Footer", "true");
+		"LinnDS-jukebox", "true");
 	}
 	$cachefile = $CACHE_DIR . "/pagecategory-" . $cat;
 	file_put_contents($cachefile, $str);
@@ -256,7 +257,7 @@ function MakeOnePreset($manifest, $FirstPreset, $PresetCount)
     $id = "presets-" . $FirstPreset . "-" . $PresetCount;
     $str .= Page("page_presets-" . $FirstPreset . "-" . $PresetCount, "Artist / Album", 
 	MakePresetList($manifest, $id, "presets.php", $FirstPreset, $PresetCount),
-	"Page Footer", "false");
+	"LinnDS-jukebox", "false");
 
     $cachefilename = $CACHE_DIR . "/presets-" . $FirstPreset . "-" . $PresetCount;
     file_put_contents($cachefilename, $str);

@@ -37,7 +37,7 @@ $cont .= '</div></p>';
 
 $cont .= '<p><a href="' . $State['ProductUrl'] . '">' . $State['ProductName'] .'-' . $State['ProductRoom'] . '</a></p>';
 
-$str = Page("page_options", "Options", $cont, "Page Footer", "true");
+$str = Page("page_options", "Options", $cont, "LinnDS-jukebox", "true");
 
 file_put_contents($cachefilename, $str);
 echo $str;

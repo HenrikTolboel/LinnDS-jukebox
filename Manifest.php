@@ -83,8 +83,9 @@
                        }
 
                        $dir = dirname($url);
-                       $filename = basename($url);
-                       $url = $dir . "/80x80/" . $filename;
+                       //$filename = basename($url);
+                       //$url = $dir . "/80x80/" . $filename;
+                       $url = $dir . "/80x80.jpg";
                    }
                    else
                    {

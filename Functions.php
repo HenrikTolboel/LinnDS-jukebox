@@ -50,6 +50,13 @@ function Dialog($id, $title, $content)
     return $str;
 }
 
+function data_uri($file, $mime) 
+{
+    $contents = file_get_contents($file);
+    $base64 = base64_encode($contents);
+    return "data:$mime;base64,$base64";
+}
+
 function CategoryList($id, &$manifest)
 {
     $str= '<ul id="' . $id . '" data-role="listview" data-filter="false">' . "\n";
@@ -85,7 +92,8 @@ function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
         $str .= '<li class="onepreset">';
         //$str .= '<a href="PlayDialog.php?preset=' . $i . "&frompage=" . $FromPage . "&firstpreset=" . $FirstPreset . "&count=" . $PresetCount . '" data-rel="dialog">';
         $str .= '<a href="PlayDialog.php?preset=' . $i . '" data-rel="dialog">';
-        $str .= '<img class="onepreset" src="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
+        //$str .= '<img class="onepreset" src="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
+        $str .= '<img class="onepreset" src="' . data_uri("../" . $manifest->PresetImage80x80[$i], 'image/jpg') . '" />';
         $str .= '<h3>';
         //$str .= '0' . $i . '<br />';
         if ($manifest->PresetArtist[$i] == "Various")

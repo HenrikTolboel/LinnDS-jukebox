@@ -86,14 +86,25 @@ function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
     $str = '<ul id="' . $id . '" class="presets" data-role="listview" data-filter="false">' . "\n";
 
     for ($i = $FirstPreset; 
-    $i < $FirstPreset + $PresetCount;
-    $i++)
+	$i < $FirstPreset + $PresetCount;
+	$i++)
     {
-        $str .= '<li class="onepreset">';
+	$str .= '<li class="onepreset">';
         //$str .= '<a href="PlayDialog.php?preset=' . $i . "&frompage=" . $FromPage . "&firstpreset=" . $FirstPreset . "&count=" . $PresetCount . '" data-rel="dialog">';
         $str .= '<a href="PlayDialog.php?preset=' . $i . '" data-rel="dialog">';
-        //$str .= '<img class="onepreset" src="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
-        $str .= '<img class="onepreset" src="' . data_uri("../" . $manifest->PresetImage80x80[$i], 'image/jpg') . '" />';
+	if (file_exists("../" . $manifest->PresetImage80x80[$i]))
+	{
+	    //$str .= '<img class="onepreset" src="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
+	    $str .= '<img class="onepreset" src="' . data_uri("../" . $manifest->PresetImage80x80[$i], 'image/jpg') . '" />';
+	}
+	elseif (file_exists("../" . $manifest->PresetImage[$i]))
+	{
+	    $str .= '<img class="onepreset" src="' . "../" . $manifest->PresetImage[$i] . '" />';
+	}
+	else
+	{
+	    $str .= '<img class="onepreset" src="#" />';
+	}
         $str .= '<h3>';
         //$str .= '0' . $i . '<br />';
         if ($manifest->PresetArtist[$i] == "Various")
@@ -191,7 +202,6 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
 {
    // Keep artist after first letter on same page
    //
-   $str = '<ul id="' . $id . '" class="artistindex" data-role="listview" data-filter="false">' . "\n";
 
    $c = 1;
 
@@ -224,6 +234,8 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
     $FP[$Index] = -1;
     $CNT[$Index] = 0;
 
+   $str = '<ul id="' . $id . '" class="artistindex" data-role="listview" data-filter="false">' . "\n";
+
     for ($i = 1; $i < $Index; $i++)
     {
 	$str .= '<li class="artistindex">';
@@ -241,6 +253,121 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
     return $str;
 }
 
+function MakeArtistIndex4(&$manifest, $id, $Category)
+{
+    // Keep artist after first letter on same page
+    //
+    $ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    $c = 1;
+
+    $end = $manifest->CategoryFirstPreset[$Category] + $manifest->GetCategoryCount($Category);
+
+    $fp = $manifest->CategoryFirstPreset[$Category]; 
+    $FP = array();
+    $CNT = array();
+    $Index = 1;
+    $FP[0] = -1;
+    $CNT[0] = 0;
+    while ($fp < $end)
+    {
+	$cnt = $c;
+	if ($fp + $c > $end)
+	    $cnt = $end - $fp;
+	else
+	{
+	    $tmp = $cnt;
+	    if (is_numeric($manifest->PresetArtistSkip[$fp+$tmp-1][0]))
+	    {
+		while (is_numeric($manifest->PresetArtistSkip[$fp+$cnt][0]) && $fp + $cnt < $end)
+		    $cnt++;
+	    }
+	    else
+	    {
+		while (strcmp(strtoupper($manifest->PresetArtistSkip[$fp+$tmp-1][0]), strtoupper($manifest->PresetArtistSkip[$fp+$cnt][0])) == 0 && $fp + $cnt < $end)
+		    $cnt++;
+	    }
+	}
+
+	$FP[$Index] = $fp;
+	$CNT[$Index] = $cnt;
+	$Index = $Index + 1;
+
+	$fp += $cnt;
+    }
+    $FP[$Index] = -1;
+    $CNT[$Index] = 0;
+
+    $str = '<div class="ui-grid-c">' ."\n";
+
+    $class = "ui-block-a";
+
+    $start = 1;
+    if (is_numeric($manifest->PresetArtistSkip[$FP[1]][0]))
+	$start = 2;
+    $alpha = 0;
+    for ($i = $start; $i < $Index; $i++)
+    {
+	$letter = strtoupper($manifest->PresetArtistSkip[$FP[$i]][0]);
+
+	while ($alpha < strlen($ALPHABET) && strcmp($ALPHABET[$alpha], $letter) < 0)
+	{
+	    $class .= " ui-disabled";
+	    $str .= '<div class="' . $class . '">';
+	    $href = '#';
+	    $str .= '<a href="' . $href . '" data-role="button">';
+	    $str .= strtoupper($ALPHABET[$alpha]);
+	    $str .= '</a>';
+	    $str .= "</div>\n";
+	    $class = "ui-block-b";
+	    $alpha++;
+	}
+
+	$str .= '<div class="' . $class . '">';
+	$href = 'presets.php?firstpreset=' . $FP[$i] . '&count=' . $CNT[$i];
+	$str .= '<a href="' . $href . '" data-role="button">';
+	if (is_numeric($letter))
+	    $str .= '#';
+	else
+	    $str .= strtoupper($letter);
+	$str .= '</a>';
+
+	$str .= "</div>\n";
+        $tmp = MakeOnePreset($manifest, $FP[$i], $CNT[$i]);
+	$class = "ui-block-b";
+	$alpha++;
+    }
+
+    while ($alpha < strlen($ALPHABET))
+    {
+	$class .= " ui-disabled";
+	$str .= '<div class="' . $class . '">';
+	$href = '#';
+	$str .= '<a href="' . $href . '" data-role="button">';
+	$str .= strtoupper($ALPHABET[$alpha]);
+	$str .= '</a>';
+	$str .= "</div>\n";
+	$class = "ui-block-b";
+	$alpha++;
+    }
+    if ($start == 2)
+    {
+	$class = "ui-block-b";
+	$str .= '<div class="' . $class . '">';
+	$href = 'presets.php?firstpreset=' . $FP[1] . '&count=' . $CNT[1];
+	$str .= '<a href="' . $href . '" data-role="button">';
+	$str .= '#';
+	$str .= '</a>';
+	$str .= "</div>\n";
+	$class = "ui-block-b";
+	$alpha++;
+    }
+
+    $str .= "</div>\n";
+
+    return $str;
+}
+
 function MakePageCategories($manifest)
 {
     global $CACHE_DIR;
@@ -250,7 +377,7 @@ function MakePageCategories($manifest)
 	if (strpos($catName, " / Album") > 3 && $manifest->GetCategoryCount($cat) > 15)
 	{
 	    $str = Page("page_cat-" . $cat, "Artist Index",
-		MakeArtistIndex3($manifest, "artistindex", $cat),
+		MakeArtistIndex4($manifest, "artistindex", $cat),
 		"LinnDS-jukebox", "true");
 	}
 	else

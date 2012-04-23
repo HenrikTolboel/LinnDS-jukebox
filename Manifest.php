@@ -82,7 +82,7 @@
 			   $url= substr($image, 24);
                        }
 
-                       $dir = dirname($url);
+                       $dir = dirname(rawurldecode($url));
                        //$filename = basename($url);
                        //$url = $dir . "/80x80/" . $filename;
                        $url = $dir . "/80x80.jpg";

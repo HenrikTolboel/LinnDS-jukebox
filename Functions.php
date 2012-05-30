@@ -95,15 +95,17 @@ function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
 	if (file_exists("../" . $manifest->PresetImage80x80[$i]))
 	{
 	    //$str .= '<img class="onepreset" src="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
-	    $str .= '<img class="onepreset" src="' . data_uri("../" . $manifest->PresetImage80x80[$i], 'image/jpg') . '" />';
+	    //$str .= '<img class="onepreset" src="' . data_uri("../" . $manifest->PresetImage80x80[$i], 'image/jpg') . '" />';
+	    $str .= '<img class="lazy" src="grey.jpg" data-original="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
 	}
 	elseif (file_exists("../" . $manifest->PresetImage[$i]))
 	{
-	    $str .= '<img class="onepreset" src="' . "../" . $manifest->PresetImage[$i] . '" />';
+	    //$str .= '<img class="onepreset" src="' . "../" . $manifest->PresetImage[$i] . '" />';
+	    $str .= '<img class="lazy" src="grey.jpg" data-original="' . "../" . $manifest->PresetImage[$i] . '" />';
 	}
 	else
 	{
-	    $str .= '<img class="onepreset" src="#" />';
+	    $str .= '<img class="onepreset" src="grey.jpg" />';
 	}
         $str .= '<h3>';
         //$str .= '0' . $i . '<br />';

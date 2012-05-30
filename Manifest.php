@@ -14,6 +14,7 @@
        public $CategoryFirstPreset = array();
        public $PresetImage = array();
        public $PresetImage80x80 = array();
+       public $PresetImage160x160 = array();
        public $PresetArtist = array();
        public $PresetArtistSkip = array();
        public $PresetAlbum = array();
@@ -21,6 +22,8 @@
        public $PresetCategory = array();
        public $ImageBase;
        public $NumberOfPresets = 0;
+
+       public $DevicePixelRatio = 1;
 
        private $LastCategory = 0;
 
@@ -86,14 +89,17 @@
                        //$filename = basename($url);
                        //$url = $dir . "/80x80/" . $filename;
                        $url = $dir . "/80x80.jpg";
+                       $url160 = $dir . "/160x160.jpg";
                    }
                    else
                    {
                        $url = "#";
+                       $url160 = "#";
                    }
 
                    $this->PresetImage[$this->NumberOfPresets] = $image;
                    $this->PresetImage80x80[$this->NumberOfPresets] = $url;
+                   $this->PresetImage160x160[$this->NumberOfPresets] = $url160;
                    $this->PresetArtist[$this->NumberOfPresets] = $artist;
                    $this->PresetArtistSkip[$this->NumberOfPresets] = $artist;
                    $this->PresetAlbum[$this->NumberOfPresets] = $album;

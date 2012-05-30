@@ -60,3 +60,11 @@ $(function() {
     //$("img.onepreset").lazyload({placeholder : "webapp/tuupola-jquery_lazyload-3f123e9/img/grey.gif"});
 });
 
+// Query the device pixel ratio. 
+//------------------------------- 
+    function getDevicePixelRatio() { 
+	if(window.devicePixelRatio === undefined) 
+	    return 1; // No pixel ratio available. Assume 1:1. 
+	return window.devicePixelRatio; 
+    };
+

@@ -94,18 +94,19 @@ function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
         $str .= '<a href="PlayDialog.php?preset=' . $i . '" data-rel="dialog">';
 	if (file_exists("../" . $manifest->PresetImage80x80[$i]))
 	{
-	    //$str .= '<img class="onepreset" src="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
-	    //$str .= '<img class="onepreset" src="' . data_uri("../" . $manifest->PresetImage80x80[$i], 'image/jpg') . '" />';
-	    $str .= '<img class="lazy" src="grey.jpg" data-original="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
+	    //$str .= '<img src="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
+	    //$str .= '<img src="' . data_uri("../" . $manifest->PresetImage80x80[$i], 'image/jpg') . '" />';
+	    //$str .= '<img class="lazy" src="grey.jpg" data-original="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
+	    $str .= '<img class="sprite_' . $i . '" src="Transparent.gif"/>';
 	}
 	elseif (file_exists("../" . $manifest->PresetImage[$i]))
 	{
-	    //$str .= '<img class="onepreset" src="' . "../" . $manifest->PresetImage[$i] . '" />';
-	    $str .= '<img class="lazy" src="grey.jpg" data-original="' . "../" . $manifest->PresetImage[$i] . '" />';
+	    //$str .= '<img src="' . "../" . $manifest->PresetImage[$i] . '" />';
+	    $str .= '<img class="lazy" src="Transparent.gif" data-original="' . "../" . $manifest->PresetImage[$i] . '" />';
 	}
 	else
 	{
-	    $str .= '<img class="onepreset" src="grey.jpg" />';
+	    $str .= '<img src="Transparent.gif" />';
 	}
         $str .= '<h3>';
         //$str .= '0' . $i . '<br />';

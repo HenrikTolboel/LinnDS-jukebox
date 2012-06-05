@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+
+	<title>LinnDS-jukebox</title> 
+
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+<link rel="stylesheet" href="sprites/sprites.css" />
+<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script src="actions.js"></script>
+<script src="jquery.lazyload.js"></script>
+<script>
+    $(document).bind("mobileinit", function(){
+    });
+
+    $(document).live("pageshow", function(){
+	  $("img.lazy").lazyload({translate_url : function (value) {
+		      if (getDevicePixelRatio() != 1)
+			  value = value.replace("80x80", "160x160");
+		      return value;
+	      }
+      });
+    });
+</script>
+<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+
+</head>
+<body>
+
+
+<div data-role="page" id="first_page"> 
+   <div data-role="header">header</div> 
+   <div data-role="content">
+      <ul data-role="listview">
+         <li><a href="http://jp.dk"><img src="Transparent.gif" class="sprite_1">Nummer 1</a></li>
+         <li><a href="http://jp.dk"><img src="Transparent.gif" class="sprite_3">Nummer 3</a></li>
+         <li><a href="http://jp.dk"><img src="Transparent.gif" class="sprite_20">Nummer 20</a></li>
+         <li><a href="http://jp.dk"><img src="Transparent.gif" class="sprite_21">Nummer 21</a></li>
+         <li><a href="http://jp.dk"><img src="Transparent.gif" class="sprite_38">Nummer 38</a></li>
+         <li><a href="http://jp.dk"><img src="Transparent.gif" class="sprite_41">Nummer 41</a></li>
+         <li><a href="http://jp.dk"><img src="Transparent.gif" class="sprite_64">Nummer 64</a></li>
+         <li><a href="http://jp.dk"><img src="Transparent.gif" class="sprite_379">Nummer 379</a></li>
+         <li><a href="http://jp.dk"><img src="Transparent.gif" class="sprite_400">Nummer 400</a></li>
+         <li><a href="http://jp.dk"><img src="Transparent.gif" class="sprite_401">Nummer 401</a></li>
+         <li><a href="http://jp.dk"><img src="Transparent.gif" class="sprite_402">Nummer 402</a></li>
+      </ul>
+   </div> 
+   <div data-role="footer">footer</div> 
+</div> 
+</body>
+</html>

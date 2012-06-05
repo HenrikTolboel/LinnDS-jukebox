@@ -9,7 +9,7 @@
 */
 
 $PRESETS_DIR  = "../_Presets";
-$CACHE_DIR  = "../tmp";
+$CACHE_DIR  = "./tmp";
 
 $DO_CACHE = false;
 $DO_CACHE = true;

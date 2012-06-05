@@ -29,12 +29,16 @@ for ($i = 1; $i <= $MaxPreset; $i++)
 }
 */
 
-echo "Run montage -background transparent -tile 20x20 -geometry 80x80+1+1 sprites/* sprites/sprite.jpg";
 
 $MaxPreset = 860;
 $ImgSize = 80;
-$TileW = 20;
-$TileH = 20;
+$TileW = 10;
+$TileH = 10;
+
+// On an ipad somehow the size of a sprite image should be < 1024 pixels 
+// wide / high - otherwise the display of sprite elements are distorted.
+
+echo "Run montage -background transparent -tile " . $TileW . "x" . $TileH . " -geometry 80x80+1+1 sprites/* sprites/sprite.jpg\n";
 
 $css = "";
 $cnt = 0;

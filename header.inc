@@ -22,8 +22,11 @@
 <script src="actions.js"></script>
 <script src="jquery.lazyload.js"></script>
 <script>
-    $(document).bind("mobileinit", function(){
-    });
+    //$(document).bind("mobileinit", function(){
+	    //$.extend($.mobile, {
+		    //defaultPageTransition: 'slide'
+	    //});
+    //});
 
     $(document).live("pageshow", function(){
 	  $("img.lazy").lazyload({translate_url : function (value) {

@@ -1,0 +1,1 @@
+start-stop-daemon --start --background --exec /usr/bin/php /musik/webapp/daemon/LinnDS-jukebox-daemon.php

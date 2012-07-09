@@ -92,7 +92,7 @@ function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
 	$str .= '<li class="onepreset">';
         //$str .= '<a href="PlayDialog.php?preset=' . $i . "&frompage=" . $FromPage . "&firstpreset=" . $FirstPreset . "&count=" . $PresetCount . '" data-rel="dialog">';
         $str .= '<a href="PlayDialog.php?preset=' . $i . '" data-rel="dialog">';
-	if (file_exists("../" . $manifest->PresetImage80x80[$i]))
+	if (true || file_exists("../" . $manifest->PresetImage80x80[$i]))
 	{
 	    //$str .= '<img src="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
 	    //$str .= '<img src="' . data_uri("../" . $manifest->PresetImage80x80[$i], 'image/jpg') . '" />';

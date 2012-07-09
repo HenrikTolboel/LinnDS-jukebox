@@ -18,15 +18,17 @@
 
 <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
 <link rel="stylesheet" href="sprites/sprites.css" />
+<link rel="stylesheet" href="sprites/sprites@2x.css" media="(-webkit-min-device-pixel-ratio: 2)"/>
 <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 <script src="actions.js"></script>
 <script src="jquery.lazyload.js"></script>
 <script>
-    //$(document).bind("mobileinit", function(){
-	    //$.extend($.mobile, {
-		    //defaultPageTransition: 'slide'
-	    //});
-    //});
+    $(document).bind("mobileinit", function(){
+	    $.extend($.mobile, {
+		    defaultPageTransition: 'none',
+		    defaultDialogTransition: 'none'
+	    });
+    });
 
     $(document).live("pageshow", function(){
 	  $("img.lazy").lazyload({translate_url : function (value) {

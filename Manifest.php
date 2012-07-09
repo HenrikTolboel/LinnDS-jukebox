@@ -67,22 +67,24 @@
                    $image = $child->Image[0];
 
                    if (strlen($image) > 4) {
-		       $t = strpos($image, "p://192.168.0.105/musik/");
+                       $t = strpos($image, "p://192.168.0.105/musik/");
                        if ($t === false)
                        {
-			   $t = strpos($image, ".105/musik/");
-			   if ($t === false)
-			   {
-			       $url = $image;
-			   }
-			   else
-			   {
-			       $url= substr($image, 11);
-			   }
+                           $t = strpos($image, ".105/musik/");
+                           if ($t === false)
+                           {
+                               $url = $image;
+                           }
+                           else
+                           {
+                               $image= substr($image, 11);
+                               $url= $image;
+                           }
                        }
                        else
                        {
-			   $url= substr($image, 24);
+                           $image= substr($image, 24);
+                           $url= $image;
                        }
 
                        $dir = dirname(rawurldecode($url));
@@ -106,12 +108,12 @@
                    $this->PresetYear[$this->NumberOfPresets] = $year;
                    $this->PresetCategory[$this->NumberOfPresets] = $CurCategory;
 
-		   foreach ($this->SkipList as $w) {
-		       if (!strncmp($w, $artist, strlen($w))) {
-			   $this->PresetArtistSkip[$this->NumberOfPresets] = substr($artist, strlen($w));
-			   break;
-		       }
-		   }
+           foreach ($this->SkipList as $w) {
+               if (!strncmp($w, $artist, strlen($w))) {
+               $this->PresetArtistSkip[$this->NumberOfPresets] = substr($artist, strlen($w));
+               break;
+               }
+           }
 
                }
            }

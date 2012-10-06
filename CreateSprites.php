@@ -34,7 +34,7 @@ for ($i = 1; $i <= $MaxPreset; $i++)
     copy($sourcefile, $newfile);
 }
 
-$MaxPreset = 860;
+//$MaxPreset = 860;
 $ImgSize = 80;
 $TileW = 10;
 $TileH = 10;

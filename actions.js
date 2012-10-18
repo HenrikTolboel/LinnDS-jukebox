@@ -8,18 +8,31 @@
 */
 
 $(function() {
-    //$('.play,body,div.ui-dialog,ul.presets').delegate("a.onepreset", "click", function() {
-    $('body').delegate("a.onepreset", "click", function() {
+   $('body').delegate("a.onepreset", "click", function() {
 	var value = $(this).data("musik").preset;
 	var action = $(this).data("musik").action;
-	//alert("click " +value);
 	console.log(action + " = " + value);
-	jQuery.get("Send.php", { action: action, value: value } , function (data) {
-	    //alert('Load OK' + data);
-	});
+	if (action != "Cancel") {
+	    jQuery.get("Send.php", { action: action, value: value } , function (data) {
+		//alert('Load OK' + data);
+	    });
+	}
 	//$('.ui-dialog').dialog('close');
 	return true;
-    });
+   });
+
+   $('body').delegate("a.popupclick", "click", function() {
+	var value = $(this).data("musik").preset;
+	var action = $(this).data("musik").action;
+	console.log(action + " = " + value);
+	if (action != "Cancel") {
+	    jQuery.get("Send.php", { action: action, value: value } , function (data) {
+		//alert('Load OK' + data);
+	    });
+	}
+	$('.ui-popup').popup('close');
+	return true;
+   });
 
     //$('ul.presets').delegate("a.onepreset", "swipeleft", function() {
     /*
@@ -49,12 +62,12 @@ $(function() {
     });
     */
     
-    $("input#volume").live("change", function() {
-	console.log("volume = " + $(this).val());
-	jQuery.get("Send.php", { action: "SetVolume", value: $(this).val() } , function (data) {
-	    //alert('Load OK' + data);
-	});
-    });
+   $("input#volume").live("change", function() {
+      console.log("volume = " + $(this).val());
+      jQuery.get("Send.php", { action: "SetVolume", value: $(this).val() } , function (data) {
+          //alert('Load OK' + data);
+      });
+   });
 
 
     //$("img.onepreset").lazyload({placeholder : "webapp/tuupola-jquery_lazyload-3f123e9/img/grey.gif"});
@@ -62,9 +75,9 @@ $(function() {
 
 // Query the device pixel ratio. 
 //------------------------------- 
-    function getDevicePixelRatio() { 
-	if(window.devicePixelRatio === undefined) 
-	    return 1; // No pixel ratio available. Assume 1:1. 
-	return window.devicePixelRatio; 
-    };
+function getDevicePixelRatio() { 
+   if(window.devicePixelRatio === undefined) 
+      return 1; // No pixel ratio available. Assume 1:1. 
+   return window.devicePixelRatio; 
+};
 

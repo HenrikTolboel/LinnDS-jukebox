@@ -12,41 +12,41 @@ require_once("setup.php");
 
 function Page($id, $title, $content, $footer, $cache)
 {
-    $str = '<div data-role="page" data-dom-cache="' . $cache . '" id="' . $id . '">' . "\n";
-    //$str = '<div data-role="page" id="' . $id . '">' . "\n";
+    $str = '<div data-role="page" data-dom-cache="' . $cache . '" id="' . $id . '">' . $NL;
+    //$str = '<div data-role="page" id="' . $id . '">' . $NL;
 
-    $str .= '<div data-role="header" data-position="fixed">' . "\n";
-    $str .= '<h1>' . $title . '</h1>'. "\n";
+    $str .= '<div data-role="header" data-position="fixed">' . $NL;
+    $str .= '<h1>' . $title . '</h1>'. $NL;
     if ($id != "page_options" && $id != "dialog_play")
-        $str .= '<a href="options.php" data-icon="gear" class="ui-btn-right" data-prefetch>Options</a>' . "\n";
-    $str .= '</div><!-- /header -->' ."\n";
+        $str .= '<a href="options.php" data-icon="gear" class="ui-btn-right" data-prefetch>Options</a>' . $NL;
+    $str .= '</div><!-- /header -->' . $NL;
 
-    $str .= '<div data-role="content">' . "\n";
+    $str .= '<div data-role="content">' . $NL;
     $str .= $content;
-    $str .= "\n" . '</div><!-- /content -->' ."\n";
+    $str .= $NL . '</div><!-- /content -->' . $NL;
 
-    //$str .= '<div data-role="footer" data-position="fixed">' . "\n";
-    $str .= '<div data-role="footer">' . "\n";
-    $str .= '<h4>' . $footer . "</h4>\n";
-    $str .= "</div><!-- /footer -->\n";
+    //$str .= '<div data-role="footer" data-position="fixed">' . $NL;
+    $str .= '<div data-role="footer">' . $NL;
+    $str .= '<h4>' . $footer . "</h4>" . $NL;
+    $str .= "</div><!-- /footer -->" . $NL;
 
-    $str .= "</div><!-- /page -->\n\n";
+    $str .= "</div><!-- /page -->" . $NL . $NL;
     return $str;
 }
 
 function Dialog($id, $title, $content)
 {
-    $str = '<div data-role="page" id="' . $id . '">'. "\n";
+    $str = '<div data-role="page" id="' . $id . '">'. $NL;
 
-    $str .= '<div data-role="header" data-position="inline">' . "\n";
-    $str .= '<h1>' . $title . '</h1>' . "\n";
-    $str .= '</div><!-- /header -->' ."\n";
+    $str .= '<div data-role="header" data-position="inline">' . $NL;
+    $str .= '<h1>' . $title . '</h1>' . $NL;
+    $str .= '</div><!-- /header -->' . $NL;
 
-    $str .= '<div data-role="content">' . "\n";
+    $str .= '<div data-role="content">' . $NL;
     $str .= $content;
-    $str .= "\n" . '</div><!-- /content -->' ."\n";
+    $str .= $NL . '</div><!-- /content -->' . $NL;
 
-    $str .= "</div><!-- /page -->\n\n";
+    $str .= "</div><!-- /page -->" . $NL . $NL;
     return $str;
 }
 
@@ -59,7 +59,7 @@ function data_uri($file, $mime)
 
 function CategoryList($id, &$manifest)
 {
-    $str= '<ul id="' . $id . '" data-role="listview" data-filter="false">' . "\n";
+    $str= '<ul id="' . $id . '" data-role="listview" data-filter="false">' . $NL;
     foreach ($manifest->Category as $cat => $catName) 
     {
 	if ($cat == "1") 
@@ -73,7 +73,7 @@ function CategoryList($id, &$manifest)
         $str .= '<li><a href="pagecategory.php?category=' . $cat . '"' . $prefetch .'>' . $catName .'</a>';
 
         $str .= '<span class="ui-li-count">' . $manifest->GetCategoryCount($cat) .'</span>';
-        $str .= '</li>' . "\n";
+        $str .= '</li>' . $NL;
     }
 
     $str .= "</ul>";
@@ -81,27 +81,22 @@ function CategoryList($id, &$manifest)
     return $str;
 }
 
-function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
+function MakeDialogPresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
 {
-    $str = '<ul id="' . $id . '" class="presets" data-role="listview" data-filter="false">' . "\n";
+    $str = '<ul id="' . $id . '" class="presets" data-role="listview" data-filter="false">' . $NL;
 
     for ($i = $FirstPreset; 
 	$i < $FirstPreset + $PresetCount;
 	$i++)
     {
 	$str .= '<li class="onepreset">';
-        //$str .= '<a href="PlayDialog.php?preset=' . $i . "&frompage=" . $FromPage . "&firstpreset=" . $FirstPreset . "&count=" . $PresetCount . '" data-rel="dialog">';
         $str .= '<a href="PlayDialog.php?preset=' . $i . '" data-rel="dialog">';
 	if (true || file_exists("../" . $manifest->PresetImage80x80[$i]))
 	{
-	    //$str .= '<img src="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
-	    //$str .= '<img src="' . data_uri("../" . $manifest->PresetImage80x80[$i], 'image/jpg') . '" />';
-	    //$str .= '<img class="lazy" src="grey.jpg" data-original="' . "../" . $manifest->PresetImage80x80[$i] . '" />';
 	    $str .= '<img class="sprite_' . $i . '" src="Transparent.gif"/>';
 	}
 	elseif (file_exists("../" . $manifest->PresetImage[$i]))
 	{
-	    //$str .= '<img src="' . "../" . $manifest->PresetImage[$i] . '" />';
 	    $str .= '<img class="lazy" src="Transparent.gif" data-original="' . "../" . $manifest->PresetImage[$i] . '" />';
 	}
 	else
@@ -109,7 +104,6 @@ function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
 	    $str .= '<img src="Transparent.gif" />';
 	}
         $str .= '<h3>';
-        //$str .= '0' . $i . '<br />';
         if ($manifest->PresetArtist[$i] == "Various")
         {
             $str .= $manifest->PresetAlbum[$i];
@@ -124,10 +118,9 @@ function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
             $str .= '<p>' . $manifest->PresetAlbum[$i] . ' (' . $manifest->PresetYear[$i] . ')</p>';  
             $str .= '</a>';
         }
-        //$str .= '<p class="ui-li-aside"><strong>0' . $i .'</strong></p>';
         $str .= '<a href="album.php?preset=' . $i . '"></a>';
 
-        $str .= "</li>\n";
+        $str .= "</li>" . $NL;
     }
 
     $str .= "</ul>";
@@ -135,9 +128,73 @@ function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
     return $str;
 }
 
+function MakePopupPresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
+{
+   $str = '<ul id="' . $id . '" data-role="listview" data-filter="false">' . $NL;
+
+   for ($i = $FirstPreset; $i < $FirstPreset + $PresetCount; $i++)
+   {
+      $str .= '<li>';
+      $str .= '<a href="#popupMenu-' . $i . '" data-rel="popup">';
+
+      $str .= '<img class="sprite_' . $i . '" src="Transparent.gif"/>';
+
+      $str .= '<h3>';
+
+      if ($manifest->PresetArtist[$i] == "Various")
+      {
+         $str .= $manifest->PresetAlbum[$i];
+         $str .= '</h3>';
+         $str .= '<p>' . ' (' . $manifest->PresetYear[$i] . ')</p>';  
+         $str .= '</a>';
+      }
+      else
+      {
+         $str .= $manifest->PresetArtist[$i];
+         $str .= '</h3>';
+         $str .= '<p>' . $manifest->PresetAlbum[$i] . ' (' . $manifest->PresetYear[$i] . ')</p>';  
+         $str .= '</a>';
+      }
+
+      $str .= '<a href="album.php?preset=' . $i . '"></a>';
+
+      $str .= "</li>" . $NL;
+   }
+
+   $str .= "</ul>";
+
+   for ($i = $FirstPreset; $i < $FirstPreset + $PresetCount; $i++)
+   {
+		$str .= '<div data-role="popup" id="popupMenu-' . $i . '">' . $NL;
+      $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">';
+      $str .= '<li><a href="#" class="popupclick" data-musik=' . "'" . '{"action": "PlayNow", "preset": "' . $i . '"}' . "'" . '">Play Now</a></li>' . $NL;
+      $str .= '<li><a href="#" class="popupclick" data-musik=' . "'" . '{"action": "PlayNext", "preset": "' . $i . '"}' . "'" . '">Play Next</a></li>' . $NL;
+      $str .= '<li><a href="#" class="popupclick" data-musik=' . "'" . '{"action": "PlayLater", "preset": "' . $i . '"}' . "'" . '">Play Later</a></li>' . $NL;
+      $str .= '<li><a href="#" class="popupclick" data-musik=' . "'" . '{"action": "Cancel", "preset": "' . $i . '"}' . "'" . '">Cancel</a></li>' . $NL;
+   $str .= "</ul>" . $NL;
+		$str .= '</div>' . $NL;
+   }
+
+   return $str;
+}
+
+function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
+{
+   global $USE_DIALOG;
+
+   if ($USE_DIALOG)
+   {
+      return MakePopupPresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount);
+   }
+   else
+   {
+      return MakeDialogPresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount);
+   }
+}
+
 function MakeArtistIndex1(&$manifest, $id, $Category)
 {
-    $str = '<ul id="' . $id . '" class="artistindex" data-role="listview" data-filter="false">' . "\n";
+    $str = '<ul id="' . $id . '" class="artistindex" data-role="listview" data-filter="false">' . $NL;
 
     $c = min(20, ceil($manifest->GetCategoryCount($Category)/4)); // When doing index always at least 4 categories
 
@@ -154,7 +211,7 @@ function MakeArtistIndex1(&$manifest, $id, $Category)
         $str .= '<a href="presets.php?firstpreset=' . $fp . '&count=' . $c . '">';
         $str .= '0' . $fp . ' -- ' . $manifest->PresetArtist[$fp] . '</a>';
 
-        $str .= "</li>\n";
+        $str .= "</li>" . $NL;
     }
 
     $str .= "</ul>";
@@ -166,7 +223,7 @@ function MakeArtistIndex2(&$manifest, $id, $Category)
 {
    // Keep same artist on a page
    //
-   $str = '<ul id="' . $id . '" class="artistindex" data-role="listview" data-filter="false">' . "\n";
+   $str = '<ul id="' . $id . '" class="artistindex" data-role="listview" data-filter="false">' . $NL;
 
    $c = min(20, ceil($manifest->GetCategoryCount($Category)/4)); // When doing index always at least 4 categories
 
@@ -191,7 +248,7 @@ function MakeArtistIndex2(&$manifest, $id, $Category)
       $str .= '<a href="presets.php?firstpreset=' . $fp . '&count=' . $cnt . '">';
       $str .= '0' . $fp . ' -- ' . $manifest->PresetArtist[$fp] . '</a>';
 
-      $str .= "</li>\n";
+      $str .= "</li>" . $NL;
 
       $fp += $cnt;
    }
@@ -237,7 +294,7 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
     $FP[$Index] = -1;
     $CNT[$Index] = 0;
 
-   $str = '<ul id="' . $id . '" class="artistindex" data-role="listview" data-filter="false">' . "\n";
+   $str = '<ul id="' . $id . '" class="artistindex" data-role="listview" data-filter="false">' . $NL;
 
     for ($i = 1; $i < $Index; $i++)
     {
@@ -247,7 +304,7 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
 	$str .= strtoupper($manifest->PresetArtistSkip[$FP[$i]][0]) . '</a>';
 
 	$str .= '<span class="ui-li-count">' . $CNT[$i] .'</span>';
-	$str .= "</li>\n";
+	$str .= "</li>" . $NL;
         $tmp = MakeOnePreset($manifest, $FP[$i], $CNT[$i]);
     }
 
@@ -301,7 +358,7 @@ function MakeArtistIndex4(&$manifest, $id, $Category)
     $FP[$Index] = -1;
     $CNT[$Index] = 0;
 
-    $str = '<div class="ui-grid-c">' ."\n";
+    $str = '<div class="ui-grid-c">' . $NL;
 
     $class = "ui-block-a";
 
@@ -321,7 +378,7 @@ function MakeArtistIndex4(&$manifest, $id, $Category)
 	    $str .= '<a href="' . $href . '" data-role="button">';
 	    $str .= strtoupper($ALPHABET[$alpha]);
 	    $str .= '</a>';
-	    $str .= "</div>\n";
+	    $str .= "</div>" . $NL;
 	    $class = "ui-block-b";
 	    $alpha++;
 	}
@@ -335,7 +392,7 @@ function MakeArtistIndex4(&$manifest, $id, $Category)
 	    $str .= strtoupper($letter);
 	$str .= '</a>';
 
-	$str .= "</div>\n";
+	$str .= "</div>" . $NL;
         $tmp = MakeOnePreset($manifest, $FP[$i], $CNT[$i]);
 	$class = "ui-block-b";
 	$alpha++;
@@ -349,7 +406,7 @@ function MakeArtistIndex4(&$manifest, $id, $Category)
 	$str .= '<a href="' . $href . '" data-role="button">';
 	$str .= strtoupper($ALPHABET[$alpha]);
 	$str .= '</a>';
-	$str .= "</div>\n";
+	$str .= "</div>" . $NL;
 	$class = "ui-block-b";
 	$alpha++;
     }
@@ -361,12 +418,12 @@ function MakeArtistIndex4(&$manifest, $id, $Category)
 	$str .= '<a href="' . $href . '" data-role="button">';
 	$str .= '#';
 	$str .= '</a>';
-	$str .= "</div>\n";
+	$str .= "</div>" . $NL;
 	$class = "ui-block-b";
 	$alpha++;
     }
 
-    $str .= "</div>\n";
+    $str .= "</div>" . $NL;
 
     return $str;
 }

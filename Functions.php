@@ -167,10 +167,10 @@ function MakePopupPresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCo
    {
 		$str .= '<div data-role="popup" id="popupMenu-' . $i . '">' . $NL;
       $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">';
-      $str .= '<li><a href="#" class="popupclick" data-musik=' . "'" . '{"action": "PlayNow", "preset": "' . $i . '"}' . "'" . '">Play Now</a></li>' . $NL;
-      $str .= '<li><a href="#" class="popupclick" data-musik=' . "'" . '{"action": "PlayNext", "preset": "' . $i . '"}' . "'" . '">Play Next</a></li>' . $NL;
-      $str .= '<li><a href="#" class="popupclick" data-musik=' . "'" . '{"action": "PlayLater", "preset": "' . $i . '"}' . "'" . '">Play Later</a></li>' . $NL;
-      $str .= '<li><a href="#" class="popupclick" data-musik=' . "'" . '{"action": "Cancel", "preset": "' . $i . '"}' . "'" . '">Cancel</a></li>' . $NL;
+      $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "PlayNow", "preset": "' . $i . '"}' . $SQ . '">Play Now</a></li>' . $NL;
+      $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "PlayNext", "preset": "' . $i . '"}' . $SQ . '">Play Next</a></li>' . $NL;
+      $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "PlayLater", "preset": "' . $i . '"}' . $SQ . '">Play Later</a></li>' . $NL;
+      $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Cancel", "preset": "' . $i . '"}' . $SQ . '">Cancel</a></li>' . $NL;
    $str .= "</ul>" . $NL;
 		$str .= '</div>' . $NL;
    }
@@ -313,7 +313,7 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
     return $str;
 }
 
-function MakeArtistIndex4(&$manifest, $id, $Category)
+function MakeArtistIndexAlphabet(&$manifest, $id, $Category)
 {
     // Keep artist after first letter on same page
     //
@@ -437,7 +437,7 @@ function MakePageCategories($manifest)
 	if (strpos($catName, " / Album") > 3 && $manifest->GetCategoryCount($cat) > 15)
 	{
 	    $str = Page("page_cat-" . $cat, "Artist Index",
-		MakeArtistIndex4($manifest, "artistindex", $cat),
+		MakeArtistIndexAlphabet($manifest, "artistindex", $cat),
 		"LinnDS-jukebox", "true");
 	}
 	else

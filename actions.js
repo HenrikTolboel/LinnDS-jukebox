@@ -8,7 +8,7 @@
 */
 
 $(function() {
-   $('body').delegate("a.onepreset", "click", function() {
+   $('body').delegate("a.dialogclick", "click", function() {
 	var value = $(this).data("musik").preset;
 	var action = $(this).data("musik").action;
 	console.log(action + " = " + value);

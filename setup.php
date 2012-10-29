@@ -17,6 +17,7 @@ $DO_CACHE = true;
 $USE_DIALOG = true;
 
 $NL = "\n";
+$SQ = "'";
 
 $manifestfile = $PRESETS_DIR ."/" . "manifest.xml";
 

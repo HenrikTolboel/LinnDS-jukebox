@@ -17,9 +17,9 @@ $href = "#";
 
 $cont = "";
 $cont .= '<div class="play">' . "\n";
-$cont .= '<a href="' . $href . '" data-rel="back" class="onepreset" data-role="button" data-theme="b" data-musik=' . "'" . '{"action": "PlayNow", "preset":' . $preset . "}'>" . 'Play Now</a>' . "\n";
-$cont .= '<a href="' . $href . '" data-rel="back" class="onepreset" data-role="button" data-theme="b" data-musik=' . "'" . '{"action": "PlayNext", "preset":' . $preset . "}'>" . 'Play Next</a>' . "\n";
-$cont .= '<a href="' . $href . '" data-rel="back" class="onepreset" data-role="button" data-theme="b" data-musik=' . "'" . '{"action": "PlayLater", "preset":' . $preset . "}'>" . 'Play Later</a>' . "\n";
+$cont .= '<a href="' . $href . '" data-rel="back" class="dialogclick" data-role="button" data-theme="b" data-musik=' . "'" . '{"action": "PlayNow", "preset":' . $preset . "}'>" . 'Play Now</a>' . "\n";
+$cont .= '<a href="' . $href . '" data-rel="back" class="dialogclick" data-role="button" data-theme="b" data-musik=' . "'" . '{"action": "PlayNext", "preset":' . $preset . "}'>" . 'Play Next</a>' . "\n";
+$cont .= '<a href="' . $href . '" data-rel="back" class="dialogclick" data-role="button" data-theme="b" data-musik=' . "'" . '{"action": "PlayLater", "preset":' . $preset . "}'>" . 'Play Later</a>' . "\n";
 $cont .= '<a href="' . $href . '" data-rel="back" data-icon="delete" data-role="button" data-theme="c">Cancel</a>' . "\n";
 $cont .= '</div>' ."\n";
 

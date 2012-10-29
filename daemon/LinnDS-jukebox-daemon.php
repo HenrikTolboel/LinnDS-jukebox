@@ -305,7 +305,8 @@ while (true) {
                }
                if (preg_match("/IdArray \"([[:graph:]]+)\"/m", $data, $matches) > 0)
                {
-                  $State['IdArray'] = $matches[1];
+                  $State['IdArray_base64'] = $matches[1];
+                  $State['IdArray'] = unpack("N*", base64_decode($matches[1]));
                }
                if (preg_match("/Shuffle \"(\w+)\"/m", $data, $matches) > 0)
                {

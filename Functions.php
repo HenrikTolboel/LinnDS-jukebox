@@ -12,13 +12,59 @@ require_once("setup.php");
 
 function Page($id, $title, $content, $footer, $cache)
 {
+    global $SQ;
+    global $NL;
+
     $str = '<div data-role="page" data-dom-cache="' . $cache . '" id="' . $id . '">' . $NL;
     //$str = '<div data-role="page" id="' . $id . '">' . $NL;
 
     $str .= '<div data-role="header" data-position="fixed">' . $NL;
     $str .= '<h1>' . $title . '</h1>'. $NL;
-    if ($id != "page_options" && $id != "dialog_play")
-        $str .= '<a href="options.php" data-icon="gear" class="ui-btn-right" data-prefetch>Options</a>' . $NL;
+    //if ($id != "page_options" && $id != "dialog_play")
+        //$str .= '<a href="options.php" data-icon="gear" class="ui-btn-right" data-prefetch>Options</a>' . $NL;
+
+    $str .= '<a href="#popupSource" data-rel="popup" data-icon="gear">Kilde</a>' . $NL;
+    //$str .= '<a href="#popupVolume" data-rel="popup" data-icon="gear">Volume</a>' . $NL;
+    $str .= '<a href="#popupControl" data-rel="popup" data-icon="gear">Kontrol</a>' . $NL;
+
+    $str .= '<div data-role="popup" id="popupSource">' . $NL;
+    $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Playlist", "preset": "0"}' . $SQ . '">Playlist</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-TV", "preset": "0"}' . $SQ . '">TV</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Radio", "preset": "0"}' . $SQ . '">Radio</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-NetAux", "preset": "0"}' . $SQ . '">Air-Play</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Off", "preset": "0"}' . $SQ . '">Off</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Cancel", "preset": "0"}' . $SQ . '">Cancel</a></li>' . $NL;
+    $str .= "</ul>" . $NL;
+    $str .= '</div>' . $NL;
+
+    $str .= '<div data-role="popup" id="popupVolume">' . $NL;
+    $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "preset": "35"}' . $SQ . '">35</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "preset": "39"}' . $SQ . '">39</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "preset": "42"}' . $SQ . '">42</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "IncrVolume", "preset": "0"}' . $SQ . '">+1</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "DecrVolume", "preset": "0"}' . $SQ . '">-1</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Cancel", "preset": "0"}' . $SQ . '">Cancel</a></li>' . $NL;
+    $str .= "</ul>" . $NL;
+    $str .= '</div>' . $NL;
+
+    $str .= '<div data-role="popup" id="popupControl">' . $NL;
+    $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Play", "preset": "0"}' . $SQ . '">Play</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Pause", "preset": "0"}' . $SQ . '">Pause</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Stop", "preset": "0"}' . $SQ . '">Stop</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Next", "preset": "0"}' . $SQ . '">Next</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Previous", "preset": "0"}' . $SQ . '">Previous</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "preset": "35"}' . $SQ . '">35</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "preset": "39"}' . $SQ . '">39</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "preset": "42"}' . $SQ . '">42</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "IncrVolume", "preset": "0"}' . $SQ . '">+1</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "DecrVolume", "preset": "0"}' . $SQ . '">-1</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Cancel", "preset": "0"}' . $SQ . '">Cancel</a></li>' . $NL;
+    $str .= "</ul>" . $NL;
+    $str .= '</div>' . $NL;
+
     $str .= '</div><!-- /header -->' . $NL;
 
     $str .= '<div data-role="content">' . $NL;
@@ -36,6 +82,9 @@ function Page($id, $title, $content, $footer, $cache)
 
 function Dialog($id, $title, $content)
 {
+    global $SQ;
+    global $NL;
+
     $str = '<div data-role="page" id="' . $id . '">'. $NL;
 
     $str .= '<div data-role="header" data-position="inline">' . $NL;
@@ -59,6 +108,9 @@ function data_uri($file, $mime)
 
 function CategoryList($id, &$manifest)
 {
+    global $SQ;
+    global $NL;
+
     $str= '<ul id="' . $id . '" data-role="listview" data-filter="false">' . $NL;
     foreach ($manifest->Category as $cat => $catName) 
     {
@@ -83,6 +135,9 @@ function CategoryList($id, &$manifest)
 
 function MakeDialogPresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
 {
+    global $SQ;
+    global $NL;
+
     $str = '<ul id="' . $id . '" class="presets" data-role="listview" data-filter="false">' . $NL;
 
     for ($i = $FirstPreset; 
@@ -130,6 +185,9 @@ function MakeDialogPresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetC
 
 function MakePopupPresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
 {
+    global $SQ;
+    global $NL;
+
    $str = '<ul id="' . $id . '" data-role="listview" data-filter="false">' . $NL;
 
    for ($i = $FirstPreset; $i < $FirstPreset + $PresetCount; $i++)
@@ -166,7 +224,7 @@ function MakePopupPresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCo
    for ($i = $FirstPreset; $i < $FirstPreset + $PresetCount; $i++)
    {
 		$str .= '<div data-role="popup" id="popupMenu-' . $i . '">' . $NL;
-      $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">';
+      $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">' . $NL;
       $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "PlayNow", "preset": "' . $i . '"}' . $SQ . '">Play Now</a></li>' . $NL;
       $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "PlayNext", "preset": "' . $i . '"}' . $SQ . '">Play Next</a></li>' . $NL;
       $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "PlayLater", "preset": "' . $i . '"}' . $SQ . '">Play Later</a></li>' . $NL;
@@ -181,6 +239,9 @@ function MakePopupPresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCo
 function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
 {
    global $USE_DIALOG;
+    global $SQ;
+    global $NL;
+
 
    if ($USE_DIALOG)
    {
@@ -194,6 +255,9 @@ function MakePresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCount)
 
 function MakeArtistIndex1(&$manifest, $id, $Category)
 {
+    global $SQ;
+    global $NL;
+
     $str = '<ul id="' . $id . '" class="artistindex" data-role="listview" data-filter="false">' . $NL;
 
     $c = min(20, ceil($manifest->GetCategoryCount($Category)/4)); // When doing index always at least 4 categories
@@ -221,6 +285,9 @@ function MakeArtistIndex1(&$manifest, $id, $Category)
 
 function MakeArtistIndex2(&$manifest, $id, $Category)
 {
+    global $SQ;
+    global $NL;
+
    // Keep same artist on a page
    //
    $str = '<ul id="' . $id . '" class="artistindex" data-role="listview" data-filter="false">' . $NL;
@@ -260,6 +327,9 @@ function MakeArtistIndex2(&$manifest, $id, $Category)
 
 function MakeArtistIndex3(&$manifest, $id, $Category)
 {
+    global $SQ;
+    global $NL;
+
    // Keep artist after first letter on same page
    //
 
@@ -315,6 +385,9 @@ function MakeArtistIndex3(&$manifest, $id, $Category)
 
 function MakeArtistIndexAlphabet(&$manifest, $id, $Category)
 {
+    global $SQ;
+    global $NL;
+
     // Keep artist after first letter on same page
     //
     $ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -431,6 +504,9 @@ function MakeArtistIndexAlphabet(&$manifest, $id, $Category)
 function MakePageCategories($manifest)
 {
     global $CACHE_DIR;
+    global $SQ;
+    global $NL;
+
 
     foreach ($manifest->Category as $cat => $catName) 
     {
@@ -456,6 +532,9 @@ function MakePageCategories($manifest)
 function MakeOnePreset($manifest, $FirstPreset, $PresetCount)
 {
     global $CACHE_DIR;
+    global $SQ;
+    global $NL;
+
 
     $id = "presets-" . $FirstPreset . "-" . $PresetCount;
     $str .= Page("page_presets-" . $FirstPreset . "-" . $PresetCount, "Artist / Album", 

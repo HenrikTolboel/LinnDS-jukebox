@@ -635,6 +635,53 @@ while (true) {
 		$DataHandled = true;
             }
 	 }
+         elseif (strpos($data, "Source") !== false)
+         {
+            // Here things happens - we execute the actions sent from the
+            // application, by issuing a number of ACTIONs.
+            if (preg_match("/Source Off/m", $data, $matches) > 0)
+            {
+		if ($State['Standby'] == "false")
+		{
+		    Send('ACTION Ds/Product 1 SetStandby "true"');
+		}
+		$DataHandled = true;
+            }
+	    else
+	    {
+	       if ($State['Standby'] == "true")
+	       {
+		   Send('ACTION Ds/Product 1 SetStandby "false"');
+	       }
+
+		if (preg_match("/Source Playlist/m", $data, $matches) > 0)
+		{
+		   if ($State['SourceIndex'] != $State['SourceIndex_Playlist'])
+		       Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceIndex_Playlist'] . '"');
+		   if ($State['TransportState'] == "Stopped")
+		       Send("ACTION Ds/Playlist 1 Play");
+		    $DataHandled = true;
+		}
+		if (preg_match("/Source TV/m", $data, $matches) > 0)
+		{
+		   if ($State['SourceIndex'] != 5)
+		       Send('ACTION Ds/Product 1 SetSourceIndex "' . 5 . '"');
+		    $DataHandled = true;
+		}
+		if (preg_match("/Source Radio/m", $data, $matches) > 0)
+		{
+		   if ($State['SourceIndex'] != $State['SourceIndex_Radio'])
+		       Send('ACTION Ds/Product 1 SetSourceIndex "' . 5 . '"');
+		    $DataHandled = true;
+		}
+		if (preg_match("/Source NetAux/m", $data, $matches) > 0)
+		{
+		   if ($State['SourceIndex'] != 4)
+		       Send('ACTION Ds/Product 1 SetSourceIndex "' . 4 . '"');
+		    $DataHandled = true;
+		}
+	    }
+	 }
          elseif (strpos($data, "State") !== false)
          {
             LogWrite("State");

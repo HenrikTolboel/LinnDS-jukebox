@@ -32,6 +32,43 @@ elseif ($action == "PlayLater") {
 elseif ($action == "SetVolume") {
     $Str = "Volume Set \"" . $value . "\"";
 }
+elseif ($action == "IncrVolume") {
+    $Str = "Volume Incr";
+}
+elseif ($action == "DecrVolume") {
+    $Str = "Volume Decr";
+}
+elseif ($action == "Control-Play") {
+    $Str = "Control Play";
+}
+elseif ($action == "Control-Pause") {
+    $Str = "Control Pause";
+}
+elseif ($action == "Control-Stop") {
+    $Str = "Control Stop";
+}
+elseif ($action == "Control-Next") {
+    $Str = "Control Next";
+}
+elseif ($action == "Control-Previous") {
+    $Str = "Control Previous";
+}
+elseif ($action == "Source-Playlist") {
+    $Str = "Source Playlist";
+}
+elseif ($action == "Source-TV") {
+    $Str = "Source TV";
+}
+elseif ($action == "Source-Radio") {
+    $Str = "Source Radio";
+}
+elseif ($action == "Source-NetAux") {
+    $Str = "Source NetAux";
+}
+elseif ($action == "Source-Off") {
+    $Str = "Source Off";
+}
+
 socket_write($socket, $Str . "\n");
 
 //socket_write($socket, "State\n");

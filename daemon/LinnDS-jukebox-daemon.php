@@ -9,6 +9,9 @@
 * http://www.opensource.org/licenses/mit-license.php
 */
 
+$LINN_JUKEBOX_URL = "http://192.168.0.105/musik";
+$NL = "\n";
+$SQ = "'";
 
 // Debug write out.... Higher number 1,2,3,.. means more output
 $DEBUG = 2;
@@ -51,6 +54,9 @@ $State['MAX_VOLUME'] = 60;
 $State['PlayNext'] = -1;
 $State['PlayLater'] = array();
 $State['SourceIndex_Playlist'] = -1;
+$State['IdArray'] = array('0');
+$State['Id'] = 0;
+$State['NewId'] = 0;
 
 // SubscribeType tells the mapping between "EVENT <digits> XXX" subscribed
 // to protokol (e.g. "Ds/Playlist")
@@ -62,6 +68,8 @@ $SubscribeType['Ds/Playlist'] = -1;
 $SubscribeType['Ds/Jukebox'] = -1;
 $SubscribeType['Ds/Volume'] = -1;
 $SubscribeType['Ds/Radio'] = -1;
+$SubscribeType['Ds/Info'] = -1;
+$SubscribeType['Ds/Time'] = -1;
 
 function LogWrite($Str)
 {
@@ -77,6 +85,7 @@ function Send($Str)
    global $Queue;
    global $lpec_socket;
    global $AwaitResponse;
+   global $State;
 
    // Add to queue. if not awaiting responses, then send front
    if (strlen($Str) > 0)
@@ -86,11 +95,85 @@ function Send($Str)
    if ($AwaitResponse == 0 && count($Queue) > 0)
    {
       $S = array_shift($Queue);
-      LogWrite("Send: " .$S);
+      $S = str_replace("%NewId%", strval($State['NewId']), $S);
+      LogWrite("Send: " . $S);
       socket_write($lpec_socket, $S . "\n");
       array_unshift($Queue, $S); // We leave the sent item in Queue - removed when we get the response
       $AwaitResponse = 1;
    }
+}
+
+function PresetURL($num)
+{
+    global $LINN_JUKEBOX_URL;
+
+    return $LINN_JUKEBOX_URL . "/_Presets/" . $num . ".dpl";
+}
+
+function PrepareXML($xml)
+{
+    $xml = htmlspecialchars(str_replace(array("\n", "\r"), '', $xml));
+    return $xml;
+}
+
+function InsertDIDL_list($DIDL_URL, $AfterId)
+{
+    global $NL;
+
+    $xml = simplexml_load_file($DIDL_URL);
+
+    //$xml->registerXPathNamespace('linn', 'urn:linn-co-uk/playlist');
+    //$Tracks = $xml->xpath('linn:Track');
+
+    $xml->registerXPathNamespace('didl', 'urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/');
+    $URLs = $xml->xpath('//didl:res');
+
+    //print_r($URLs);
+
+    $DIDLs = $xml->xpath('//didl:DIDL-Lite');
+
+    //print_r($DIDLs);
+
+    //for ($i = sizeof($URLs) -1; $i >= 0; $i--)
+    //{
+	//print "URL[" . $i . "] : " .$URLs[$i][0] . $NL;
+	//print "DIDL[" . $i . "]: " .$DIDLs[$i]->asXML() . $NL;
+
+	//Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" .$URLs[$i][0] . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
+    //}
+
+    Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" .$URLs[0][0] . "\" \"" . PrepareXML($DIDLs[0]->asXML()) . "\"");
+    for ($i = 1; $i < sizeof($URLs); $i++)
+	Send("ACTION Ds/Playlist 1 Insert \"%NewId%\" \"" .$URLs[$i][0] . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
+}
+
+function ReadBlockFromSocket($read_sock)
+{
+     global $NL;
+
+      // read until newline or 10240 bytes
+      // socket_read while show errors when the client is disconnected, so silence the error messages
+      //LogWrite("ReadBlockFromSocket: begin");
+      $res = "";
+
+      do {
+	  $data = @socket_read($read_sock, 10240, PHP_NORMAL_READ);
+
+	  if ($data === false) {
+	      if ($res != "")
+		  return $res;
+	      else
+		  return $data;
+	  }
+
+	  //LogWrite("ReadBlockFromSocket: " . strlen($data));
+
+	  $res .= $data;
+	  $cnt = substr_count($res, '"');
+	  //LogWrite("cnt: " . $cnt);
+      } while ($cnt != 0 && $cnt % 2 != 0);
+
+      return $res;
 }
 
 print "LinnDS-jukebox-daemon starts...\n\n";
@@ -124,9 +207,7 @@ while (true) {
 
    // loop through all the clients that have data to read from
    foreach ($read as $read_sock) {
-      // read until newline or 10240 bytes
-      // socket_read while show errors when the client is disconnected, so silence the error messages
-      $data = @socket_read($read_sock, 10240, PHP_NORMAL_READ);
+      $data = ReadBlockFromSocket($read_sock);
      
       // check if the client is disconnected
       if ($data === false) {
@@ -198,7 +279,7 @@ while (true) {
 		      // We have the Playlist service. subscribe...
 		      $State['SourceIndex_Playlist'] = $matches[1];
 			Send("SUBSCRIBE Ds/Playlist");
-			Send("SUBSCRIBE Ds/Jukebox");
+			//Send("SUBSCRIBE Ds/Jukebox");
 		  }
 		  elseif ($match[2] == "Radio")
 		  {
@@ -208,6 +289,25 @@ while (true) {
 		  }
                }
             }
+	    elseif (preg_match("/ACTION Ds\/Playlist 1 Read \"(\d+)\"/m", $front, $matches) > 0)
+            {
+               if (preg_match("/RESPONSE \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"/m", $data, $match) > 0)
+               {
+		      $State['Id_URL'] = htmlspecialchars_decode($match[1]);
+		      $State['Id_Metadata'] = htmlspecialchars_decode($match[2]);
+	       }
+               LogWrite("State:");
+               print_r($State);
+	    }
+	    elseif (preg_match("/ACTION Ds\/Playlist 1 Insert \"(\d+)\"/m", $front, $matches) > 0)
+            {
+               if (preg_match("/RESPONSE \"([[:ascii:]]+?)\"/m", $data, $match) > 0)
+               {
+		      $State['NewId'] = $match[1];
+	       }
+               //LogWrite("State:");
+               //print_r($State);
+	    }
 
             Send("");
             $DataHandled = true;
@@ -263,14 +363,6 @@ while (true) {
 		    //Send("SUBSCRIBE Ds/Time");
 		  }
                }
-               //if (preg_match("/ProductSourceXml \"([[:graph:]]+)\"/m", $data, $matches) > 0)
-               //{
-                  //$State['ProductSourceXml'] = $matches[1];
-               //}
-               //if (preg_match("/ProductAnySourceType \"(\w+)\"/m", $data, $matches) > 0)
-               //{
-                  //$State['ProductAnySourceType'] = $matches[1];
-               //}
                if (preg_match("/SourceCount \"(\d+)\"/m", $data, $matches) > 0)
                {
                   $State['SourceCount'] = $matches[1];
@@ -284,7 +376,7 @@ while (true) {
             {
                if (preg_match("/TransportState \"(\w+)\"/m", $data, $matches) > 0)
                {
-                  if (count($State['PlayLater']) >= 1 && $matches[1] == "Stopped" && $State['TransportState'] != $matches[1] && $State['SourceIndex'] == $State['SourceIndex_Playlist'])
+                  if (false && count($State['PlayLater']) >= 1 && $matches[1] == "Stopped" && $State['TransportState'] != $matches[1] && $State['SourceIndex'] == $State['SourceIndex_Playlist'])
                   {
                      $front = array_shift($State['PlayLater']);
                      Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $front . "\"");
@@ -294,7 +386,7 @@ while (true) {
                }
                if (preg_match("/Id \"(\d+)\"/m", $data, $matches) > 0)
                {
-                  if ($State['PlayNext'] != -1 && $State['Id'] != $matches[1])
+                  if (false && $State['PlayNext'] != -1 && $State['Id'] != $matches[1])
                   {
                      Send("ACTION Ds/Playlist 1 Stop");
                      Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $State['PlayNext'] . "\"");
@@ -302,6 +394,7 @@ while (true) {
                      $State['PlayNext'] = -1;
                   }
                   $State['Id'] = $matches[1];
+		  //Send("ACTION Ds/Playlist 1 Read \"" . $matches[1] . "\"");
                }
                if (preg_match("/IdArray \"([[:graph:]]+)\"/m", $data, $matches) > 0)
                {
@@ -362,10 +455,15 @@ while (true) {
                }
                $DataHandled = true;
             }
+	    else
+	    {
+		LogWrite("UNKNOWN : " . $data);
+		$DataHandled = true;
+	    }
 
             if ($DEBUG > 0)
             {
-               LogWrite($data);
+               LogWrite("State:");
                print_r($State);
             }
          }
@@ -379,39 +477,74 @@ while (true) {
                $State['PlayNext'] = -1;
                $State['PlayLater'] = array();
                LogWrite("JukeBoxPlayNow: " . $JukeBoxPlay);
+
 	       if ($State['Standby'] == 'true')
 	       {
 		   Send('ACTION Ds/Product 1 SetStandby "false"');
 		   Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceIndex_Playlist'] . '"');
 	       }
+	       elseif ($State['SourceIndex'] != $State['SourceIndex_Playlist'])
+		   Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceIndex_Playlist'] . '"');
+
                Send("ACTION Ds/Playlist 1 Stop");
-               Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $JukeBoxPlay . "\"");
+
+               Send("ACTION Ds/Playlist 1 DeleteAll");
+	       InsertDIDL_list(PresetURL($JukeBoxPlay), 0);
+
+               //Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $JukeBoxPlay . "\"");
+
                Send("ACTION Ds/Playlist 1 Play");
                $DataHandled = true;
             }
             elseif (preg_match("/Jukebox PlayNext \"(\d+)\"/m", $data, $matches) > 0)
             {
                $JukeBoxPlay = $matches[1];
+               //$State['PlayNext'] = $JukeBoxPlay;
+               //$State['PlayLater'] = array();
                LogWrite("JukeBoxPlayNext: " . $JukeBoxPlay);
-               $State['PlayNext'] = $JukeBoxPlay;
-               $State['PlayLater'] = array();
+
+	       InsertDIDL_list(PresetURL($JukeBoxPlay), $State['Id']);
+
+	       if ($State['Standby'] == 'true')
+	       {
+		   Send('ACTION Ds/Product 1 SetStandby "false"');
+		   Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceIndex_Playlist'] . '"');
+	       }
+	       elseif ($State['SourceIndex'] != $State['SourceIndex_Playlist'])
+		   Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceIndex_Playlist'] . '"');
+	       if ($State['TransportState'] == "Stopped")
+		   Send("ACTION Ds/Playlist 1 Play");
+
                if ($DEBUG > 0)
                {
                   //LogWrite($data);
-                  print_r($State);
+                  //print_r($State);
                }
                $DataHandled = true;
             }
             elseif (preg_match("/Jukebox PlayLater \"(\d+)\"/m", $data, $matches) > 0)
             {
                $JukeBoxPlay = $matches[1];
+               //$State['PlayNext'] = -1;
+               //array_push($State['PlayLater'], $JukeBoxPlay);
                LogWrite("JukeBoxPlayLater: " . $JukeBoxPlay);
-               $State['PlayNext'] = -1;
-               array_push($State['PlayLater'], $JukeBoxPlay);
+
+	       InsertDIDL_list(PresetURL($JukeBoxPlay), end($State['IdArray']));
+
+	       if ($State['Standby'] == 'true')
+	       {
+		   Send('ACTION Ds/Product 1 SetStandby "false"');
+		   Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceIndex_Playlist'] . '"');
+	       }
+	       elseif ($State['SourceIndex'] != $State['SourceIndex_Playlist'])
+		   Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceIndex_Playlist'] . '"');
+	       if ($State['TransportState'] == "Stopped")
+		   Send("ACTION Ds/Playlist 1 Play");
+
                if ($DEBUG > 0)
                {
                   //LogWrite($data);
-                  print_r($State);
+                  //print_r($State);
                }
               $DataHandled = true;
             }
@@ -449,6 +582,56 @@ while (true) {
             {
 		LogWrite("VolumeDecr: ");
 		Send("ACTION Ds/Volume 1 VolumeDec");
+		$DataHandled = true;
+            }
+	 }
+         elseif (strpos($data, "Control") !== false)
+         {
+            // Here things happens - we execute the actions sent from the
+            // application, by issuing a number of ACTIONs.
+            if (preg_match("/Control Play/m", $data, $matches) > 0)
+            {
+		if ($State['TransportState'] != "Playing")
+		{
+		    LogWrite("ControlPlay: ");
+		    Send("ACTION Ds/Playlist 1 Play");
+		}
+		$DataHandled = true;
+            }
+            if (preg_match("/Control Pause/m", $data, $matches) > 0)
+            {
+		if ($State['TransportState'] != "Paused")
+		{
+		    LogWrite("ControlPause: ");
+		    Send("ACTION Ds/Playlist 1 Pause");
+		}
+		$DataHandled = true;
+            }
+            if (preg_match("/Control Stop/m", $data, $matches) > 0)
+            {
+		if ($State['TransportState'] != "Stopped")
+		{
+		    LogWrite("ControlStop: ");
+		    Send("ACTION Ds/Playlist 1 Stop");
+		}
+		$DataHandled = true;
+            }
+            if (preg_match("/Control Next/m", $data, $matches) > 0)
+            {
+		if ($State['TransportState'] != "Stopped")
+		{
+		    LogWrite("ControlNext: ");
+		    Send("ACTION Ds/Playlist 1 Next");
+		}
+		$DataHandled = true;
+            }
+            if (preg_match("/Control Previous/m", $data, $matches) > 0)
+            {
+		if ($State['TransportState'] != "Stopped")
+		{
+		    LogWrite("ControlPrevious: ");
+		    Send("ACTION Ds/Playlist 1 Previous");
+		}
 		$DataHandled = true;
             }
 	 }

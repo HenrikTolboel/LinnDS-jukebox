@@ -142,9 +142,9 @@ function InsertDIDL_list($DIDL_URL, $AfterId)
 	//Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" .$URLs[$i][0] . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
     //}
 
-    Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" .$URLs[0][0] . "\" \"" . PrepareXML($DIDLs[0]->asXML()) . "\"");
+    Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[0][0]) . "\" \"" . PrepareXML($DIDLs[0]->asXML()) . "\"");
     for ($i = 1; $i < sizeof($URLs); $i++)
-	Send("ACTION Ds/Playlist 1 Insert \"%NewId%\" \"" .$URLs[$i][0] . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
+	Send("ACTION Ds/Playlist 1 Insert \"%NewId%\" \"" . PrepareXML($URLs[$i][0]) . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
 }
 
 function ReadBlockFromSocket($read_sock)

@@ -23,47 +23,58 @@ function Page($id, $title, $content, $footer, $cache)
     //if ($id != "page_options" && $id != "dialog_play")
         //$str .= '<a href="options.php" data-icon="gear" class="ui-btn-right" data-prefetch>Options</a>' . $NL;
 
-    $str .= '<a href="#popupSource" data-rel="popup" data-icon="gear">Kilde</a>' . $NL;
-    //$str .= '<a href="#popupVolume" data-rel="popup" data-icon="gear">Volume</a>' . $NL;
-    $str .= '<a href="#popupControl" data-rel="popup" data-icon="gear">Kontrol</a>' . $NL;
+    $str .= '<a href="#popupSource" data-rel="popup" data-icon="gear" data-history="false">Kilde</a>' . $NL;
+    $str .= '<a href="#popupControl" data-rel="popup" data-icon="gear" data-history="false">Kontrol</a>' . $NL;
 
     $str .= '<div data-role="popup" id="popupSource">' . $NL;
     $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">' . $NL;
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Playlist", "preset": "0"}' . $SQ . '">Playlist</a></li>' . $NL;
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-TV", "preset": "0"}' . $SQ . '">TV</a></li>' . $NL;
+
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Radio", "preset": "0"}' . $SQ . '">Radio</a></li>' . $NL;
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-NetAux", "preset": "0"}' . $SQ . '">Air-Play</a></li>' . $NL;
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Off", "preset": "0"}' . $SQ . '">Off</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Cancel", "preset": "0"}' . $SQ . '">Cancel</a></li>' . $NL;
     $str .= "</ul>" . $NL;
     $str .= '</div>' . $NL;
 
-    $str .= '<div data-role="popup" id="popupVolume">' . $NL;
-    $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "preset": "35"}' . $SQ . '">35</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "preset": "39"}' . $SQ . '">39</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "preset": "42"}' . $SQ . '">42</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "IncrVolume", "preset": "0"}' . $SQ . '">+1</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "DecrVolume", "preset": "0"}' . $SQ . '">-1</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Cancel", "preset": "0"}' . $SQ . '">Cancel</a></li>' . $NL;
-    $str .= "</ul>" . $NL;
-    $str .= '</div>' . $NL;
+
 
     $str .= '<div data-role="popup" id="popupControl">' . $NL;
-    $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">' . $NL;
+    $str .= '<div data-role="collapsible-set" data-content-theme="d" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" style="margin:0; width:250;">' . $NL;
+
+    $str .= '<div data-role="collapsible" data-inset="false" data-collapsed="false">' . $NL;
+    $str .= '<h2>Kontrol</h2>' . $NL;
+    $str .= '<ul data-role="listview">' . $NL;
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Play", "preset": "0"}' . $SQ . '">Play</a></li>' . $NL;
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Pause", "preset": "0"}' . $SQ . '">Pause</a></li>' . $NL;
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Stop", "preset": "0"}' . $SQ . '">Stop</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Next", "preset": "0"}' . $SQ . '">Next</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Previous", "preset": "0"}' . $SQ . '">Previous</a></li>' . $NL;
+    $str .= '</ul>' . $NL;
+    $str .= '</div> <!-- collapsible: Kontrol -->' . $NL;
+
+    $str .= '<div data-role="collapsible" data-inset="false">' . $NL;
+    $str .= '<h2>Volume</h2>' . $NL;
+    $str .= '<ul data-role="listview">' . $NL;
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "preset": "35"}' . $SQ . '">35</a></li>' . $NL;
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "preset": "39"}' . $SQ . '">39</a></li>' . $NL;
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "preset": "42"}' . $SQ . '">42</a></li>' . $NL;
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "IncrVolume", "preset": "0"}' . $SQ . '">+1</a></li>' . $NL;
     $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "DecrVolume", "preset": "0"}' . $SQ . '">-1</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Cancel", "preset": "0"}' . $SQ . '">Cancel</a></li>' . $NL;
-    $str .= "</ul>" . $NL;
-    $str .= '</div>' . $NL;
+    $str .= '</ul>' . $NL;
+    $str .= '</div> <!-- collapsible: Extra -->' . $NL;
+
+    $str .= '<div data-role="collapsible" data-inset="false">' . $NL;
+    $str .= '<h2>Extra</h2>' . $NL;
+    $str .= '<ul data-role="listview">' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Next", "preset": "0"}' . $SQ . '">Next</a></li>' . $NL;
+    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Previous", "preset": "0"}' . $SQ . '">Previous</a></li>' . $NL;
+    $str .= '</ul>' . $NL;
+    $str .= '</div> <!-- collapsible: Extra -->' . $NL;
+
+    $str .= '</div> <!-- collapsible-set: popupControl -->' . $NL;
+    $str .= '</div> <!-- popup: popupControl -->' . $NL;
+
+
+
 
     $str .= '</div><!-- /header -->' . $NL;
 
@@ -193,7 +204,7 @@ function MakePopupPresetList(&$manifest, $id, $FromPage, $FirstPreset, $PresetCo
    for ($i = $FirstPreset; $i < $FirstPreset + $PresetCount; $i++)
    {
       $str .= '<li>';
-      $str .= '<a href="#popupMenu-' . $i . '" data-rel="popup">';
+      $str .= '<a href="#popupMenu-' . $i . '" data-rel="popup" data-history="false">';
 
       $str .= '<img class="sprite_' . $i . '" src="Transparent.gif"/>';
 

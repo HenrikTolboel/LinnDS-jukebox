@@ -112,6 +112,10 @@ function PresetURL($num)
 
 function PrepareXML($xml)
 {
+    global $LINN_JUKEBOX_URL;
+
+    $xml = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_URL, $xml); // late binding of http server
+
     $xml = htmlspecialchars(str_replace(array("\n", "\r"), '', $xml));
     return $xml;
 }
@@ -139,7 +143,7 @@ function InsertDIDL_list($DIDL_URL, $AfterId)
 	//print "URL[" . $i . "] : " .$URLs[$i][0] . $NL;
 	//print "DIDL[" . $i . "]: " .$DIDLs[$i]->asXML() . $NL;
 
-	//Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" .$URLs[$i][0] . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
+	//Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" .PrepareXML($URLs[$i][0]) . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
     //}
 
     Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[0][0]) . "\" \"" . PrepareXML($DIDLs[0]->asXML()) . "\"");

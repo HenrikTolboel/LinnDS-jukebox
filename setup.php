@@ -18,6 +18,7 @@ $USE_DIALOG = true;
 
 $NL = "\n";
 $SQ = "'";
+$DIR_DELIM = "/";
 
 $manifestfile = $PRESETS_DIR ."/" . "manifest.xml";
 

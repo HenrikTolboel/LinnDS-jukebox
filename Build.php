@@ -491,7 +491,7 @@ function MainMenu(&$Menu)
     global $ALPHABET_SIZE;
 
     $str = file_get_contents("header.inc");
-    $str .= '<div id="htplace" data-musik=""></div>' . $NL . $NL;
+    $str .= '<div id="globals" data-musik=""></div>' . $NL . $NL;
 
     $str .= Page("page_musik", "Musik", RootMenu("RootMenu", $Menu->RootMenu, $Menu), "LinnDS-jukebox", "true");
 
@@ -630,83 +630,94 @@ function Make_CSS($AlbumCnt, $CSS1, $CSS2)
 
 // ########## Main  #######################################################################
 
-//Create a didl file in each directory containing music
-echo "Removing old .dpl files" . $NL;
-#UnlinkDPL();
-echo "Making a didl file in each directory..." . $NL;
-#MakePlaylists($TopDirectory);
-
-//Build Menu tree
-echo "Building Menu tree..." . $NL;
-$Menu = new Menus($RootMenu, $SubMenuType);
-
-
-
-
- echo "Find all didl files and add to Menu tree..." . $NL;
-// Find all didl files and add it to the menus
-try
+function Main($DoAll)
 {
-    foreach ($TopDirectory as $Dir => $RootMenuNo)
-    {
-	$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($Dir));
-	while($it->valid())
-	{
-	    if($it->isFile())
-	    {
-		$ext = pathinfo($it->current(), PATHINFO_EXTENSION);
+    global $NL;
+    global $RootMenu;
+    global $SubMenuType;
+    global $TopDirectory;
+    global $AppDir;
 
-		if ($ext == "dpl")
+    //Create a didl file in each directory containing music
+    echo "Removing old .dpl files" . $NL;
+    if ($DoAll) UnlinkDPL();
+    echo "Making a didl file in each directory..." . $NL;
+    if ($DoAll) MakePlaylists($TopDirectory);
+
+    //Build Menu tree
+    echo "Building Menu tree..." . $NL;
+    $Menu = new Menus($RootMenu, $SubMenuType);
+
+
+
+
+     echo "Find all didl files and add to Menu tree..." . $NL;
+    // Find all didl files and add it to the menus
+    try
+    {
+	foreach ($TopDirectory as $Dir => $RootMenuNo)
+	{
+	    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($Dir));
+	    while($it->valid())
+	    {
+		if($it->isFile())
 		{
-		    $didl = new DIDLPreset($it->getPathName(), $RootMenuNo);
-		    $Menu->Add($didl);
+		    $ext = pathinfo($it->current(), PATHINFO_EXTENSION);
+
+		    if ($ext == "dpl")
+		    {
+			$didl = new DIDLPreset($it->getPathName(), $RootMenuNo);
+			$Menu->Add($didl);
+		    }
 		}
+		$it->next();
 	    }
-	    $it->next();
 	}
     }
+    catch(Exception $e)
+    {
+	echo $e->getMessage();
+    }
+
+    echo "Sort menu tree..." . $NL;
+    $Menu->sort();
+
+    //print_r($Menu);
+
+    $AppDir = "site/";
+
+    $cmd = "rm " . $AppDir . "* " . $AppDir . "*/*";
+    echo "executing " . $cmd . $NL;
+    shell_exec($cmd);
+
+    copy("actions.js", $AppDir . "actions.js");
+    copy("daemon/LinnDS-jukebox-daemon.php", $AppDir . "LinnDS-jukebox-daemon.php");
+    copy("daemon/S98linn_lpec", $AppDir . "S98linn_lpec");
+    copy("Transparent.gif", $AppDir . "Transparent.gif");
+    copy("setup.php", $AppDir . "setup.php");
+    copy("Send.php", $AppDir . "Send.php");
+
+    echo "Writing MainMenu to " . $AppDir . $NL;
+    file_put_contents($AppDir . "index.html", MainMenu($Menu));
+
+    echo "Making URI_Index in " . $AppDir . $NL;
+    $URI_Array = array();
+    $Menu->user_func('Make_URI_Array', $URI_Array);
+    file_put_contents($AppDir . "URI_index", serialize($URI_Array));
+
+    echo "Making album files in " . $AppDir . $NL;
+    $AlbumCnt = 0;
+    $Menu->user_func('Make_AlbumHTML', $AlbumCnt);
+
+    echo "Collecting directory images in " . $AppDir . $NL;
+    if ($DoAll) $Menu->user_func('CollectFolderImgs', $dummy);
+
+    echo "Making sprites and css file in " . $AppDir . $NL;
+    if ($DoAll) Make_CSS($AlbumCnt, $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
+
+    echo "Finished..." . $NL;
 }
-catch(Exception $e)
-{
-    echo $e->getMessage();
-}
 
-echo "Sort menu tree..." . $NL;
-$Menu->sort();
-
-//print_r($Menu);
-
-$AppDir = "site/";
-
-$cmd = "rm " . $AppDir . "* " . $AppDir . "*/*";
-echo "executing " . $cmd . $NL;
-shell_exec($cmd);
-
-copy("actions.js", $AppDir . "actions.js");
-copy("daemon/LinnDS-jukebox-daemon.php", $AppDir . "LinnDS-jukebox-daemon.php");
-copy("daemon/S98linn_lpec", $AppDir . "S98linn_lpec");
-copy("Transparent.gif", $AppDir . "Transparent.gif");
-copy("setup.php", $AppDir . "setup.php");
-copy("Send.php", $AppDir . "Send.php");
-
-echo "Writing MainMenu to " . $AppDir . $NL;
-file_put_contents($AppDir . "index.html", MainMenu($Menu));
-
-echo "Making URI_Index in " . $AppDir . $NL;
-$URI_Array = array();
-$Menu->user_func('Make_URI_Array', $URI_Array);
-file_put_contents($AppDir . "URI_index", serialize($URI_Array));
-
-echo "Making album files in " . $AppDir . $NL;
-$AlbumCnt = 0;
-$Menu->user_func('Make_AlbumHTML', $AlbumCnt);
-
-echo "Collecting directory images in " . $AppDir . $NL;
-#$Menu->user_func('CollectFolderImgs', $dummy);
-
-echo "Making sprites and css file in " . $AppDir . $NL;
-#Make_CSS($AlbumCnt, $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
-
-echo "Finished..." . $NL;
+Main(true);
 
 ?>

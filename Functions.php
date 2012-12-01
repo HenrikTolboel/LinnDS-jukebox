@@ -24,9 +24,9 @@ function Page($id, $title, $content, $footer, $cache)
         //$str .= '<a href="options.php" data-icon="gear" class="ui-btn-right" data-prefetch>Options</a>' . $NL;
 
     //$str .= '<a href="#popupSource" data-rel="popup" data-icon="gear" data-history="false">Kilde</a>' . $NL;
-$str .= '<a class="popsource" href="#" data-icon="gear" data-musik=' . $SQ . '{"id": "#' . $id . '-popupSource"}' . $SQ . '>Kilde</a>' . $NL;
+$str .= '<a class="popsource" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "#' . $id . '-popupSource"}' . $SQ . '>Kilde</a>' . $NL;
     //$str .= '<a href="#popupControl" data-rel="popup" data-icon="gear" data-history="false">Kontrol</a>' . $NL;
-$str .= '<a class="popcontrol" href="#" data-icon="gear" data-musik=' . $SQ . '{"id": "#' . $id . '-popupControl"}' . $SQ . '>Kontrol</a>' . $NL;
+$str .= '<a class="popcontrol" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "#' . $id . '-popupControl"}' . $SQ . '>Kontrol</a>' . $NL;
 
 
     $str .= '<div data-role="popup" id="' . $id . '-popupSource">' . $NL;

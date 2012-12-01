@@ -24,7 +24,7 @@ $(function() {
    $('body').delegate("a.popupclick", "click", function() {
 	var volume = $(this).data("musik").volume;
 	var action = $(this).data("musik").action;
-	var preset = $('#htplace').data("musik").preset;
+	var preset = $('#globals').data("musik").preset;
 	console.log(action + " = " + preset + ", " + volume);
 	if (action != "Cancel") {
 	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset } , function (data) {
@@ -39,9 +39,9 @@ $(function() {
 	var preset = $(this).data("musik").preset;
 	var id = $(this).data("musik").id; // id of the popup menu to calls
 	console.log(id + " = " + preset);
-	$('#htplace').data("musik", {preset: preset, last: id }); 
+	$('#globals').data("musik", {preset: preset, last: id }); 
 	$(id).html($('#play-popup'));
-	//var t = $('#htplace').data("musik");
+	//var t = $('#globals').data("musik");
 	$(id).popup('open', {positionTo: "#" + preset } );
 	return true;
    });

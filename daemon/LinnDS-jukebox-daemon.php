@@ -126,6 +126,7 @@ function PresetURL($num)
     {
 	$URI_index_mtime = filemtime("URI_index");
 	$URI_index = unserialize(file_get_contents("URI_index"));
+	LogWrite("Load URI_index");
     }
     
     if ($URI_index_mtime > 0)

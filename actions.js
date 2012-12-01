@@ -22,15 +22,41 @@ $(function() {
    });
 
    $('body').delegate("a.popupclick", "click", function() {
-	var value = $(this).data("musik").preset;
+	var volume = $(this).data("musik").volume;
 	var action = $(this).data("musik").action;
-	console.log(action + " = " + value);
+	var preset = $('#htplace').data("musik").preset;
+	console.log(action + " = " + preset + ", " + volume);
 	if (action != "Cancel") {
-	    jQuery.get("Send.php", { action: action, value: value } , function (data) {
+	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset } , function (data) {
 		//alert('Load OK' + data);
 	    });
 	}
 	$('.ui-popup').popup('close');
+	return true;
+   });
+
+   $('body').delegate("a.pop", "click", function() {
+	var preset = $(this).data("musik").preset;
+	var id = $(this).data("musik").id; // id of the popup menu to calls
+	console.log(id + " = " + preset);
+	$('#htplace').data("musik", {preset: preset, last: id }); 
+	$(id).html($('#play-popup'));
+	//var t = $('#htplace').data("musik");
+	$(id).popup('open', {positionTo: "# . $id + " } );
+	return true;
+   });
+
+   $('body').delegate("a.popsource", "click", function() {
+	var id = $(this).data("musik").id; // id of the popup menu to calls
+	$(id).html($('#popupSource'));
+	$(id).popup('open');
+	return true;
+   });
+
+   $('body').delegate("a.popcontrol", "click", function() {
+	var id = $(this).data("musik").id; // id of the popup menu to calls
+	$(id).html($('#popupControl'));
+	$(id).popup('open');
 	return true;
    });
 

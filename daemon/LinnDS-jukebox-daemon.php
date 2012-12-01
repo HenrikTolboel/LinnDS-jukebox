@@ -71,6 +71,18 @@ $SubscribeType['Ds/Radio'] = -1;
 $SubscribeType['Ds/Info'] = -1;
 $SubscribeType['Ds/Time'] = -1;
 
+// Load index over # -> DPL URI's
+if (file_exists("URI_index"))
+{
+    $URI_index_mtime = filemtime("URI_index");
+    $URI_index = unserialize(file_get_contents("URI_index"));
+    $State['URI_index'] = "Loaded";
+}
+else
+{
+    $URI_index_mtime = 0;
+}
+
 function LogWrite($Str)
 {
    global $Queue;
@@ -106,8 +118,26 @@ function Send($Str)
 function PresetURL($num)
 {
     global $LINN_JUKEBOX_URL;
+    global $URI_index;
+    global $URI_index_mtime;
 
-    return $LINN_JUKEBOX_URL . "/_Presets/" . $num . ".dpl";
+    echo "PresetURL: " . $URI_index[$num] . $NL;
+    if (file_exists("URI_index") && filemtime("URI_index") > $URI_index_mtime)
+    {
+	$URI_index_mtime = filemtime("URI_index");
+	$URI_index = unserialize(file_get_contents("URI_index"));
+    }
+    
+    if ($URI_index_mtime > 0)
+    {
+	$dpl = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_URL, $URI_index[$num]);
+
+	return $dpl;
+    }
+    else
+    {
+	return $LINN_JUKEBOX_URL . "/_Presets/" . $num . ".dpl";
+    }
 }
 
 function PrepareXML($xml)

@@ -10,7 +10,6 @@
 
 require_once("setup.php");
 
-$value = $_GET["value"];
 $action = $_GET["action"];
 
 $HOST = "127.0.0.1";
@@ -21,15 +20,19 @@ socket_connect($socket, $HOST, $PORT);
 $string = socket_read($socket, 10000); // Remove connection info sent from server...
 
 if ($action == "PlayNow") {
+    $value = $_GET["preset"];
     $Str = "Jukebox PlayNow \"" . $value . "\"";
 }
 elseif ($action == "PlayNext") {
+    $value = $_GET["preset"];
     $Str = "Jukebox PlayNext \"" . $value . "\"";
 }
 elseif ($action == "PlayLater") {
+    $value = $_GET["preset"];
     $Str = "Jukebox PlayLater \"" . $value . "\"";
 }
 elseif ($action == "SetVolume") {
+    $value = $_GET["volume"];
     $Str = "Volume Set \"" . $value . "\"";
 }
 elseif ($action == "IncrVolume") {

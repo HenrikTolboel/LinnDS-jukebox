@@ -418,7 +418,7 @@ function MenuAlbumList($id, &$ArrayList)
 	$str .= '<li>';
 
 	//$str .= '<a href="#'. $id . '-' . $c . '" data-rel="popup" data-history="false">';
-	$str .= '<a id="' . $it->current()->SequenceNo() . '" class="pop" href="#" data-musik=' . $SQ . '{"id": "#' . $id . '-popup", "preset": "' . $it->current()->SequenceNo() . '"}' . $SQ . '>';
+	$str .= '<a id="' . $it->current()->SequenceNo() . '" class="pop" data-rel=popup" href="#" data-musik=' . $SQ . '{"id": "#' . $id . '-popup", "preset": "' . $it->current()->SequenceNo() . '"}' . $SQ . '>';
 
 	$str .= '<img class="sprite_' . $it->current()->SequenceNo() . '" src="Transparent.gif"/>';
 

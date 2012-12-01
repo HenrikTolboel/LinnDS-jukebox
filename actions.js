@@ -42,7 +42,7 @@ $(function() {
 	$('#htplace').data("musik", {preset: preset, last: id }); 
 	$(id).html($('#play-popup'));
 	//var t = $('#htplace').data("musik");
-	$(id).popup('open', {positionTo: "# . $id + " } );
+	$(id).popup('open', {positionTo: "#" + preset } );
 	return true;
    });
 

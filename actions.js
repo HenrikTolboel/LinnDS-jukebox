@@ -37,26 +37,25 @@ $(function() {
 
    $('body').delegate("a.pop", "click", function() {
 	var preset = $(this).data("musik").preset;
-	var id = $(this).data("musik").id; // id of the popup menu to calls
+	var id = $(this).data("musik").id;
 	console.log(id + " = " + preset);
 	$('#globals').data("musik", {preset: preset, last: id }); 
 	$(id).html($('#play-popup'));
-	//var t = $('#globals').data("musik");
 	$(id).popup('open', {positionTo: "#" + preset } );
 	return true;
    });
 
    $('body').delegate("a.popsource", "click", function() {
-	var id = $(this).data("musik").id; // id of the popup menu to calls
-	$(id).html($('#popupSource'));
-	$(id).popup('open');
+	var id = $(this).data("musik").id;
+	$("#" + id).html($('#popupSource'));
+	$("#" + id).popup('open', {positionTo: "#" + id + "-pos" } );
 	return true;
    });
 
    $('body').delegate("a.popcontrol", "click", function() {
-	var id = $(this).data("musik").id; // id of the popup menu to calls
-	$(id).html($('#popupControl'));
-	$(id).popup('open');
+	var id = $(this).data("musik").id;
+	$("#" + id).html($('#popupControl'));
+	$("#" + id).popup('open', {positionTo: "#" + id + "-pos" } );
 	return true;
    });
 

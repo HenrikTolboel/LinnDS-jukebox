@@ -21,9 +21,9 @@ function Page($id, $title, $content, $footer, $cache)
     $str .= '<div data-role="header" data-position="fixed">' . $NL;
     $str .= '<h1>' . $title . '</h1>'. $NL;
 
-$str .= '<a class="popsource" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "#' . $id . '-popupSource"}' . $SQ . '>Kilde</a>' . $NL;
+$str .= '<a id="' . $id . '-popupSource-pos" class="popsource" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "' . $id . '-popupSource"}' . $SQ . '>Kilde</a>' . $NL;
 
-$str .= '<a class="popcontrol" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "#' . $id . '-popupControl"}' . $SQ . '>Kontrol</a>' . $NL;
+$str .= '<a id="' . $id . '-popupControl-pos" class="popcontrol" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "' . $id . '-popupControl"}' . $SQ . '>Kontrol</a>' . $NL;
 
 
     $str .= '<div data-role="popup" id="' . $id . '-popupSource">' . $NL;

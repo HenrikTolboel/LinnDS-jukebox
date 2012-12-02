@@ -121,7 +121,7 @@ function PresetURL($num)
     global $URI_index;
     global $URI_index_mtime;
 
-    echo "PresetURL: " . $URI_index[$num] . $NL;
+    LogWrite("PresetURL: " . $URI_index[$num]);
     if (file_exists("URI_index") && filemtime("URI_index") > $URI_index_mtime)
     {
 	$URI_index_mtime = filemtime("URI_index");

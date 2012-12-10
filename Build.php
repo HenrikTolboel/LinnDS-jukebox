@@ -336,6 +336,19 @@ function RootMenu($id, $RootMenu, &$Menu)
 
     $str .= "</ul>" . $NL;
 
+    $str .= DummyPage();
+
+    return $str;
+}
+
+function DummyPage()
+{
+    global $SQ;
+    global $DQ;
+    global $NL;
+
+    $str= "";
+
     // The play menu is not used here in root menu, but it is copied from 
     // here on activation to other pages - done by actions.jp "a.pop" 
     // delegate
@@ -362,9 +375,19 @@ function RootMenu($id, $RootMenu, &$Menu)
     $str .= '</div>' . $NL;
     //End of popupSource menu
 
+    // popupPanel...
+    $str .= '<div data-role="popup" id="popupPanel" data-history="false" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0">' . $NL;
+
+    $str .= '<button href="#" class="popupclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Play"}' . $SQ . '">Play</button>' . $NL;
+    $str .= '<button href="#" class="popupclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Pause"}' . $SQ . '">Pause</button>' . $NL;
+    $str .= '<button href="#" class="popupclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Stop"}' . $SQ . '">Stop</button>' . $NL;
+
+    $str .= '</div>' . $NL;
+    //End of popupPanel
 
 
     // popupControl menu...
+    /*
     $str .= '<div data-role="popup" id="popupControl" data-history="false">' . $NL;
     $str .= '<div data-role="collapsible-set" data-content-theme="d" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" style="margin:0; width:250;">' . $NL;
 
@@ -398,6 +421,7 @@ function RootMenu($id, $RootMenu, &$Menu)
 
     $str .= '</div> <!-- collapsible-set: popupControl -->' . $NL;
     $str .= '</div> <!-- popup: popupControl -->' . $NL;
+    */
     // End of popupControl menu...
 
 
@@ -418,7 +442,7 @@ function MenuAlbumList($id, &$ArrayList)
 	$str .= '<li>';
 
 	//$str .= '<a href="#'. $id . '-' . $c . '" data-rel="popup" data-history="false">';
-	$str .= '<a id="' . $it->current()->SequenceNo() . '" class="pop" data-rel=popup" href="#" data-musik=' . $SQ . '{"id": "#' . $id . '-popup", "preset": "' . $it->current()->SequenceNo() . '"}' . $SQ . '>';
+	$str .= '<a id="' . $it->current()->SequenceNo() . '" class="pop" data-rel=popup" href="#" data-musik=' . $SQ . '{"id": "' . $id . '-popup", "preset": "' . $it->current()->SequenceNo() . '"}' . $SQ . '>';
 
 	$str .= '<img class="sprite_' . $it->current()->SequenceNo() . '" src="Transparent.gif"/>';
 
@@ -691,6 +715,7 @@ function Main($DoAll)
     shell_exec($cmd);
 
     copy("actions.js", $AppDir . "actions.js");
+    copy("musik.css", $AppDir . "musik.css");
     copy("daemon/LinnDS-jukebox-daemon.php", $AppDir . "LinnDS-jukebox-daemon.php");
     copy("daemon/S98linn_lpec", $AppDir . "S98linn_lpec");
     copy("Transparent.gif", $AppDir . "Transparent.gif");

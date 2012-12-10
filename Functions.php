@@ -23,15 +23,18 @@ function Page($id, $title, $content, $footer, $cache)
 
 $str .= '<a id="' . $id . '-popupSource-pos" class="popsource" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "' . $id . '-popupSource"}' . $SQ . '>Kilde</a>' . $NL;
 
-$str .= '<a id="' . $id . '-popupControl-pos" class="popcontrol" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "' . $id . '-popupControl"}' . $SQ . '>Kontrol</a>' . $NL;
+//$str .= '<a id="' . $id . '-popupControl-pos" class="popcontrol" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "' . $id . '-popupControl"}' . $SQ . '>Kontrol</a>' . $NL;
+$str .= '<a id="' . $id . '-popupPanel" class="poppanel popupPanel" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "' . $id . '-popupPanel"}' . $SQ . '>Kontrol</a>' . $NL;
 
 
     $str .= '<div data-role="popup" id="' . $id . '-popupSource">' . $NL;
     $str .= '</div>' . $NL;
 
-
     $str .= '<div data-role="popup" id="' . $id . '-popupControl">' . $NL;
-    $str .= '</div> <!-- popup: popupControl -->' . $NL;
+    $str .= '</div>' . $NL;
+
+    $str .= '<div data-role="popup" id="' . $id . '-popupPanel">' . $NL;
+    $str .= '</div>' . $NL;
 
 
     $str .= '</div><!-- /header -->' . $NL;

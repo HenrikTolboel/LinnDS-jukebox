@@ -527,6 +527,7 @@ function MainMenu(&$Menu)
     global $NL;
     global $ALPHABET;
     global $ALPHABET_SIZE;
+    global $RootMenu;
 
     $str .= Page("page_musik", "Musik", RootMenu("RootMenu", $Menu->RootMenu, $Menu), "LinnDS-jukebox", "true");
 

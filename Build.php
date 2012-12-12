@@ -743,6 +743,7 @@ function Main($DoAll)
     echo "Finished..." . $NL;
 }
 
-Main(true);
+//Main(true);
+Main(false);
 
 ?>

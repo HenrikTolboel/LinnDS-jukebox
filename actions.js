@@ -25,13 +25,14 @@ $(function() {
 	var volume = $(this).data("musik").volume;
 	var action = $(this).data("musik").action;
 	var preset = $('#globals').data("musik").preset;
+	var id = $('#globals').data("musik").id;
 	console.log(action + " = " + preset + ", " + volume);
 	if (action != "Cancel") {
 	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset } , function (data) {
 		//alert('Load OK' + data);
 	    });
 	}
-	$('.ui-popup').popup('close');
+	$("#" + id).popup('close');
 	return true;
    });
 
@@ -39,7 +40,7 @@ $(function() {
 	var preset = $(this).data("musik").preset;
 	var id = $(this).data("musik").id;
 	console.log(id + " = " + preset);
-	$('#globals').data("musik", {preset: preset, last: id }); 
+	$('#globals').data("musik", {preset: preset, id: id }); 
 	var t = $('#play-popup').clone();
 	$("#" + id).empty().append(t);
 	$("#" + id).popup('open', {positionTo: "#" + preset } );

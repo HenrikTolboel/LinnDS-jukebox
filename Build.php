@@ -317,7 +317,7 @@ function RootMenu($id, $RootMenu, &$Menu)
     global $DQ;
     global $NL;
 
-    $str= '<ul id="' . $id . '" data-role="listview" data-filter="false">' . $NL;
+    $str= '<ul data-role="listview" data-filter="false">' . $NL;
     for ($i=0; $i < $Menu->MenuCnt; $i++)
     {
 	if ($i == 0) 
@@ -328,7 +328,7 @@ function RootMenu($id, $RootMenu, &$Menu)
 	{
 	    $prefetch = "";
 	}
-        $str .= '<li><a href="#page_SubMenu_' . $i . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
+        $str .= '<li><a href="#p' . $i . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
 
         $str .= '<span class="ui-li-count">' . $Menu->MenuAlbumCnt[$i] .'</span>';
         $str .= '</li>' . $NL;
@@ -336,12 +336,12 @@ function RootMenu($id, $RootMenu, &$Menu)
 
     $str .= "</ul>" . $NL;
 
-    $str .= DummyPage();
+    $str .= DummyPopups();
 
     return $str;
 }
 
-function DummyPage()
+function DummyPopups()
 {
     global $SQ;
     global $DQ;
@@ -433,7 +433,7 @@ function MenuAlbumList($id, &$ArrayList)
     global $SQ;
     global $NL;
 
-    $str = '<ul id="' . $id . '" data-role="listview" data-filter="false">' . $NL;
+    $str = '<ul data-role="listview" data-filter="false">' . $NL;
     $funcs = "";
 
     $it = $ArrayList->getIterator();
@@ -485,7 +485,7 @@ function MenuAlphabetPage($id, &$ArrayListList)
     global $ALPHABET;
     global $ALPHABET_SIZE;
 
-    $str = '<div id="' . $id . '" class="ui-grid-c">' . $NL;
+    $str = '<div class="ui-grid-c">' . $NL;
 
     $class = "ui-block-a";
 
@@ -494,7 +494,7 @@ function MenuAlphabetPage($id, &$ArrayListList)
 	if ($ArrayListList[$ALPHABET[$alpha]]->count() < 1)
 	    $class .= " ui-disabled";
 	$str .= '<div class="' . $class . '">';
-	$href = '#page_' . $id . "_" . $ALPHABET[$alpha];
+	$href = '#' . $id . "_" . $ALPHABET[$alpha];
 	$str .= '<a href="' . $href . '" data-role="button">';
 	$str .= strtoupper($ALPHABET[$alpha]);
 	$str .= '</a>';
@@ -522,18 +522,18 @@ function MainMenu(&$Menu)
     for ($i = 0; $i < $Menu->MenuCnt; $i++)
     {
 	if ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NONE) 
-	    $str .= Page("page_SubMenu_" . $i, $RootMenu[$i], MenuAlbumList("SubMenu_" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", "false");
+	    $str .= Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", "false");
 	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_ALPHABET)
 	{
-	    $str .= Page("page_SubMenu_" . $i, $RootMenu[$i], MenuAlphabetPage("SubMenu_" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", "false");
+	    $str .= Page("p" . $i, $RootMenu[$i], MenuAlphabetPage("p" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", "false");
 
 	    for ($alpha = 0; $alpha < $ALPHABET_SIZE; $alpha++)
 	    {
 		if ($Menu->Menu[$i][$ALPHABET[$alpha]]->count() > 0)
 		{
-		    $str .= Page("page_SubMenu_" . $i . "_" . $ALPHABET[$alpha], 
+		    $str .= Page("p" . $i . "_" . $ALPHABET[$alpha], 
 			$Menu->RootMenu[$i] . " - " . $ALPHABET[$alpha],
-			MenuAlbumList("SubMenu_" . $i . "_" . $ALPHABET[$alpha], $Menu->Menu[$i][$ALPHABET[$alpha]]),
+			MenuAlbumList("p" . $i . "_" . $ALPHABET[$alpha], $Menu->Menu[$i][$ALPHABET[$alpha]]),
 			"LinnDS-jukebox", "false");
 		}
 	    }

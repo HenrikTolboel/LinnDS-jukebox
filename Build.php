@@ -508,14 +508,25 @@ function MenuAlphabetPage($id, &$ArrayListList)
 }
 
 
+function HTMLDocument($WrapStr)
+{
+    global $NL;
+
+    $str = file_get_contents("header.inc");
+    $str .= '<div id="globals" data-musik=""></div>' . $NL . $NL;
+
+    $str .= $WrapStr;
+
+    $str .= file_get_contents("footer.inc");
+
+    return $str;
+}
+
 function MainMenu(&$Menu)
 {
     global $NL;
     global $ALPHABET;
     global $ALPHABET_SIZE;
-
-    $str = file_get_contents("header.inc");
-    $str .= '<div id="globals" data-musik=""></div>' . $NL . $NL;
 
     $str .= Page("page_musik", "Musik", RootMenu("RootMenu", $Menu->RootMenu, $Menu), "LinnDS-jukebox", "true");
 
@@ -540,8 +551,6 @@ function MainMenu(&$Menu)
 	}
     }
 
-    $str .= file_get_contents("footer.inc");
-
     return $str;
 }
 
@@ -554,7 +563,7 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
 {
     global $AppDir;
 
-    file_put_contents($AppDir . 'album_' . $didl->SequenceNo() . '.html', Album($didl->FileName()));
+    file_put_contents($AppDir . 'album_' . $didl->SequenceNo() . '.html', HTMLDocument(Album($didl->FileName())));
     $AlbumCnt++;
 }
 
@@ -723,7 +732,7 @@ function Main($DoAll)
     copy("Send.php", $AppDir . "Send.php");
 
     echo "Writing MainMenu to " . $AppDir . $NL;
-    file_put_contents($AppDir . "index.html", MainMenu($Menu));
+    file_put_contents($AppDir . "index.html", HTMLDocument(MainMenu($Menu)));
 
     echo "Making URI_Index in " . $AppDir . $NL;
     $URI_Array = array();

@@ -17,7 +17,7 @@ function Album($DIDLFile)
     global $LINN_JUKEBOX_URL;
     global $NL;
 
-    $str = file_get_contents("header.inc");
+    $str = "";
     $cont = "";
     $first = true;
 
@@ -158,8 +158,8 @@ function Album($DIDLFile)
 
 	$cont .= '<li>';
 
-	$cont .= '<h3><a href="#">' . $TRACK_NUMBER . '. ' . $TITLE . '</a></h3>';
-	$cont .= '<p>' . $DURATION . '</p>';
+	$cont .= '<a href="#"><h3>' . $TRACK_NUMBER . '. ' . $TITLE . '</h3>';
+	$cont .= '<p>' . $DURATION . '</p></a>';
 
 	$cont .= "</li>" . $NL;
     }
@@ -169,7 +169,6 @@ function Album($DIDLFile)
 
     $str .= Page("album-" . $preset, "Album", $cont, "LinnDS-jukebox", "false");
 
-    $str .= file_get_contents("footer.inc");
     return $str;
 }
 ?>

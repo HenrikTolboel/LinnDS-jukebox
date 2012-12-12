@@ -347,7 +347,7 @@ function DummyPopups()
     global $DQ;
     global $NL;
 
-    $str= "";
+    $str= $NL;
 
     // The play menu is not used here in root menu, but it is copied from 
     // here on activation to other pages - done by actions.jp "a.pop" 
@@ -494,7 +494,8 @@ function MenuAlphabetPage($id, &$ArrayListList)
 	if ($ArrayListList[$ALPHABET[$alpha]]->count() < 1)
 	    $class .= " ui-disabled";
 	$str .= '<div class="' . $class . '">';
-	$href = '#' . $id . "_" . $ALPHABET[$alpha];
+	//$href = '#' . $id . "_" . $ALPHABET[$alpha];
+	$href = $id . "_" . $ALPHABET[$alpha] . ".html";
 	$str .= '<a href="' . $href . '" data-role="button">';
 	$str .= strtoupper($ALPHABET[$alpha]);
 	$str .= '</a>';
@@ -525,6 +526,7 @@ function HTMLDocument($WrapStr)
 function MainMenu(&$Menu)
 {
     global $NL;
+    global $AppDir;
     global $ALPHABET;
     global $ALPHABET_SIZE;
     global $RootMenu;
@@ -534,7 +536,10 @@ function MainMenu(&$Menu)
     for ($i = 0; $i < $Menu->MenuCnt; $i++)
     {
 	if ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NONE) 
-	    $str .= Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", "false");
+	{
+	    file_put_contents($AppDir . "p" . $i . ".html", 
+		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i]) . DummyPopups(), "LinnDS-jukebox", "false")));
+	}
 	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_ALPHABET)
 	{
 	    $str .= Page("p" . $i, $RootMenu[$i], MenuAlphabetPage("p" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", "false");
@@ -543,10 +548,11 @@ function MainMenu(&$Menu)
 	    {
 		if ($Menu->Menu[$i][$ALPHABET[$alpha]]->count() > 0)
 		{
-		    $str .= Page("p" . $i . "_" . $ALPHABET[$alpha], 
+		    file_put_contents($AppDir . "p" . $i . "_" . $ALPHABET[$alpha] . ".html", 
+			HTMLDocument(Page("p" . $i . "_" . $ALPHABET[$alpha], 
 			$Menu->RootMenu[$i] . " - " . $ALPHABET[$alpha],
-			MenuAlbumList("p" . $i . "_" . $ALPHABET[$alpha], $Menu->Menu[$i][$ALPHABET[$alpha]]),
-			"LinnDS-jukebox", "false");
+			MenuAlbumList("p" . $i . "_" . $ALPHABET[$alpha], $Menu->Menu[$i][$ALPHABET[$alpha]]) . DummyPopups(),
+			"LinnDS-jukebox", "false")));
 		}
 	    }
 	}
@@ -564,7 +570,11 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
 {
     global $AppDir;
 
-    file_put_contents($AppDir . 'album_' . $didl->SequenceNo() . '.html', HTMLDocument(Album($didl->FileName())));
+    file_put_contents($AppDir . 'album_' . $didl->SequenceNo() . '.html', 
+	HTMLDocument(
+	    Page("album-" . $didl->SequenceNo(), "Album", 
+	    Album($didl->FileName()) . DummyPopups(),
+	    "LinnDS-jukebox", "false")));
     $AlbumCnt++;
 }
 

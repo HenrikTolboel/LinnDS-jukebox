@@ -17,7 +17,6 @@ function Album($DIDLFile)
     global $LINN_JUKEBOX_URL;
     global $NL;
 
-    $str = "";
     $cont = "";
     $first = true;
 
@@ -166,9 +165,6 @@ function Album($DIDLFile)
 
     $cont .= "</ul>";
 
-
-    $str .= Page("album-" . $preset, "Album", $cont, "LinnDS-jukebox", "false");
-
-    return $str;
+    return $cont;
 }
 ?>

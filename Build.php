@@ -686,10 +686,16 @@ function Main($DoAll)
     global $AppDir;
 
     //Create a didl file in each directory containing music
-    echo "Removing old .dpl files" . $NL;
-    if ($DoAll) UnlinkDPL();
-    echo "Making a didl file in each directory..." . $NL;
-    if ($DoAll) MakePlaylists($TopDirectory);
+    if ($DoAll > 3) 
+    {
+	echo "Removing old .dpl files" . $NL;
+	UnlinkDPL();
+    }
+    if ($DoAll > 0) 
+    {
+	echo "Making a didl file in each directory..." . $NL;
+	MakePlaylists($TopDirectory);
+    }
 
     //Build Menu tree
     echo "Building Menu tree..." . $NL;
@@ -757,16 +763,22 @@ function Main($DoAll)
     $AlbumCnt = 0;
     $Menu->user_func('Make_AlbumHTML', $AlbumCnt);
 
-    echo "Collecting directory images in " . $AppDir . $NL;
-    if ($DoAll) $Menu->user_func('CollectFolderImgs', $dummy);
+    if ($DoAll > 0) 
+    {
+	echo "Collecting directory images in " . $AppDir . $NL;
+	$Menu->user_func('CollectFolderImgs', $dummy);
+    }
 
-    echo "Making sprites and css file in " . $AppDir . $NL;
-    if ($DoAll) Make_CSS($AlbumCnt, $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
+    if ($DoAll > 0) 
+    {
+	echo "Making sprites and css file in " . $AppDir . $NL;
+	Make_CSS($AlbumCnt, $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
+    }
 
     echo "Finished..." . $NL;
 }
 
-//Main(true);
-Main(false);
+//Main(1);
+Main(0);
 
 ?>

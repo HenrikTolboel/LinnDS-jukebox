@@ -33,7 +33,35 @@ function PlayListFromDir($Dir, &$Key, &$Playlist)
     $Arr = new ArrayObject();
     try
     {
+	$cnt = 0;
+	$MTimeDPL = -1;
+	$MaxMTimeMusic = -1;
         $it = new directoryIterator($Dir);
+        while( $it->valid())
+        {
+            if( $it->isFile() )
+            {
+		$ext = pathinfo($it->current(), PATHINFO_EXTENSION);
+
+		if ($ext == "dpl")
+		{
+		    $MTimeDPL = $it->getMTime();
+		}
+		elseif ($ext == "flac" || $ext == "mp3" || $ext == "wma")
+		{
+		    if ($MaxMTimeMusic == -1 || $MaxMTimeMusic < $it->getMTime())
+			$MaxMTimeMusic = $it->getMTime();
+		    $cnt++;
+		}
+            }
+            $it->next();
+        }
+
+	if ($cnt == 0 || ($MTimeDPL > 0 && $MTimeDPL > $MaxMTimeMusic))
+	    return false;
+
+	$it->rewind();
+
         while( $it->valid())
         {
             if( $it->isFile() )
@@ -41,7 +69,9 @@ function PlayListFromDir($Dir, &$Key, &$Playlist)
 
 		$ext = pathinfo($it->current(), PATHINFO_EXTENSION);
 
-		if ($ext == "flac" || $ext == "mp3" || $ext == "wma")
+		if ($ext == "dpl")
+		    unlink($it->getPathName());
+		elseif ($ext == "flac" || $ext == "mp3" || $ext == "wma")
 		{
 		    //echo $it->getPathName() . $NL;
 		    $Arr->append(new MusicTags($it->getPathName()));

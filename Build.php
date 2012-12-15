@@ -328,6 +328,9 @@ function RootMenu($id, $RootMenu, &$Menu)
 	{
 	    $prefetch = "";
 	}
+	if ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NONE) 
+        $str .= '<li><a href="p' . $i . ".html" . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
+	else
         $str .= '<li><a href="#p' . $i . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
 
         $str .= '<span class="ui-li-count">' . $Menu->MenuAlbumCnt[$i] .'</span>';

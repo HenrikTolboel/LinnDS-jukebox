@@ -74,7 +74,7 @@ $SubscribeType['Ds/Time'] = -1;
 // Load index over # -> DPL URI's
 if (file_exists("URI_index"))
 {
-    $URI_index_mtime = filemtime("URI_index");
+    $State['URI_index_mtime'] = filemtime("URI_index");
     $URI_index = unserialize(file_get_contents("URI_index"));
     $State['URI_index'] = "Loaded";
 }
@@ -117,19 +117,19 @@ function Send($Str)
 
 function PresetURL($num)
 {
+    global $State;
     global $LINN_JUKEBOX_URL;
     global $URI_index;
-    global $URI_index_mtime;
 
     LogWrite("PresetURL: " . $URI_index[$num]);
-    if (file_exists("URI_index") && filemtime("URI_index") > $URI_index_mtime)
+    if (file_exists("URI_index") && filemtime("URI_index") > $State['URI_index_mtime'])
     {
-	$URI_index_mtime = filemtime("URI_index");
+	$State['URI_index_mtime'] = filemtime("URI_index");
 	$URI_index = unserialize(file_get_contents("URI_index"));
 	LogWrite("Load URI_index");
     }
     
-    if ($URI_index_mtime > 0)
+    if ($State['URI_index_mtime'] > 0)
     {
 	$dpl = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_URL, $URI_index[$num]);
 
@@ -157,29 +157,15 @@ function InsertDIDL_list($DIDL_URL, $AfterId)
 
     $xml = simplexml_load_file($DIDL_URL);
 
-    //$xml->registerXPathNamespace('linn', 'urn:linn-co-uk/playlist');
-    //$Tracks = $xml->xpath('linn:Track');
-
     $xml->registerXPathNamespace('didl', 'urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/');
     $URLs = $xml->xpath('//didl:res');
 
-    //print_r($URLs);
-
     $DIDLs = $xml->xpath('//didl:DIDL-Lite');
-
-    //print_r($DIDLs);
-
-    //for ($i = sizeof($URLs) -1; $i >= 0; $i--)
-    //{
-	//print "URL[" . $i . "] : " .$URLs[$i][0] . $NL;
-	//print "DIDL[" . $i . "]: " .$DIDLs[$i]->asXML() . $NL;
-
-	//Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" .PrepareXML($URLs[$i][0]) . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
-    //}
 
     Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[0][0]) . "\" \"" . PrepareXML($DIDLs[0]->asXML()) . "\"");
     for ($i = 1; $i < sizeof($URLs); $i++)
 	Send("ACTION Ds/Playlist 1 Insert \"%NewId%\" \"" . PrepareXML($URLs[$i][0]) . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
+    Send("ACTION Ds/Playlist 1 IdArray");
 }
 
 function ReadBlockFromSocket($read_sock)
@@ -273,6 +259,11 @@ while (true) {
             LogWrite("ALIVE ignored : " . $data);
             $DataHandled = true;
          }
+         elseif (strpos($data, "ERROR") !== false)
+         {
+            LogWrite("ERROR ignored : " . $data);
+            $DataHandled = true;
+         }
          elseif (strpos($data, "SUBSCRIBE") !== false)
          {
             // SUBSCRIBE are sent by Linn when a SUBSCRIBE finishes, thus
@@ -342,6 +333,16 @@ while (true) {
 	       }
                //LogWrite("State:");
                //print_r($State);
+	    }
+	    elseif (preg_match("/ACTION Ds\/Playlist 1 IdArray/m", $front, $matches) > 0)
+            {
+               if (preg_match("/RESPONSE \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"/m", $data, $match) > 0)
+               {
+		      $State['IdArray_base64'] = $match[2];
+		      $State['IdArray'] = unpack("N*", base64_decode($match[2]));
+	       }
+               LogWrite("State:");
+               print_r($State);
 	    }
 
             Send("");

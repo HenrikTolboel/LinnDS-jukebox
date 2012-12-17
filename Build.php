@@ -779,6 +779,6 @@ function Main($DoAll)
 }
 
 //Main(1);
-Main(0);
+Main(1);
 
 ?>

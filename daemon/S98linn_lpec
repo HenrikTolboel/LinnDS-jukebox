@@ -1,1 +1,1 @@
-(sleep 60 ; tart-stop-daemon --start --background --exec /usr/bin/php /musik/webapp/daemon/LinnDS-jukebox-daemon.php) &
+(sleep 60 ; start-stop-daemon --start --background --exec /usr/bin/php /musik/webapp/LinnDS-jukebox-daemon.php) &

@@ -65,6 +65,16 @@ class MusicTags {
 	    $this->Arr[Date]    = $FileInfo[tags_html][asf][year][0];
 	    //$this->Arr[DiscNo]   = $FileInfo[tags_html][vorbiscomment][discnumber][0];
 	}
+	elseif ($this->Arr[FileFormat] == "quicktime")
+	{
+	    $this->Arr[Title]   = $FileInfo[tags_html][quicktime][title][0];
+	    $this->Arr[Artist]  = $FileInfo[tags_html][quicktime][artist][0];
+	    $this->Arr[Album]   = $FileInfo[tags_html][quicktime][album][0];
+	    $this->Arr[TrackNo] = $FileInfo[tags_html][quicktime][track][0];
+	    $this->Arr[Genre]   = $FileInfo[tags_html][quicktime][genre][0];
+	    $this->Arr[Date]    = $FileInfo[tags_html][quicktime][year][0];
+	    //$this->Arr[DiscNo]   = $FileInfo[tags_html][vorbiscomment][discnumber][0];
+	}
 
 	$this->Arr[TrackNo] = ltrim($this->Arr[TrackNo], "0");
     }
@@ -127,5 +137,6 @@ function Test_MusicTags($FileName)
 //Test_MusicTags("test_music/file.flac");
 //Test_MusicTags("test_music/fil.mp3");
 //Test_MusicTags("test_music/fil.wma");
+//Test_MusicTags("test_music/fil.m4a");
 
 ?>

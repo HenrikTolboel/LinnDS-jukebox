@@ -47,7 +47,7 @@ function PlayListFromDir($Dir, &$Key, &$Playlist)
 		{
 		    $MTimeDPL = $it->getMTime();
 		}
-		elseif ($ext == "flac" || $ext == "mp3" || $ext == "wma")
+		elseif ($ext == "flac" || $ext == "mp3" || $ext == "wma" || $ext == "m4a")
 		{
 		    if ($MaxMTimeMusic == -1 || $MaxMTimeMusic < $it->getMTime())
 			$MaxMTimeMusic = $it->getMTime();
@@ -71,7 +71,7 @@ function PlayListFromDir($Dir, &$Key, &$Playlist)
 
 		if ($ext == "dpl")
 		    unlink($it->getPathName());
-		elseif ($ext == "flac" || $ext == "mp3" || $ext == "wma")
+		elseif ($ext == "flac" || $ext == "mp3" || $ext == "wma" || $ext == "m4a")
 		{
 		    //echo $it->getPathName() . $NL;
 		    $Arr->append(new MusicTags($it->getPathName()));

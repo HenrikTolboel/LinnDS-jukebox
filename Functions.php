@@ -10,7 +10,7 @@
 
 require_once("setup.php");
 
-function Page($id, $title, $content, $footer, $cache)
+function Page($id, $title, $content, $footer, $cache, $widgets)
 {
     global $SQ;
     global $NL;
@@ -21,21 +21,8 @@ function Page($id, $title, $content, $footer, $cache)
     $str .= '<div data-role="header" data-position="fixed">' . $NL;
     $str .= '<h1>' . $title . '</h1>'. $NL;
 
-$str .= '<a id="' . $id . '-popupSource-pos" class="popsource" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "' . $id . '-popupSource"}' . $SQ . '>Kilde</a>' . $NL;
 
-//$str .= '<a id="' . $id . '-popupControl-pos" class="popcontrol" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "' . $id . '-popupControl"}' . $SQ . '>Kontrol</a>' . $NL;
-$str .= '<a id="' . $id . '-popupPanel" class="poppanel popupPanel" href="#" data-rel="popup" data-history="false" data-icon="gear" data-musik=' . $SQ . '{"id": "' . $id . '-popupPanel"}' . $SQ . '>Kontrol</a>' . $NL;
-
-
-    $str .= '<div data-role="popup" id="' . $id . '-popupSource">' . $NL;
-    $str .= '</div>' . $NL;
-
-    $str .= '<div data-role="popup" id="' . $id . '-popupControl">' . $NL;
-    $str .= '</div>' . $NL;
-
-    $str .= '<div data-role="popup" id="' . $id . '-popupPanel">' . $NL;
-    $str .= '</div>' . $NL;
-
+    $str .= '<a id="' . $id . '-KontrolPanel" class="poppanel KontrolPanel ui-btn-left" href="#KontrolPanel" data-icon="bars">Kontrol</a>' . $NL;
 
     $str .= '</div><!-- /header -->' . $NL;
 
@@ -47,6 +34,8 @@ $str .= '<a id="' . $id . '-popupPanel" class="poppanel popupPanel" href="#" dat
     $str .= '<div data-role="footer">' . $NL;
     $str .= '<h4>' . $footer . "</h4>" . $NL;
     $str .= "</div><!-- /footer -->" . $NL;
+
+    $str .= $widgets . $NL;
 
     $str .= "</div><!-- /page -->" . $NL . $NL;
     return $str;
@@ -486,7 +475,7 @@ function MakePageCategories($manifest)
 	{
 	    $str = Page("page_cat-" . $cat, "Artist Index",
 		MakeArtistIndexAlphabet($manifest, "artistindex", $cat),
-		"LinnDS-jukebox", "true");
+		"LinnDS-jukebox", "true", "");
 	}
 	else
 	{
@@ -494,7 +483,7 @@ function MakePageCategories($manifest)
 		MakePresetList($manifest, "presets-" . $cat, "#page-cat-" . $cat,
 		    $manifest->CategoryFirstPreset[$cat], 
 		    min(21, $manifest->GetCategoryCount($cat))), 
-		"LinnDS-jukebox", "false");
+		"LinnDS-jukebox", "false", "");
 	}
 	$cachefile = $CACHE_DIR . "/pagecategory-" . $cat;
 	file_put_contents($cachefile, $str);
@@ -511,7 +500,7 @@ function MakeOnePreset($manifest, $FirstPreset, $PresetCount)
     $id = "presets-" . $FirstPreset . "-" . $PresetCount;
     $str .= Page("page_presets-" . $FirstPreset . "-" . $PresetCount, "Artist / Album", 
 	MakePresetList($manifest, $id, "presets.php", $FirstPreset, $PresetCount),
-	"LinnDS-jukebox", "false");
+	"LinnDS-jukebox", "false", "");
 
     $cachefilename = $CACHE_DIR . "/presets-" . $FirstPreset . "-" . $PresetCount;
     file_put_contents($cachefilename, $str);

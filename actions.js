@@ -36,6 +36,21 @@ $(function() {
 	return true;
    });
 
+   $('body').delegate("button.panelclick", "click", function() {
+	var volume = $(this).data("musik").volume;
+	var action = $(this).data("musik").action;
+	var preset = $('#globals').data("musik").preset;
+	var id = $('#globals').data("musik").id;
+	console.log(action + " = " + preset + ", " + volume);
+	if (action != "Cancel") {
+	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset } , function (data) {
+		//alert('Load OK' + data);
+	    });
+	}
+	//$("#" + id).popup('close');
+	return true;
+   });
+
    $('body').delegate("a.pop", "click", function() {
 	var preset = $(this).data("musik").preset;
 	var id = $(this).data("musik").id;
@@ -53,33 +68,6 @@ $(function() {
 	$("#" + id).popup('open', {positionTo: "#" + id + "-pos" } );
 	return true;
    });
-
-   $('body').delegate("a.popcontrol", "click", function() {
-	var id = $(this).data("musik").id;
-	var t = $('#popupControl').clone();
-	$("#" + id).empty().append(t);
-	$("#" + id).popup('open', {positionTo: "#" + id + "-pos" } );
-	return true;
-   });
-
-   $('body').delegate("a.poppanel", "click", function() {
-	var id = $(this).data("musik").id;
-	var t = $('#popupPanel').clone();
-	$("#" + id).empty().append(t);
-	var h = $( window ).height();
-
-	$("#" + id).css( "height", h );
-	$("#" + id).popup('open' );
-	return true;
-   });
-
-    $( ".popupPanel" ).on({
-	popupbeforeposition: function() {
-	    var h = $( window ).height();
-
-	    $( ".popupPanel" ).css( "height", h );
-	}
-    });
 
     //$('ul.presets').delegate("a.onepreset", "swipeleft", function() {
     /*

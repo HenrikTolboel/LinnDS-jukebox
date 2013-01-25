@@ -339,8 +339,6 @@ function RootMenu($id, $RootMenu, &$Menu)
 
     $str .= "</ul>" . $NL;
 
-    $str .= DummyPopups();
-
     return $str;
 }
 
@@ -352,7 +350,7 @@ function DummyPopups()
 
     $str= $NL;
 
-    // The play menu is not used here in root menu, but it is copied from 
+    // The play menu is not used here, but it is copied from 
     // here on activation to other pages - done by actions.jp "a.pop" 
     // delegate
     $str .= '<div data-role="popup" id="play-popup" data-history="false">' . $NL;
@@ -365,71 +363,41 @@ function DummyPopups()
     $str .= '</div>' . $NL;
     // End of play menu
 
-    // popupSource menu....
-    $str .= '<div data-role="popup" id="popupSource" data-history="false">' . $NL;
-    $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Playlist"}' . $SQ . '">Playlist</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-TV"}' . $SQ . '">TV</a></li>' . $NL;
-
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Radio"}' . $SQ . '">Radio</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-NetAux"}' . $SQ . '">Air-Play</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Source-Off"}' . $SQ . '">Off</a></li>' . $NL;
-    $str .= "</ul>" . $NL;
-    $str .= '</div>' . $NL;
-    //End of popupSource menu
-
-    // popupPanel...
-    $str .= '<div data-role="popup" id="popupPanel" data-history="false" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0">' . $NL;
-
-    $str .= '<button href="#" class="popupclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Play"}' . $SQ . '">Play</button>' . $NL;
-    $str .= '<button href="#" class="popupclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Pause"}' . $SQ . '">Pause</button>' . $NL;
-    $str .= '<button href="#" class="popupclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Stop"}' . $SQ . '">Stop</button>' . $NL;
-
-    $str .= '</div>' . $NL;
-    //End of popupPanel
-
-
-    // popupControl menu...
-    /*
-    $str .= '<div data-role="popup" id="popupControl" data-history="false">' . $NL;
-    $str .= '<div data-role="collapsible-set" data-content-theme="d" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" style="margin:0; width:250;">' . $NL;
-
-    $str .= '<div data-role="collapsible" data-inset="false" data-collapsed="false">' . $NL;
-    $str .= '<h2>Kontrol</h2>' . $NL;
-    $str .= '<ul data-role="listview">' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Play"}' . $SQ . '">Play</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Pause"}' . $SQ . '">Pause</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Stop"}' . $SQ . '">Stop</a></li>' . $NL;
-    $str .= '</ul>' . $NL;
-    $str .= '</div> <!-- collapsible: Kontrol -->' . $NL;
-
-    $str .= '<div data-role="collapsible" data-inset="false">' . $NL;
-    $str .= '<h2>Volume</h2>' . $NL;
-    $str .= '<ul data-role="listview">' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "volume": "35"}' . $SQ . '">35</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "volume": "39"}' . $SQ . '">39</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "SetVolume", "volume": "42"}' . $SQ . '">42</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "IncrVolume"}' . $SQ . '">+1</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "DecrVolume"}' . $SQ . '">-1</a></li>' . $NL;
-    $str .= '</ul>' . $NL;
-    $str .= '</div> <!-- collapsible: Extra -->' . $NL;
-
-    $str .= '<div data-role="collapsible" data-inset="false">' . $NL;
-    $str .= '<h2>Extra</h2>' . $NL;
-    $str .= '<ul data-role="listview">' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Next"}' . $SQ . '">Next</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Control-Previous"}' . $SQ . '">Previous</a></li>' . $NL;
-    $str .= '</ul>' . $NL;
-    $str .= '</div> <!-- collapsible: Extra -->' . $NL;
-
-    $str .= '</div> <!-- collapsible-set: popupControl -->' . $NL;
-    $str .= '</div> <!-- popup: popupControl -->' . $NL;
-    */
-    // End of popupControl menu...
-
-
     return $str;
 }
+
+function PageWidgets()
+{
+    global $SQ;
+    global $DQ;
+    global $NL;
+
+    $str= $NL;
+
+    // KontrolPanel...
+    $str .= '<div data-role="panel" id="KontrolPanel" data-position="left" data-position-fixed="true">' . $NL;
+	$str .= '<ul data-role="listview" data-theme="a" data-divider-theme="a" style="margin-top:-16px;margin-bottom:16px;" class="nav-search">' . $NL;
+	    $str .= '<li data-icon="delete" style="background-color:#111;">' . $NL;
+		$str .= '<a href="#" data-rel="close">Close</a>' . $NL;
+	    $str .= '</li>' . $NL;
+	$str .= '</ul>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Play"}' . $SQ . '">Play</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Pause"}' . $SQ . '">Pause</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Stop"}' . $SQ . '">Stop</button>' . $NL;
+
+
+
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Playlist"}' . $SQ . '">Playlist</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-TV"}' . $SQ . '">TV</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Radio"}' . $SQ . '">Radio</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-NetAux"}' . $SQ . '">AirPlay</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Off"}' . $SQ . '">Off</button>' . $NL;
+    $str .= '</div><!-- /panel -->' . $NL;
+    //End of KontrolPanel
+    
+    return $str;
+}
+
 
 function MenuAlbumList($id, &$ArrayList)
 {
@@ -534,18 +502,18 @@ function MainMenu(&$Menu)
     global $ALPHABET_SIZE;
     global $RootMenu;
 
-    $str .= Page("page_musik", "Musik", RootMenu("RootMenu", $Menu->RootMenu, $Menu), "LinnDS-jukebox", "true");
+    $str .= Page("page_musik", "Musik", RootMenu("RootMenu", $Menu->RootMenu, $Menu), "LinnDS-jukebox", "true", DummyPopups() . PageWidgets());
 
     for ($i = 0; $i < $Menu->MenuCnt; $i++)
     {
 	if ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NONE) 
 	{
 	    file_put_contents($AppDir . "p" . $i . ".html", 
-		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i]) . DummyPopups(), "LinnDS-jukebox", "false")));
+		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
 	}
 	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_ALPHABET)
 	{
-	    $str .= Page("p" . $i, $RootMenu[$i], MenuAlphabetPage("p" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", "false");
+	    $str .= Page("p" . $i, $RootMenu[$i], MenuAlphabetPage("p" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", "false", PageWidgets());
 
 	    for ($alpha = 0; $alpha < $ALPHABET_SIZE; $alpha++)
 	    {
@@ -554,8 +522,8 @@ function MainMenu(&$Menu)
 		    file_put_contents($AppDir . "p" . $i . "_" . $ALPHABET[$alpha] . ".html", 
 			HTMLDocument(Page("p" . $i . "_" . $ALPHABET[$alpha], 
 			$Menu->RootMenu[$i] . " - " . $ALPHABET[$alpha],
-			MenuAlbumList("p" . $i . "_" . $ALPHABET[$alpha], $Menu->Menu[$i][$ALPHABET[$alpha]]) . DummyPopups(),
-			"LinnDS-jukebox", "false")));
+			MenuAlbumList("p" . $i . "_" . $ALPHABET[$alpha], $Menu->Menu[$i][$ALPHABET[$alpha]]),
+			"LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
 		}
 	    }
 	}
@@ -576,8 +544,8 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
     file_put_contents($AppDir . 'album_' . $didl->SequenceNo() . '.html', 
 	HTMLDocument(
 	    Page("album-" . $didl->SequenceNo(), "Album", 
-	    Album($didl->FileName()) . DummyPopups(),
-	    "LinnDS-jukebox", "false")));
+	    Album($didl->FileName()),
+	    "LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
     $AlbumCnt++;
 }
 
@@ -739,9 +707,12 @@ function Main($DoAll)
 
     $AppDir = "site/";
 
-    $cmd = "rm " . $AppDir . "* " . $AppDir . "*/*";
-    echo "executing " . $cmd . $NL;
-    shell_exec($cmd);
+    if ($DoAll > 0) 
+    {
+	$cmd = "rm " . $AppDir . "* " . $AppDir . "*/*";
+	echo "executing " . $cmd . $NL;
+	shell_exec($cmd);
+    }
 
     copy("actions.js", $AppDir . "actions.js");
     copy("musik.css", $AppDir . "musik.css");
@@ -779,6 +750,6 @@ function Main($DoAll)
 }
 
 //Main(1);
-Main(1);
+Main(0);
 
 ?>

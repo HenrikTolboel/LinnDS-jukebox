@@ -381,17 +381,20 @@ function PageWidgets()
 		$str .= '<a href="#" data-rel="close">Close</a>' . $NL;
 	    $str .= '</li>' . $NL;
 	$str .= '</ul>' . $NL;
+
+        $str .= '<h4>Source</h4>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-rel="close" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Playlist"}' . $SQ . '">Playlist</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-rel="close" data-mini="true" data-musik=' . $SQ . '{"action": "Source-TV"}' . $SQ . '">TV</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-rel="close" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Radio"}' . $SQ . '">Radio</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-rel="close" data-mini="true" data-musik=' . $SQ . '{"action": "Source-NetAux"}' . $SQ . '">AirPlay</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-rel="close" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Off"}' . $SQ . '">Off</button>' . $NL;
+
+
+
+        $str .= '<h4>Kontrol</h4>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Play"}' . $SQ . '">Play</button>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Pause"}' . $SQ . '">Pause</button>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Stop"}' . $SQ . '">Stop</button>' . $NL;
-
-
-
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Playlist"}' . $SQ . '">Playlist</button>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-TV"}' . $SQ . '">TV</button>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Radio"}' . $SQ . '">Radio</button>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-NetAux"}' . $SQ . '">AirPlay</button>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Off"}' . $SQ . '">Off</button>' . $NL;
     $str .= '</div><!-- /panel -->' . $NL;
     //End of KontrolPanel
     

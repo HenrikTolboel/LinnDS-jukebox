@@ -541,10 +541,11 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
 {
     global $AppDir;
 
+    $FolderImg = sprintf("folder/folder_%04d.jpg", $didl->SequenceNo());
     file_put_contents($AppDir . 'album_' . $didl->SequenceNo() . '.html', 
 	HTMLDocument(
 	    Page("album-" . $didl->SequenceNo(), "Album", 
-	    Album($didl->FileName()),
+	    Album($didl->FileName(), $FolderImg),
 	    "LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
     $AlbumCnt++;
 }

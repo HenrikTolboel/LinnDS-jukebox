@@ -12,7 +12,7 @@
 require_once("setup.php");
 require_once("Functions.php");
 
-function Album($DIDLFile)
+function Album($DIDLFile, $FolderImg)
 {
     global $LINN_JUKEBOX_URL;
     global $NL;
@@ -146,8 +146,8 @@ function Album($DIDLFile)
 	*/
 
 	if ($first) {
-	    //$cont .= '<img class="album" width="250" src="' . str_replace($LINN_JUKEBOX_URL, "..", $AlbumArt) . '" />' . $NL;
-	    $cont .= '<img class="album" width="250" src="' . str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_URL, $AlbumArt) . '" />' . $NL;
+	    //$cont .= '<img class="album" width="250" src="' . str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_URL, $AlbumArt) . '" />' . $NL;
+	    $cont .= '<img class="album" width="250" src="' . $FolderImg . '" />' . $NL;
 	    //$cont .= '<h3 class="album">0' . $preset . '<br />' . $Artist_Performer . '</h3>' . $NL;
 	    $cont .= '<h3>' . $Artist_Performer . '</h3>' . $NL;
 	    $cont .= '<p>' . $ALBUM . ' ('. $YEAR . ')</p>' . $NL;

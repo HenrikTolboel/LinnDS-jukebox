@@ -11,7 +11,7 @@ $(function() {
    $('body').delegate("a.dialogclick", "click", function() {
 	var value = $(this).data("musik").preset;
 	var action = $(this).data("musik").action;
-	console.log(action + " = " + value);
+	console.log("a.dialogclick: " + action + " = " + value);
 	if (action != "Cancel") {
 	    jQuery.get("Send.php", { action: action, value: value } , function (data) {
 		//alert('Load OK' + data);
@@ -26,7 +26,7 @@ $(function() {
 	var action = $(this).data("musik").action;
 	var preset = $('#globals').data("musik").preset;
 	var id = $('#globals').data("musik").id;
-	console.log(action + " = " + preset + ", " + volume);
+	console.log("a.popupclick: " + action + " = " + preset + ", " + volume);
 	if (action != "Cancel") {
 	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset } , function (data) {
 		//alert('Load OK' + data);
@@ -41,7 +41,7 @@ $(function() {
 	var action = $(this).data("musik").action;
 	var preset = $('#globals').data("musik").preset;
 	var id = $('#globals').data("musik").id;
-	console.log(action + " = " + preset + ", " + volume);
+	console.log("button.panelclick: " + action + " = " + preset + ", " + volume);
 	if (action != "Cancel") {
 	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset } , function (data) {
 		//alert('Load OK' + data);
@@ -54,7 +54,7 @@ $(function() {
    $('body').delegate("a.pop", "click", function() {
 	var preset = $(this).data("musik").preset;
 	var id = $(this).data("musik").id;
-	console.log(id + " = " + preset);
+	console.log("a.pop: " + id + " = " + preset);
 	$('#globals').data("musik", {preset: preset, id: id }); 
 	var t = $('#play-popup').clone();
 	$("#" + id).empty().append(t);
@@ -64,6 +64,7 @@ $(function() {
 
    $('body').delegate("a.popsource", "click", function() {
 	var id = $(this).data("musik").id;
+	console.log("a.popsource: " + id);
 	$("#" + id).empty().append($('#popupSource').clone());
 	$("#" + id).popup('open', {positionTo: "#" + id + "-pos" } );
 	return true;
@@ -98,8 +99,9 @@ $(function() {
     */
     
    $("input#volume").live("change", function() {
-      console.log("volume = " + $(this).val());
-      jQuery.get("Send.php", { action: "SetVolume", value: $(this).val() } , function (data) {
+       var value = $(this).val();
+      console.log("volume = " + value);
+      jQuery.get("Send.php", { action: "SetVolume", value: value } , function (data) {
           //alert('Load OK' + data);
       });
    });

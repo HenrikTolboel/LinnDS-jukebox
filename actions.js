@@ -99,9 +99,9 @@ $(function() {
     */
     
    $("input#volume").live("change", function() {
-       var value = $(this).val();
-      console.log("volume = " + value);
-      jQuery.get("Send.php", { action: "SetVolume", value: value } , function (data) {
+       var vol = $(this).val();
+      console.log("volume = " + vol);
+      jQuery.get("Send.php", { action: "SetVolume", volume: vol } , function (data) {
           //alert('Load OK' + data);
       });
    });

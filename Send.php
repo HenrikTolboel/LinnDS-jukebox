@@ -19,7 +19,10 @@ $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 socket_connect($socket, $HOST, $PORT);
 $string = socket_read($socket, 10000); // Remove connection info sent from server...
 
-if ($action == "PlayNow") {
+if ($action == "State") {
+    $Str = "State";
+}
+elseif ($action == "PlayNow") {
     $value = $_GET["preset"];
     $Str = "Jukebox PlayNow \"" . $value . "\"";
 }
@@ -72,13 +75,20 @@ elseif ($action == "Source-Off") {
     $Str = "Source Off";
 }
 
-socket_write($socket, $Str . "\n");
+socket_write($socket, $Str . $NL);
 
-//socket_write($socket, "State\n");
-//$string = socket_read($socket, 10000);
+if ($action == "State") {
+    $string = socket_read($socket, 10000);
+}
 
 socket_close($socket);
-//$State = unserialize($string);
-//echo print_r($State, TRUE);
+
+if ($action == "State") {
+    $State = unserialize($string);
+    //echo print_r($State, TRUE);
+    $a['MAX_VOLUME'] = $State['MAX_VOLUME'];
+    $a['Volume'] = $State['Volume'];
+    echo json_encode($a);
+}
 
 ?>

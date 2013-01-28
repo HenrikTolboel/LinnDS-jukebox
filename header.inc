@@ -29,6 +29,7 @@
 		    defaultDialogTransition: 'none'
 	    });
     });
+    getStatus();
 
 </script>
 <script src="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.js"></script>

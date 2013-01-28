@@ -1,7 +1,7 @@
 /*!
 * LinnDS-jukebox
 *
-* Copyright (c) 2011-2012 Henrik Tolbøl, http://tolbøl.dk
+* Copyright (c) 2011-2013 Henrik Tolbøl, http://tolbøl.dk
 *
 * Licensed under the MIT license:
 * http://www.opensource.org/licenses/mit-license.php
@@ -118,3 +118,17 @@ function getDevicePixelRatio() {
    return window.devicePixelRatio; 
 };
 
+function getStatus() {
+    $.getJSON("Send.php", { action: "State", volume: 0, preset: 0 } , function (data) {
+	//$('div#status').html(data.status);
+	//$('div#lastupdate').html(data.lastupdate);
+	var myslider = $('#volume');
+	if (myslider.val() != data.Volume)
+	{
+	    myslider.val(data.Volume);
+	    myslider.attr('max', data.MAX_VOLUME);
+	    myslider.slider('refresh');
+	}
+    });
+    setTimeout("getStatus()",10000);
+}

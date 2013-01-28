@@ -122,6 +122,16 @@ function PresetURL($num)
     global $URI_index;
 
     LogWrite("PresetURL: " . $URI_index[$num]);
+    if (file_exists("URI_index"))
+    {
+	LogWrite("file_exists(URI_index): Exist");
+	clearstatcache(true,"URI_index");
+    }
+    else
+	LogWrite("file_exists(URI_index): Dont Exist");
+    $mt = filemtime("URI_index");
+    LogWrite("filemtime(URI_index): " . $mt);
+    LogWrite("State['URI_index_mtime']: " . $State['URI_index_mtime']);
     if (file_exists("URI_index") && filemtime("URI_index") > $State['URI_index_mtime'])
     {
 	$State['URI_index_mtime'] = filemtime("URI_index");
@@ -132,6 +142,7 @@ function PresetURL($num)
     if ($State['URI_index_mtime'] > 0)
     {
 	$dpl = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_URL, $URI_index[$num]);
+	LogWrite("dpl: " . $dpl);
 
 	return $dpl;
     }

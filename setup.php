@@ -48,11 +48,13 @@ $RootMenu[3] = "Klassisk / Album";
 $RootMenu[4] = "Børn - Kunstner / Album";
 $RootMenu[5] = "Børn - Opsamlinger";
 $RootMenu[6] = "Diverse";
+$RootMenu[7] = "Newest";
 
 
 // Currently we have to types of sub menus of the root menus.
 define("SUBMENU_TYPE_NONE", 0);
 define("SUBMENU_TYPE_ALPHABET", 1);
+define("SUBMENU_TYPE_NEWEST", 2);
 
 
 // This is the type of submenu for each of the RootMenu entries.
@@ -64,10 +66,14 @@ $SubMenuType[3] = SUBMENU_TYPE_ALPHABET;
 $SubMenuType[4] = SUBMENU_TYPE_ALPHABET;
 $SubMenuType[5] = SUBMENU_TYPE_NONE;
 $SubMenuType[6] = SUBMENU_TYPE_NONE;
+$SubMenuType[7] = SUBMENU_TYPE_NEWEST;
 
 // The ALPHABET submenus are ordered into these groups
 $ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#";
 $ALPHABET_SIZE = strlen($ALPHABET);
+
+// The NEWEST submenus contain this amount newest added albums
+$NEWEST_COUNT = 20;
 
 
 // Words to be skipped when sorting e.g. Artist names

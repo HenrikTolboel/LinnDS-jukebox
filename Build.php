@@ -146,6 +146,14 @@ class DIDLPreset
 	    return $this->Value[Genre];
     }
 
+    public function MusicTime()
+    {
+	if ($this->Value[File]->getExtension() == "dpl")
+	    return 0;
+	else
+	    return (int)$this->Value[MusicTime];
+    }
+
     private function RelativePath($Path)
     {
 	$Path = str_replace("/Users/henrik/Documents", "LINN_JUKEBOX_URL", $Path);
@@ -198,6 +206,19 @@ class DIDLPreset
 
 	return $cmp;
     }
+
+    public function newest($a, $b) {
+	$aMT = $a->MusicTime();
+	$bMT = $b->MusicTime();
+
+	if ($aMT < $bMT)
+	    return 1;
+
+	if ($aMT > $bMT)
+	    return -1;
+
+	return 0;
+    }
 }
 
 // ########## CLASS: Menus  ###############################################################
@@ -218,6 +239,7 @@ class Menus
 
 	$this->RootMenu = $RootMenu;
 	$this->SubMenuType = $SubMenuType;
+	$this->NewestMenuNo = -1;
 
 	$this->MenuCnt = count($this->RootMenu);
 	for ($i=0; $i < $this->MenuCnt; $i++)
@@ -233,6 +255,12 @@ class Menus
 		    $this->Menu[$i][$ALPHABET[$alpha]] = new ArrayObject();
 		}
 	    }
+	    elseif ($this->SubMenuType[$i] == SUBMENU_TYPE_NEWEST)
+	    {
+		$this->Menu[$i] = new ArrayObject();
+		$this->NewestMenuNo = $i;
+	    }
+
 	}
     }
 
@@ -259,6 +287,11 @@ class Menus
 		}
 		$this->MenuAlbumCnt[$i] = $cnt;
 	    }
+	    elseif ($this->SubMenuType[$i] == SUBMENU_TYPE_NEWEST)
+	    {
+		$this->Menu[$i]->uasort(array('DIDLPreset', 'newest'));
+		$this->MenuAlbumCnt[$i] = $this->Menu[$i]->count();
+	    }
 	}
 	$this->OrderSequenceNo();
     }
@@ -277,6 +310,10 @@ class Menus
 	    $ArtFirst = $didl->ArtistFirst();
 	    //echo "ArtFirst = " . $ArtFirst . $NL;
 	    $this->Menu[$RootMenuNo][$ArtFirst]->append($didl);
+	}
+	if ($this->NewestMenuNo != -1)
+	{
+	    $this->Menu[$this->NewestMenuNo]->append($didl);
 	}
     }
 
@@ -389,7 +426,7 @@ function RootMenu($id, $RootMenu, &$Menu)
     $str= '<ul data-role="listview" data-filter="false">' . $NL;
     for ($i=0; $i < $Menu->MenuCnt; $i++)
     {
-	if ($i == 0) 
+	if ($i == 0 || $Menu->SubMenuType[$i] == SUBMENU_TYPE_NEWEST) 
 	{
 	    $prefetch = " data-prefetch";
 	}
@@ -397,12 +434,22 @@ function RootMenu($id, $RootMenu, &$Menu)
 	{
 	    $prefetch = "";
 	}
+	$str .= '<li>';
 	if ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NONE) 
-	    $str .= '<li><a href="p' . $i . ".html" . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
+	{
+	    $str .= '<a href="p' . $i . ".html" . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
+	    $str .= '<span class="ui-li-count">' . $Menu->MenuAlbumCnt[$i] .'</span>';
+	}
+	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NEWEST) 
+	{
+	    $str .= '<a href="p' . $i . ".html" . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
+	}
 	else
-	    $str .= '<li><a href="#p' . $i . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
+	{
+	    $str .= '<a href="#p' . $i . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
+	    $str .= '<span class="ui-li-count">' . $Menu->MenuAlbumCnt[$i] .'</span>';
+	}
 
-        $str .= '<span class="ui-li-count">' . $Menu->MenuAlbumCnt[$i] .'</span>';
         $str .= '</li>' . $NL;
     }
 
@@ -476,16 +523,17 @@ function PageWidgets()
 }
 
 
-function MenuAlbumList($id, &$ArrayList)
+function MenuAlbumList($id, &$ArrayList, $MaxCount)
 {
     global $SQ;
     global $NL;
 
     $str = '<ul data-role="listview" data-filter="false">' . $NL;
     $funcs = "";
+    $Count = 0;
 
     $it = $ArrayList->getIterator();
-    while($it->valid())
+    while($it->valid() && ($MaxCount == -1 || $Count < $MaxCount))
     {
 	$str .= '<li>';
 
@@ -516,6 +564,7 @@ function MenuAlbumList($id, &$ArrayList)
 	$str .= "</li>" . $NL;
 
 	$it->next();
+	$Count++;
     }
 
     $str .= "</ul>" . $NL;
@@ -580,6 +629,7 @@ function MainMenu(&$Menu)
     global $AppDir;
     global $ALPHABET;
     global $ALPHABET_SIZE;
+    global $NEWEST_COUNT;
     global $RootMenu;
 
     $str .= Page("page_musik", "Musik", RootMenu("RootMenu", $Menu->RootMenu, $Menu), "LinnDS-jukebox", "true", DummyPopups() . PageWidgets());
@@ -589,7 +639,7 @@ function MainMenu(&$Menu)
 	if ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NONE) 
 	{
 	    file_put_contents($AppDir . "p" . $i . ".html", 
-		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
+		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], -1), "LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
 	}
 	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_ALPHABET)
 	{
@@ -602,10 +652,15 @@ function MainMenu(&$Menu)
 		    file_put_contents($AppDir . "p" . $i . "_" . $ALPHABET[$alpha] . ".html", 
 			HTMLDocument(Page("p" . $i . "_" . $ALPHABET[$alpha], 
 			$Menu->RootMenu[$i] . " - " . $ALPHABET[$alpha],
-			MenuAlbumList("p" . $i . "_" . $ALPHABET[$alpha], $Menu->Menu[$i][$ALPHABET[$alpha]]),
+			MenuAlbumList("p" . $i . "_" . $ALPHABET[$alpha], $Menu->Menu[$i][$ALPHABET[$alpha]], -1),
 			"LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
 		}
 	    }
+	}
+	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NEWEST)
+	{
+	    file_put_contents($AppDir . "p" . $i . ".html", 
+		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], $NEWEST_COUNT), "LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
 	}
     }
 

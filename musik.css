@@ -1,0 +1,19 @@
+/*!
+* LinnDS-jukebox
+*
+* Copyright (c) 2011-2012 Henrik Tolbøl, http://tolbøl.dk
+*
+* Licensed under the MIT license:
+* http://www.opensource.org/licenses/mit-license.php
+*/
+
+
+.nav-search .ui-btn-up-a {
+    background-image:none;
+    background-color:#333333;
+}
+.nav-search .ui-btn-inner {
+    border-top: 1px solid #888;
+    border-color: rgba(255, 255, 255, .1);
+}
+

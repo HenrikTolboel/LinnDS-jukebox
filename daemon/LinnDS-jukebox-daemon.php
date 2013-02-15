@@ -10,6 +10,7 @@
 */
 
 $LINN_JUKEBOX_URL = "http://192.168.0.105/musik";
+$LINN_JUKEBOX_PATH = "/musik";
 $NL = "\n";
 $SQ = "'";
 
@@ -19,6 +20,8 @@ $DEBUG = 2;
 // This is where your linn is in the network.
 $LINN_HOST = "192.168.0.108";
 $LINN_PORT = 23;
+
+$URI_index_file = dirname($argv[0]) . "/URI_index";
 
 // Create a socket to your linn LPEC interface, and connect...
 $lpec_socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -72,10 +75,10 @@ $SubscribeType['Ds/Info'] = -1;
 $SubscribeType['Ds/Time'] = -1;
 
 // Load index over # -> DPL URI's
-if (file_exists("URI_index"))
+if (file_exists($URI_index_file))
 {
-    $State['URI_index_mtime'] = filemtime("URI_index");
-    $URI_index = unserialize(file_get_contents("URI_index"));
+    $State['URI_index_mtime'] = filemtime($URI_index_file);
+    $URI_index = unserialize(file_get_contents($URI_index_file));
     $State['URI_index'] = "Loaded";
 }
 else
@@ -119,29 +122,38 @@ function PresetURL($num)
 {
     global $State;
     global $LINN_JUKEBOX_URL;
+    global $LINN_JUKEBOX_PATH;
     global $URI_index;
+    global $URI_index_file;
 
     LogWrite("PresetURL: " . $URI_index[$num]);
-    if (file_exists("URI_index"))
+    if (file_exists($URI_index_file))
     {
-	LogWrite("file_exists(URI_index): Exist");
-	clearstatcache(true,"URI_index");
+	clearstatcache(true,$URI_index_file);
     }
-    else
-	LogWrite("file_exists(URI_index): Dont Exist");
-    $mt = filemtime("URI_index");
-    LogWrite("filemtime(URI_index): " . $mt);
-    LogWrite("State['URI_index_mtime']: " . $State['URI_index_mtime']);
-    if (file_exists("URI_index") && filemtime("URI_index") > $State['URI_index_mtime'])
+    $mt = filemtime($URI_index_file);
+    if (file_exists($URI_index_file) && filemtime($URI_index_file) > $State['URI_index_mtime'])
     {
-	$State['URI_index_mtime'] = filemtime("URI_index");
-	$URI_index = unserialize(file_get_contents("URI_index"));
+	$State['URI_index_mtime'] = filemtime($URI_index_file);
+	$URI_index = unserialize(file_get_contents($URI_index_file));
 	LogWrite("Load URI_index");
     }
     
     if ($State['URI_index_mtime'] > 0)
     {
-	$dpl = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_URL, $URI_index[$num]);
+	$dpl = $URI_index[$num];
+	//$dpl = implode("/", array_map("rawurlencode", explode("/", $dpl)));
+	////$dpl = str_replace("&#", "%26%23", $dpl);
+	////$dpl = str_replace(" ", "%20", $dpl);
+	$dpl = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_PATH, $dpl);
+	////$dpl = htmlentities($dpl);
+	////$dpl = str_replace("'", "&amp;#39;", $dpl);
+
+	//$dpl = str_replace("&", "\&", $dpl);
+	//$dpl = str_replace("#", "\#", $dpl);
+	//$dpl = str_replace(";", "\;", $dpl);
+	//$dpl = str_replace("'", "\'", $dpl);
+
 	LogWrite("dpl: " . $dpl);
 
 	return $dpl;
@@ -155,6 +167,7 @@ function PresetURL($num)
 function PrepareXML($xml)
 {
     global $LINN_JUKEBOX_URL;
+    global $LINN_JUKEBOX_PATH;
 
     $xml = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_URL, $xml); // late binding of http server
 
@@ -166,7 +179,21 @@ function InsertDIDL_list($DIDL_URL, $AfterId)
 {
     global $NL;
 
-    $xml = simplexml_load_file($DIDL_URL);
+    LogWrite("InsertDIDL_list: " . $DIDL_URL);
+
+    $cmd = "cp '" . $DIDL_URL . "' /tmp/fil.dpl";
+    $esc_cmd = escapeshellcmd($cmd);
+    LogWrite("cmd: " . $cmd);
+    LogWrite("esc_cmd: " . $esc_cmd);
+    system($esc_cmd);
+
+    
+    //$DIDL_URL = urlencode($DIDL_URL);
+    //$DIDL_URL = implode("/", array_map("rawurlencode", explode("/", $DIDL_URL)));
+    //LogWrite("InsertDIDL_list: " . $DIDL_URL);
+
+    //$xml = simplexml_load_file($DIDL_URL);
+    $xml = simplexml_load_file("/tmp/fil.dpl");
 
     $xml->registerXPathNamespace('didl', 'urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/');
     $URLs = $xml->xpath('//didl:res');

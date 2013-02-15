@@ -2,7 +2,7 @@
 /*!
 * LinnDS-jukebox
 *
-* Copyright (c) 2012 Henrik Tolbøl, http://tolbøl.dk
+* Copyright (c) 2012-2013 Henrik Tolbøl, http://tolbøl.dk
 *
 * Licensed under the MIT license:
 * http://www.opensource.org/licenses/mit-license.php
@@ -10,7 +10,6 @@
 
 require_once("setup.php");
 require_once("MakePlaylists.php");
-require_once("Functions.php");
 require_once("album.php");
 require_once("FileUtils.php");
 
@@ -28,20 +27,38 @@ class DIDLPreset
 	self::$NoInstances++;
 	$this->Value[InstanceNo] = self::$NoInstances;
 	$this->Value[File] = new SplFileInfo($FileName);
-	$this->Value[Info] = explode("+", $this->Value[File]->getBasename('.dpl'));
-	$this->Value[Path] = explode("/", $this->RelativePath($this->Value[File]->getPath()));
+	if ($this->Value[File]->getExtension() == "dpl")
+	{
+	    $this->Value[Info] = explode("+", $this->Value[File]->getBasename('.dpl'));
+	    $this->Value[Path] = explode("/", $this->RelativePath($this->Value[File]->getPath()));
+	}
+	else
+	{
+	    $xml = simplexml_load_file($this->Value[File]->getPathname());
+
+	    foreach ($xml->children() as $info) {
+		$this->Value[$info->getName()]  = (string) $info;
+	    }
+	    $this->Value[Path] = explode("/", $this->RelativePath($this->Value[Playlist]));
+	}
 	$this->Value[RootMenuNo] = $RootMenuNo;
 	//print_r($this->Value);
     }
 
-    public function FileName()
+    public function PlaylistFileName()
     {
-	return $this->Value[File]->getPathname();
+	if ($this->Value[File]->getExtension() == "dpl")
+	    return $this->Value[File]->getPathname();
+	else
+	    return $this->Value[Playlist];
     }
 
     public function ImageFileName()
     {
-	return $this->Value[File]->getPath() . "/folder.jpg";
+	if ($this->Value[File]->getExtension() == "dpl")
+	    return $this->Value[File]->getPath() . "/folder.jpg";
+	else
+	    return $this->Value[Art];
     }
 
     public function setSequenceNo($No)
@@ -83,17 +100,20 @@ class DIDLPreset
 
     public function URI()
     {
-	return $this->PrepareURI($this->Value[File]->getPathname());
+	return $this->PrepareURI($this->PlaylistFileName());
     }
 
     public function ImageURI()
     {
-	return $this->PrepareURI($this->Value[File]->getPath() . "/folder.jpg");
+	return $this->PrepareURI($this->ImageFileName());
     }
 
     public function Artist()
     {
-	return $this->Value[Info][0];
+	if ($this->Value[File]->getExtension() == "dpl")
+	    return $this->Value[Info][0];
+	else
+	    return $this->Value[Artist];
     }
     public function ArtistFirst()
     {
@@ -106,15 +126,24 @@ class DIDLPreset
     }
     public function Album()
     {
-	return $this->Value[Info][1];
+	if ($this->Value[File]->getExtension() == "dpl")
+	    return $this->Value[Info][1];
+	else
+	    return $this->Value[Album];
     }
     public function Date()
     {
-	return $this->Value[Info][2];
+	if ($this->Value[File]->getExtension() == "dpl")
+	    return $this->Value[Info][2];
+	else
+	    return $this->Value[Date];
     }
     public function Genre()
     {
-	return $this->Value[Info][3];
+	if ($this->Value[File]->getExtension() == "dpl")
+	    return $this->Value[Info][3];
+	else
+	    return $this->Value[Genre];
     }
 
     private function RelativePath($Path)
@@ -129,7 +158,15 @@ class DIDLPreset
     private function PrepareURI($Path)
     {
 	$Path = $this->RelativePath($Path);
-	$encoded = implode("/", array_map("rawurlencode", explode("/", $Path)));
+	$encoded = $Path;
+	//$encoded = implode("/", array_map("rawurlencode", explode("/", $encoded)));
+
+	//$encoded = str_replace("a%CC%8A", "%C3%A5", $encoded);
+	//$encoded = str_replace("&#", "%26%23", $encoded);
+
+	//echo "\n";
+	//echo "PrepareURI-path: " . $Path . "\n";
+	//echo "PrepareURI-enco: " . $encoded . "\n";
 	return $encoded;
     }
 
@@ -228,6 +265,8 @@ class Menus
 
     public function Add($didl)
     {
+	global $NL;
+
 	$RootMenuNo = $didl->RootMenuNo();
 	if ($this->SubMenuType[$RootMenuNo] == SUBMENU_TYPE_NONE) 
 	{
@@ -236,6 +275,7 @@ class Menus
 	elseif ($this->SubMenuType[$RootMenuNo] == SUBMENU_TYPE_ALPHABET)
 	{
 	    $ArtFirst = $didl->ArtistFirst();
+	    //echo "ArtFirst = " . $ArtFirst . $NL;
 	    $this->Menu[$RootMenuNo][$ArtFirst]->append($didl);
 	}
     }
@@ -311,6 +351,35 @@ class Menus
 
 // ########## HTML  #######################################################################
 
+function Page($id, $title, $content, $footer, $cache, $widgets)
+{
+    global $SQ;
+    global $NL;
+
+    $str = '<div data-role="page" data-dom-cache="' . $cache . '" id="' . $id . '">' . $NL;
+
+    $str .= '<div data-role="header" data-position="fixed">' . $NL;
+    $str .= '<h1>' . $title . '</h1>'. $NL;
+
+
+    $str .= '<a id="' . $id . '-KontrolPanel" class="poppanel KontrolPanel ui-btn-left" href="#KontrolPanel" data-icon="bars">Kontrol</a>' . $NL;
+
+    $str .= '</div><!-- /header -->' . $NL;
+
+    $str .= '<div data-role="content">' . $NL;
+    $str .= $content;
+    $str .= $NL . '</div><!-- /content -->' . $NL;
+
+    $str .= '<div data-role="footer">' . $NL;
+    $str .= '<h4>' . $footer . "</h4>" . $NL;
+    $str .= "</div><!-- /footer -->" . $NL;
+
+    $str .= $widgets . $NL;
+
+    $str .= "</div><!-- /page -->" . $NL . $NL;
+    return $str;
+}
+
 function RootMenu($id, $RootMenu, &$Menu)
 {
     global $SQ;
@@ -329,9 +398,9 @@ function RootMenu($id, $RootMenu, &$Menu)
 	    $prefetch = "";
 	}
 	if ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NONE) 
-        $str .= '<li><a href="p' . $i . ".html" . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
+	    $str .= '<li><a href="p' . $i . ".html" . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
 	else
-        $str .= '<li><a href="#p' . $i . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
+	    $str .= '<li><a href="#p' . $i . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
 
         $str .= '<span class="ui-li-count">' . $Menu->MenuAlbumCnt[$i] .'</span>';
         $str .= '</li>' . $NL;
@@ -474,7 +543,10 @@ function MenuAlphabetPage($id, &$ArrayListList)
 	    $class .= " ui-disabled";
 	$str .= '<div class="' . $class . '">';
 	//$href = '#' . $id . "_" . $ALPHABET[$alpha];
-	$href = $id . "_" . $ALPHABET[$alpha] . ".html";
+	if ($ALPHABET[$alpha] == "#")
+	    $href = $id . "_%23" . ".html";
+	else
+	    $href = $id . "_" . $ALPHABET[$alpha] . ".html";
 	$str .= '<a href="' . $href . '" data-role="button">';
 	$str .= strtoupper($ALPHABET[$alpha]);
 	$str .= '</a>';
@@ -553,7 +625,7 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
     file_put_contents($AppDir . 'album_' . $didl->SequenceNo() . '.html', 
 	HTMLDocument(
 	    Page("album-" . $didl->SequenceNo(), "Album", 
-	    Album($didl->FileName(), $FolderImg),
+	    Album($didl->PlaylistFileName(), $FolderImg),
 	    "LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
     $AlbumCnt++;
 }
@@ -654,7 +726,7 @@ function Make_CSS($AlbumCnt, $CSS1, $CSS2)
 
 // ########## Main  #######################################################################
 
-function Main($DoAll)
+function Main($DoLevel)
 {
     global $NL;
     global $RootMenu;
@@ -663,12 +735,12 @@ function Main($DoAll)
     global $AppDir;
 
     //Create a didl file in each directory containing music
-    if ($DoAll > 3) 
+    if ($DoLevel > 3) 
     {
 	echo "Removing old .dpl files" . $NL;
 	UnlinkDPL();
     }
-    if ($DoAll > 0) 
+    if ($DoLevel > 0) 
     {
 	echo "Making a didl file in each directory..." . $NL;
 	MakePlaylists($TopDirectory);
@@ -694,7 +766,7 @@ function Main($DoAll)
 		{
 		    $ext = pathinfo($it->current(), PATHINFO_EXTENSION);
 
-		    if ($ext == "dpl")
+		    if ($ext == "xml")
 		    {
 			$didl = new DIDLPreset($it->getPathName(), $RootMenuNo);
 			$Menu->Add($didl);
@@ -716,7 +788,7 @@ function Main($DoAll)
 
     $AppDir = "site/";
 
-    if ($DoAll > 0) 
+    if ($DoLevel > 1) 
     {
 	$cmd = "rm " . $AppDir . "* " . $AppDir . "*/*";
 	echo "executing " . $cmd . $NL;
@@ -743,13 +815,13 @@ function Main($DoAll)
     $AlbumCnt = 0;
     $Menu->user_func('Make_AlbumHTML', $AlbumCnt);
 
-    if ($DoAll > 0) 
+    if ($DoLevel > 1) 
     {
 	echo "Collecting directory images in " . $AppDir . $NL;
 	$Menu->user_func('CollectFolderImgs', $dummy);
     }
 
-    if ($DoAll > 0) 
+    if ($DoLevel > 1) 
     {
 	echo "Making sprites and css file in " . $AppDir . $NL;
 	Make_CSS($AlbumCnt, $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
@@ -759,6 +831,6 @@ function Main($DoAll)
 }
 
 //Main(1);
-Main(0);
+Main(1);
 
 ?>

@@ -114,6 +114,7 @@ class MusicTags {
 	$Path = str_replace("/Users/henrik/Documents", "LINN_JUKEBOX_URL", $Path);
 	$Path = str_replace("/Users/henrik/Music/MusicLib", "LINN_JUKEBOX_URL", $Path);
 	$encoded = implode("/", array_map("rawurlencode", explode("/", $Path)));
+	$encoded = str_replace("a%CC%8A", "%C3%A5", $encoded);
 	return $encoded;
     }
 

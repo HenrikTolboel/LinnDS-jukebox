@@ -3,7 +3,7 @@
 /*!
 * LinnDS-jukebox
 *
-* Copyright (c) 2011-2012 Henrik Tolbøl, http://tolbøl.dk
+* Copyright (c) 2011-2013 Henrik Tolbøl, http://tolbøl.dk
 *
 * Licensed under the MIT license:
 * http://www.opensource.org/licenses/mit-license.php
@@ -16,7 +16,7 @@
 
 	<title>LinnDS-jukebox</title> 
 
-<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.css" />
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0-rc.1/jquery.mobile-1.3.0-rc.1.min.css" />
 <link rel="stylesheet" href="sprites/sprites.css" />
 <link rel="stylesheet" href="sprites/sprites@2x.css" media="(-webkit-min-device-pixel-ratio: 2)"/>
 <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
@@ -32,7 +32,7 @@
     getStatus();
 
 </script>
-<script src="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.3.0-rc.1/jquery.mobile-1.3.0-rc.1.min.js"></script>
 
 </head>
 <body>

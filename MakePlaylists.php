@@ -2,7 +2,7 @@
 /*!
 * LinnDS-jukebox
 *
-* Copyright (c) 2012 Henrik Tolbøl, http://tolbøl.dk
+* Copyright (c) 2012-2013 Henrik Tolbøl, http://tolbøl.dk
 *
 * Licensed under the MIT license:
 * http://www.opensource.org/licenses/mit-license.php
@@ -26,9 +26,10 @@ function TrackNoOrder($a, $b)
     return $res;
 }
 
-function PlayListFromDir($Dir, &$Key, &$Playlist)
+function PlayListFromDir($Dir, &$Key, &$Playlist, &$Info)
 {
     global $NL;
+    global $DIR_DELIM;
 
     $Arr = new ArrayObject();
     try
@@ -95,12 +96,21 @@ function PlayListFromDir($Dir, &$Key, &$Playlist)
     while($it->valid()) 
     {
 	if (isset($Artist) && $Artist != $it->current()->Artist())
+	{
 	    $Artist = "Various Artists";
+	    $ARTIST = $Artist;
+	}
 	else
+	{
 	    $Artist = str_replace("/", ",", $it->current()->Artist());
+	    $ARTIST = $it->current()->Artist();
+	}
 	$Album = str_replace("/", ",", $it->current()->Album());
+	$ALBUM = $it->current()->Album();
 	$Date = $it->current()->Date();
+	$DATE = $Date;
 	$Genre = str_replace("/", ",", $it->current()->Genre());
+	$GENRE = $it->current()->Genre();
 
 	$Tracks .= $NL . Linn_Track($it->current()->getDIDL());
 	$it->next();
@@ -108,12 +118,32 @@ function PlayListFromDir($Dir, &$Key, &$Playlist)
 
     if ($cnt > 0)
     {
+	$PLAYLIST = $Dir . $DIR_DELIM . "playlist.dpl";
+	$PLAYLIST = str_replace("&", "&amp;", $PLAYLIST);
+
+	$ART = $Dir . $DIR_DELIM . "folder.jpg";
+	$ART = str_replace("&", "&amp;", $ART);
+
+	$Info = <<<EOT
+<?xml version="1.0" encoding="UTF-8"?>
+<Info>
+  <Artist>$ARTIST</Artist>
+  <Album>$ALBUM</Album>
+  <Date>$DATE</Date>
+  <Genre>$GENRE</Genre>
+  <MusicTime>$MaxMTimeMusic</MusicTime>
+  <Playlist>$PLAYLIST</Playlist>
+  <Art>$ART</Art>
+</Info>
+
+EOT;
 	$Key = $Artist . "+" . $Album . "+" . $Date . "+" . $Genre;
 	$Playlist = Linn_Playlist($Tracks);
     }
     else
     {
 	$Key = "";
+	$Info = "";
 	$Playlist = "";
     }
 
@@ -129,12 +159,14 @@ function PlaylistDir($Dir)
     global $NL;
     global $DIR_DELIM;
 
-    if (PlaylistFromDir($Dir, $Key, $Playlist))
+    if (PlaylistFromDir($Dir, $Key, $Playlist, $Info))
     {
 	print "Dir: $Dir -> Key: $Key" . $NL;
 	//print "Playlist: $Playlist" . $NL;
 
-	file_put_contents($Dir . $DIR_DELIM . $Key .".dpl", $Playlist);
+	//file_put_contents($Dir . $DIR_DELIM . $Key .".dpl", $Playlist);
+	file_put_contents($Dir . $DIR_DELIM . "playlist.dpl", $Playlist);
+	file_put_contents($Dir . $DIR_DELIM . "info.xml", $Info);
     }
 }
 
@@ -143,13 +175,7 @@ function PlaylistHere()
     global $NL;
     global $DIR_DELIM;
 
-    if (PlaylistFromDir('.', $Key, $Playlist))
-    {
-	print "Key: $Key" . $NL;
-	print "Playlist: $Playlist" . $NL;
-
-	file_put_contents($Key .".dpl", $Playlist);
-    }
+    PlaylistDir('.');
 }
 
 class RecursiveDirectoryReader extends RecursiveDirectoryIterator
@@ -173,7 +199,6 @@ class RecursiveDirectoryReader extends RecursiveDirectoryIterator
 	}
 	return FALSE;
     }
-
 }
 
 function MakePlaylists($TopDirectory)

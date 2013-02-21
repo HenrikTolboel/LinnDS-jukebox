@@ -16,7 +16,7 @@
 
 	<title>LinnDS-jukebox</title> 
 
-<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0-rc.1/jquery.mobile-1.3.0-rc.1.min.css" />
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.css" />
 <link rel="stylesheet" href="sprites/sprites.css" />
 <link rel="stylesheet" href="sprites/sprites@2x.css" media="(-webkit-min-device-pixel-ratio: 2)"/>
 <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
@@ -32,7 +32,7 @@
     getStatus();
 
 </script>
-<script src="http://code.jquery.com/mobile/1.3.0-rc.1/jquery.mobile-1.3.0-rc.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.js"></script>
 
 </head>
 <body>

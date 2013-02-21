@@ -3,11 +3,13 @@
 /*!
 * LinnDS-jukebox-daemon
 *
-* Copyright (c) 2011 Henrik Tolbøl, http://tolbøl.dk
+* Copyright (c) 2011-2013 Henrik Tolbøl, http://tolbøl.dk
 *
 * Licensed under the MIT license:
 * http://www.opensource.org/licenses/mit-license.php
 */
+
+require_once("setup.php");
 
 $LINN_JUKEBOX_URL = "http://192.168.0.105/musik";
 $LINN_JUKEBOX_PATH = "/musik";
@@ -142,17 +144,8 @@ function PresetURL($num)
     if ($State['URI_index_mtime'] > 0)
     {
 	$dpl = $URI_index[$num];
-	//$dpl = implode("/", array_map("rawurlencode", explode("/", $dpl)));
-	////$dpl = str_replace("&#", "%26%23", $dpl);
-	////$dpl = str_replace(" ", "%20", $dpl);
-	$dpl = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_PATH, $dpl);
-	////$dpl = htmlentities($dpl);
-	////$dpl = str_replace("'", "&amp;#39;", $dpl);
-
-	//$dpl = str_replace("&", "\&", $dpl);
-	//$dpl = str_replace("#", "\#", $dpl);
-	//$dpl = str_replace(";", "\;", $dpl);
-	//$dpl = str_replace("'", "\'", $dpl);
+	$dpl = ProtectPath($dpl);
+	$dpl = AbsolutePath($dpl);
 
 	LogWrite("dpl: " . $dpl);
 
@@ -166,12 +159,10 @@ function PresetURL($num)
 
 function PrepareXML($xml)
 {
-    global $LINN_JUKEBOX_URL;
-    global $LINN_JUKEBOX_PATH;
-
-    $xml = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_URL, $xml); // late binding of http server
+    $xml = AbsoluteURL($xml); // late binding of http server
 
     $xml = htmlspecialchars(str_replace(array("\n", "\r"), '', $xml));
+    $xml = str_replace("&amp;#", "&#", $xml); // e.g. danish "å" is transcoded from "&#E5;" to "&amp;#E5;" so we convert back
     return $xml;
 }
 
@@ -181,19 +172,7 @@ function InsertDIDL_list($DIDL_URL, $AfterId)
 
     LogWrite("InsertDIDL_list: " . $DIDL_URL);
 
-    $cmd = "cp '" . $DIDL_URL . "' /tmp/fil.dpl";
-    $esc_cmd = escapeshellcmd($cmd);
-    LogWrite("cmd: " . $cmd);
-    LogWrite("esc_cmd: " . $esc_cmd);
-    system($esc_cmd);
-
-    
-    //$DIDL_URL = urlencode($DIDL_URL);
-    //$DIDL_URL = implode("/", array_map("rawurlencode", explode("/", $DIDL_URL)));
-    //LogWrite("InsertDIDL_list: " . $DIDL_URL);
-
-    //$xml = simplexml_load_file($DIDL_URL);
-    $xml = simplexml_load_file("/tmp/fil.dpl");
+    $xml = simplexml_load_file($DIDL_URL);
 
     $xml->registerXPathNamespace('didl', 'urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/');
     $URLs = $xml->xpath('//didl:res');
@@ -537,8 +516,8 @@ while (true) {
 
             if ($DEBUG > 0)
             {
-               LogWrite("State:");
-               print_r($State);
+               //LogWrite("State:");
+               //print_r($State);
             }
          }
          elseif (strpos($data, "Jukebox") !== false)

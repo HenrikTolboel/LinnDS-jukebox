@@ -30,16 +30,16 @@ class DIDLPreset
 	if ($this->Value[File]->getExtension() == "dpl")
 	{
 	    $this->Value[Info] = explode("+", $this->Value[File]->getBasename('.dpl'));
-	    $this->Value[Path] = explode("/", $this->RelativePath($this->Value[File]->getPath()));
+	    $this->Value[Path] = explode("/", RelativePath($this->Value[File]->getPath()));
 	}
 	else
 	{
-	    $xml = simplexml_load_file($this->Value[File]->getPathname());
+	    $xml = simplexml_load_file(ProtectPath($this->Value[File]->getPathname()));
 
 	    foreach ($xml->children() as $info) {
 		$this->Value[$info->getName()]  = (string) $info;
 	    }
-	    $this->Value[Path] = explode("/", $this->RelativePath($this->Value[Playlist]));
+	    $this->Value[Path] = explode("/", RelativePath($this->Value[Playlist]));
 	}
 	$this->Value[RootMenuNo] = $RootMenuNo;
 	//print_r($this->Value);
@@ -86,7 +86,7 @@ class DIDLPreset
 
 	foreach ($TopDirectory as $Dir => $RootMenuNo)
 	{
-	    $RelDir = str_replace("LINN_JUKEBOX_URL/", "", $this->RelativePath($Dir));
+	    $RelDir = str_replace("LINN_JUKEBOX_URL/", "", RelativePath($Dir));
 	    if ($RelDir == $this->TopDirectory())
 		return $RootMenuNo;
 	}
@@ -100,12 +100,12 @@ class DIDLPreset
 
     public function URI()
     {
-	return $this->PrepareURI($this->PlaylistFileName());
+	return RelativePath($this->PlaylistFileName());
     }
 
     public function ImageURI()
     {
-	return $this->PrepareURI($this->ImageFileName());
+	return RelativePath($this->ImageFileName());
     }
 
     public function Artist()
@@ -152,30 +152,6 @@ class DIDLPreset
 	    return 0;
 	else
 	    return (int)$this->Value[MusicTime];
-    }
-
-    private function RelativePath($Path)
-    {
-	$Path = str_replace("/Users/henrik/Documents", "LINN_JUKEBOX_URL", $Path);
-	$Path = str_replace("/Users/henrik/Music/MusicLib", "LINN_JUKEBOX_URL", $Path);
-
-	return $Path;
-    }
-
-
-    private function PrepareURI($Path)
-    {
-	$Path = $this->RelativePath($Path);
-	$encoded = $Path;
-	//$encoded = implode("/", array_map("rawurlencode", explode("/", $encoded)));
-
-	//$encoded = str_replace("a%CC%8A", "%C3%A5", $encoded);
-	//$encoded = str_replace("&#", "%26%23", $encoded);
-
-	//echo "\n";
-	//echo "PrepareURI-path: " . $Path . "\n";
-	//echo "PrepareURI-enco: " . $encoded . "\n";
-	return $encoded;
     }
 
     private function SortSkipWords($Str)
@@ -680,7 +656,7 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
     file_put_contents($AppDir . 'album_' . $didl->SequenceNo() . '.html', 
 	HTMLDocument(
 	    Page("album-" . $didl->SequenceNo(), "Album", 
-	    Album($didl->PlaylistFileName(), $FolderImg),
+	    Album(AbsolutePath($didl->PlaylistFileName()), $FolderImg),
 	    "LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
     $AlbumCnt++;
 }
@@ -852,8 +828,8 @@ function Main($DoLevel)
 
     copy("actions.js", $AppDir . "actions.js");
     copy("musik.css", $AppDir . "musik.css");
-    copy("daemon/LinnDS-jukebox-daemon.php", $AppDir . "LinnDS-jukebox-daemon.php");
-    copy("daemon/S98linn_lpec", $AppDir . "S98linn_lpec");
+    copy("LinnDS-jukebox-daemon.php", $AppDir . "LinnDS-jukebox-daemon.php");
+    copy("S98linn_lpec", $AppDir . "S98linn_lpec");
     copy("Transparent.gif", $AppDir . "Transparent.gif");
     copy("setup.php", $AppDir . "setup.php");
     copy("Send.php", $AppDir . "Send.php");

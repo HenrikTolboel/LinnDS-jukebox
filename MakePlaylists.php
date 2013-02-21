@@ -123,6 +123,10 @@ function PlayListFromDir($Dir, &$Key, &$Playlist, &$Info)
 
 	$ART = $Dir . $DIR_DELIM . "folder.jpg";
 	$ART = str_replace("&", "&amp;", $ART);
+	
+	$ALBUM = str_replace("&", "&amp;", $ALBUM);
+	$GENRE = str_replace("&", "&amp;", $GENRE);
+	$ARTIST = str_replace("&", "&amp;", $ARTIST);
 
 	$Info = <<<EOT
 <?xml version="1.0" encoding="UTF-8"?>

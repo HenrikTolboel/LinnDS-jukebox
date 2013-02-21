@@ -23,7 +23,14 @@ $DIR_DELIM = "/";
 
 $manifestfile = $PRESETS_DIR ."/" . "manifest.xml";
 
+// These 2 "path" are equal on your music server. I.e. files search in the 
+// http url are found locally in the path...
 $LINN_JUKEBOX_URL = "http://192.168.0.105/musik";
+$LINN_JUKEBOX_PATH = "/musik";
+
+// This is where your linn is in the network.
+$LINN_HOST = "192.168.0.108";
+$LINN_PORT = 23;
 
 
 // These directories are scanned for ".dpl" files
@@ -51,7 +58,7 @@ $RootMenu[6] = "Diverse";
 $RootMenu[7] = "Newest";
 
 
-// Currently we have to types of sub menus of the root menus.
+// Currently we have 3 types of sub menus of the root menus.
 define("SUBMENU_TYPE_NONE", 0);
 define("SUBMENU_TYPE_ALPHABET", 1);
 define("SUBMENU_TYPE_NEWEST", 2);
@@ -73,7 +80,7 @@ $ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#";
 $ALPHABET_SIZE = strlen($ALPHABET);
 
 // The NEWEST submenus contain this amount newest added albums
-$NEWEST_COUNT = 20;
+$NEWEST_COUNT = 25;
 
 
 // Words to be skipped when sorting e.g. Artist names
@@ -83,5 +90,63 @@ $SortSkipList = array("The ", "the ");
 //print "TopDirectory: "; print_r($TopDirectory);
 //print "RootMenu    : "; print_r($RootMenu);
 //print "SubMenuType : "; print_r($SubMenuType);
+
+// These functions are used to protect directory paths and filenames. Making 
+// such paths path relative - to make it possible to use different machines 
+// for Your music. The relativity of file is done by replacing the front of 
+// paths with the string "LINN_JUKEBOX_URL".
+
+function RelativePath($Path)
+{
+    global $LINN_JUKEBOX_URL;
+
+    $Path = str_replace("/Users/henrik/Documents", "LINN_JUKEBOX_URL", $Path);
+    $Path = str_replace("/Users/henrik/Music/MusicLib", "LINN_JUKEBOX_URL", $Path);
+    return $Path;
+}
+
+function ProtectPath($Path)
+{
+    global $NL;
+
+    //echo "ProtectPath-beg: " . $Path . $NL;
+    $Path = str_replace("+", "XXXplusXXX", $Path);
+    $Path = implode("/", array_map("rawurlencode", explode("/", $Path)));
+    $Path = str_replace("a%CC%8A", "%C3%A5", $Path); // danish å encoded wrong
+    $Path = str_replace("e%CC%81", "%C3%A9", $Path); // é encoded wrong
+    $Path = str_replace("U%CC%88", "%C3%9C", $Path); // Ü encoded wrong
+    $Path = str_replace("XXXplusXXX", "+", $Path);
+    //http://www.w3schools.com/tags/ref_urlencode.asp
+    //echo "ProtectPath-res: " . $Path . $NL;
+    return $Path;
+	////$dpl = str_replace("&#", "%26%23", $dpl);
+	////$dpl = str_replace(" ", "%20", $dpl);
+	////$dpl = htmlentities($dpl);
+	////$dpl = str_replace("'", "&amp;#39;", $dpl);
+
+	//$dpl = str_replace("&", "\&", $dpl);
+	//$dpl = str_replace("#", "\#", $dpl);
+	//$dpl = str_replace(";", "\;", $dpl);
+	//$dpl = str_replace("'", "\'", $dpl);
+	//$dpl = str_replace(" ", "\ ", $dpl);
+}
+
+function AbsolutePath($Path)
+{
+    global $LINN_JUKEBOX_PATH;
+
+    $Path = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_PATH, $Path);
+
+    return $Path;
+}
+
+function AbsoluteURL($Path)
+{
+    global $LINN_JUKEBOX_URL;
+
+    $Path = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_URL, $Path);
+
+    return $Path;
+}
 
 ?>

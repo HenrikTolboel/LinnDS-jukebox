@@ -56,6 +56,8 @@ function DIDL_Song($TrackURI, $AlbumArtURI, $Artist, $Album, $Title, $Date, $Gen
     </DIDL-Lite>
 EOT;
 
+    $DIDL = str_replace("&", "&amp;", $DIDL);
+    $DIDL = str_replace("&amp;#", "&#", $DIDL);
     return $DIDL;
 }
 

@@ -20,6 +20,7 @@ function Album($DIDLFile, $FolderImg)
     $cont = "";
     $first = true;
 
+    //echo "Album: " .  $DIDLFile . $NL;
     $xml = simplexml_load_file($DIDLFile);
 
 

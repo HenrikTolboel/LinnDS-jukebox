@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /*!
 * LinnDS-jukebox
@@ -364,7 +365,7 @@ class Menus
 
 // ########## HTML  #######################################################################
 
-function Page($id, $title, $content, $footer, $cache, $widgets)
+function Page($id, $title, $content, $footer, $cache)
 {
     global $SQ;
     global $NL;
@@ -375,19 +376,21 @@ function Page($id, $title, $content, $footer, $cache, $widgets)
     $str .= '<h1>' . $title . '</h1>'. $NL;
 
 
-    $str .= '<a id="' . $id . '-KontrolPanel" class="poppanel KontrolPanel ui-btn-left" href="#KontrolPanel" data-icon="bars">Kontrol</a>' . $NL;
+    $KontrolButtonId = $id . '-KontrolPanel';
+    $KontrolPanelId = $id . '-KontrolPanelPanel';
+    $str .= '<a id="' . $KontrolButtonId . '" class="ui-btn-left" href="#' . $KontrolPanelId . '" data-icon="bars">Kontrol</a>' . $NL;
 
-    $str .= '</div><!-- /header -->' . $NL;
+    $str .= '</div><!-- /header -->' . $NL . $NL;
 
     $str .= '<div data-role="content">' . $NL;
     $str .= $content;
-    $str .= $NL . '</div><!-- /content -->' . $NL;
+    $str .= '</div><!-- /content -->' . $NL . $NL;
 
     $str .= '<div data-role="footer">' . $NL;
     $str .= '<h4>' . $footer . "</h4>" . $NL;
-    $str .= "</div><!-- /footer -->" . $NL;
+    $str .= "</div><!-- /footer -->" . $NL . $NL;
 
-    $str .= $widgets . $NL;
+    $str .= KontrolPanel($KontrolPanelId);
 
     $str .= "</div><!-- /page -->" . $NL . $NL;
     return $str;
@@ -442,9 +445,6 @@ function PlayPopup($id)
 
     $str= $NL;
 
-    // The play menu is not used here, but it is copied from 
-    // here on activation to other pages - done by actions.jp "a.playpopup" 
-    // delegate
     $str .= '<div class="playpopup" data-role="popup" id="' . $id . '" data-history="false">' . $NL;
     $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">' . $NL;
     $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "PlayNow"}' . $SQ . '">Play Now</a></li>' . $NL;
@@ -452,13 +452,12 @@ function PlayPopup($id)
     $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "PlayLater"}' . $SQ . '">Play Later</a></li>' . $NL;
     $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "Cancel"}' . $SQ . '">Cancel</a></li>' . $NL;
     $str .= "</ul>" . $NL;
-    $str .= '</div>' . $NL;
-    // End of play menu
+    $str .= '</div><!-- /popup -->' . $NL . $NL;
 
     return $str;
 }
 
-function PageWidgets()
+function KontrolPanel($id)
 {
     global $SQ;
     global $DQ;
@@ -466,8 +465,7 @@ function PageWidgets()
 
     $str= $NL;
 
-    // KontrolPanel...
-    $str .= '<div data-role="panel" id="KontrolPanel" data-position="left" data-position-fixed="true">' . $NL;
+    $str .= '<div data-role="panel" id="' . $id . '" data-position="left" data-position-fixed="true">' . $NL;
 	$str .= '<ul data-role="listview" data-theme="a" data-divider-theme="a" style="margin-top:-16px;margin-bottom:16px;" class="nav-search">' . $NL;
 	    $str .= '<li data-icon="delete" style="background-color:#111;">' . $NL;
 		$str .= '<a href="#" data-rel="close">Close</a>' . $NL;
@@ -492,8 +490,7 @@ function PageWidgets()
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Next"}' . $SQ . '">Next</button>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Previous"}' . $SQ . '">Previous</button>' . $NL;
 	
-    $str .= '</div><!-- /panel -->' . $NL;
-    //End of KontrolPanel
+    $str .= '</div><!-- /panel -->' . $NL . $NL;
     
     return $str;
 }
@@ -513,7 +510,6 @@ function MenuAlbumList($id, &$ArrayList, $MaxCount)
     {
 	$str .= '<li>';
 
-	//$str .= '<a href="#'. $id . '-' . $c . '" data-rel="popup" data-history="false">';
 	$ThisId = $id . '-' . $it->current()->SequenceNo();
 	$str .= '<a id="' . $ThisId . '" class="playpopup" data-rel=popup" href="#" data-musik=' . $SQ . '{"popupid": "' . $id . '-popup", "preset": "' . $it->current()->SequenceNo() . '"}' . $SQ . '>';
 
@@ -547,8 +543,6 @@ function MenuAlbumList($id, &$ArrayList, $MaxCount)
     $str .= "</ul>" . $NL;
 
     $str .= PlayPopup($id . "-popup");
-    //$str .= '<div data-role="popup" id="' . $id . '-popup">' . $NL;
-    //$str .= '</div>' . $NL;
 
     return $str;
 }
@@ -569,7 +563,6 @@ function MenuAlphabetPage($id, &$ArrayListList)
 	if ($ArrayListList[$ALPHABET[$alpha]]->count() < 1)
 	    $class .= " ui-disabled";
 	$str .= '<div class="' . $class . '">';
-	//$href = '#' . $id . "_" . $ALPHABET[$alpha];
 	if ($ALPHABET[$alpha] == "#")
 	    $href = $id . "_%23" . ".html";
 	else
@@ -609,18 +602,18 @@ function MainMenu(&$Menu)
     global $NEWEST_COUNT;
     global $RootMenu;
 
-    $str .= Page("page_musik", "Musik", RootMenu("RootMenu", $Menu->RootMenu, $Menu), "LinnDS-jukebox", "true", PageWidgets());
+    $str .= Page("page_musik", "Musik", RootMenu("RootMenu", $Menu->RootMenu, $Menu), "LinnDS-jukebox", "true");
 
     for ($i = 0; $i < $Menu->MenuCnt; $i++)
     {
 	if ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NONE) 
 	{
 	    file_put_contents($AppDir . "p" . $i . ".html", 
-		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], -1), "LinnDS-jukebox", "false", PageWidgets())));
+		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], -1), "LinnDS-jukebox", "false")));
 	}
 	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_ALPHABET)
 	{
-	    $str .= Page("p" . $i, $RootMenu[$i], MenuAlphabetPage("p" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", "false", PageWidgets());
+	    $str .= Page("p" . $i, $RootMenu[$i], MenuAlphabetPage("p" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", "false");
 
 	    for ($alpha = 0; $alpha < $ALPHABET_SIZE; $alpha++)
 	    {
@@ -630,14 +623,14 @@ function MainMenu(&$Menu)
 			HTMLDocument(Page("p" . $i . "_" . $ALPHABET[$alpha], 
 			$Menu->RootMenu[$i] . " - " . $ALPHABET[$alpha],
 			MenuAlbumList("p" . $i . "_" . $ALPHABET[$alpha], $Menu->Menu[$i][$ALPHABET[$alpha]], -1),
-			"LinnDS-jukebox", "false", PageWidgets())));
+			"LinnDS-jukebox", "false")));
 		}
 	    }
 	}
 	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NEWEST)
 	{
 	    file_put_contents($AppDir . "p" . $i . ".html", 
-		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], $NEWEST_COUNT), "LinnDS-jukebox", "false", PageWidgets())));
+		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], $NEWEST_COUNT), "LinnDS-jukebox", "false")));
 	}
     }
 
@@ -658,7 +651,7 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
 	HTMLDocument(
 	    Page("album-" . $didl->SequenceNo(), "Album", 
 	    Album(AbsolutePath($didl->PlaylistFileName()), $FolderImg),
-	    "LinnDS-jukebox", "false", PageWidgets())));
+	    "LinnDS-jukebox", "false")));
     $AlbumCnt++;
 }
 

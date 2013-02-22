@@ -24,10 +24,10 @@
 <script src="actions.js"></script>
 <script>
     $(document).bind("mobileinit", function(){
-	    $.extend($.mobile, {
-		    defaultPageTransition: 'none',
-		    defaultDialogTransition: 'none'
-	    });
+	    //$.extend($.mobile, {
+		    //defaultPageTransition: 'none',
+		    //defaultDialogTransition: 'none'
+	    //});
     });
     getStatus();
 

@@ -8,18 +8,6 @@
 */
 
 $(function() {
-   $('body').delegate("a.dialogclick", "click", function() {
-	var value = $(this).data("musik").preset;
-	var action = $(this).data("musik").action;
-	console.log("a.dialogclick: " + action + " = " + value);
-	if (action != "Cancel") {
-	    jQuery.get("Send.php", { action: action, value: value } , function (data) {
-		//alert('Load OK' + data);
-	    });
-	}
-	//$('.ui-dialog').dialog('close');
-	return true;
-   });
 
    // This one is called when clicking to open a playpopup.
    $('body').delegate("a.playpopup", "click", function() {
@@ -49,6 +37,7 @@ $(function() {
 	return true;
    });
 
+   // Click a button in left Kontrol panel
    $('body').delegate("button.panelclick", "click", function() {
 	var volume = $(this).data("musik").volume;
 	var action = $(this).data("musik").action;
@@ -59,10 +48,34 @@ $(function() {
 		//alert('Load OK' + data);
 	    });
 	}
-	//$("#" + id).popup('close');
 	return true;
    });
+    
+   // Change Kontrol volume slider
+   $("input#volume").live("change", function() {
+       var vol = $(this).val();
+      console.log("volume = " + vol);
+      jQuery.get("Send.php", { action: "SetVolume", volume: vol } , function (data) {
+          //alert('Load OK' + data);
+      });
+   });
 
+   /*
+   $('body').delegate("a.dialogclick", "click", function() {
+	var value = $(this).data("musik").preset;
+	var action = $(this).data("musik").action;
+	console.log("a.dialogclick: " + action + " = " + value);
+	if (action != "Cancel") {
+	    jQuery.get("Send.php", { action: action, value: value } , function (data) {
+		//alert('Load OK' + data);
+	    });
+	}
+	//$('.ui-dialog').dialog('close');
+	return true;
+   });
+   */
+
+   /*
    $('body').delegate("a.popsource", "click", function() {
 	var id = $(this).data("musik").id;
 	console.log("a.popsource: " + id);
@@ -70,6 +83,7 @@ $(function() {
 	$("#" + id).popup('open', {positionTo: "#" + id + "-pos" } );
 	return true;
    });
+   */
 
     //$('ul.presets').delegate("a.onepreset", "swipeleft", function() {
     /*
@@ -98,15 +112,6 @@ $(function() {
 	}
     });
     */
-    
-   $("input#volume").live("change", function() {
-       var vol = $(this).val();
-      console.log("volume = " + vol);
-      jQuery.get("Send.php", { action: "SetVolume", volume: vol } , function (data) {
-          //alert('Load OK' + data);
-      });
-   });
-
 
     //$("img.onepreset").lazyload({placeholder : "webapp/tuupola-jquery_lazyload-3f123e9/img/grey.gif"});
 });

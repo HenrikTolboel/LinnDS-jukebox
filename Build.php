@@ -434,7 +434,7 @@ function RootMenu($id, $RootMenu, &$Menu)
     return $str;
 }
 
-function DummyPopups()
+function PlayPopup($id)
 {
     global $SQ;
     global $DQ;
@@ -443,14 +443,14 @@ function DummyPopups()
     $str= $NL;
 
     // The play menu is not used here, but it is copied from 
-    // here on activation to other pages - done by actions.jp "a.pop" 
+    // here on activation to other pages - done by actions.jp "a.playpopup" 
     // delegate
-    $str .= '<div data-role="popup" id="play-popup" data-history="false">' . $NL;
+    $str .= '<div class="playpopup" data-role="popup" id="' . $id . '" data-history="false">' . $NL;
     $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "PlayNow"}' . $SQ . '">Play Now</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "PlayNext"}' . $SQ . '">Play Next</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "PlayLater"}' . $SQ . '">Play Later</a></li>' . $NL;
-    $str .= '<li><a href="#" class="popupclick" data-musik=' . $SQ . '{"action": "Cancel"}' . $SQ . '">Cancel</a></li>' . $NL;
+    $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "PlayNow"}' . $SQ . '">Play Now</a></li>' . $NL;
+    $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "PlayNext"}' . $SQ . '">Play Next</a></li>' . $NL;
+    $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "PlayLater"}' . $SQ . '">Play Later</a></li>' . $NL;
+    $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "Cancel"}' . $SQ . '">Cancel</a></li>' . $NL;
     $str .= "</ul>" . $NL;
     $str .= '</div>' . $NL;
     // End of play menu
@@ -514,7 +514,8 @@ function MenuAlbumList($id, &$ArrayList, $MaxCount)
 	$str .= '<li>';
 
 	//$str .= '<a href="#'. $id . '-' . $c . '" data-rel="popup" data-history="false">';
-	$str .= '<a id="' . $it->current()->SequenceNo() . '" class="pop" data-rel=popup" href="#" data-musik=' . $SQ . '{"id": "' . $id . '-popup", "preset": "' . $it->current()->SequenceNo() . '"}' . $SQ . '>';
+	$ThisId = $id . '-' . $it->current()->SequenceNo();
+	$str .= '<a id="' . $ThisId . '" class="playpopup" data-rel=popup" href="#" data-musik=' . $SQ . '{"popupid": "' . $id . '-popup", "preset": "' . $it->current()->SequenceNo() . '"}' . $SQ . '>';
 
 	$str .= '<img class="sprite_' . $it->current()->SequenceNo() . '" src="Transparent.gif"/>';
 
@@ -545,8 +546,9 @@ function MenuAlbumList($id, &$ArrayList, $MaxCount)
 
     $str .= "</ul>" . $NL;
 
-    $str .= '<div data-role="popup" id="' . $id . '-popup">' . $NL;
-    $str .= '</div>' . $NL;
+    $str .= PlayPopup($id . "-popup");
+    //$str .= '<div data-role="popup" id="' . $id . '-popup">' . $NL;
+    //$str .= '</div>' . $NL;
 
     return $str;
 }
@@ -590,7 +592,6 @@ function HTMLDocument($WrapStr)
     global $NL;
 
     $str = file_get_contents("header.inc");
-    $str .= '<div id="globals" data-musik=""></div>' . $NL . $NL;
 
     $str .= $WrapStr;
 
@@ -608,14 +609,14 @@ function MainMenu(&$Menu)
     global $NEWEST_COUNT;
     global $RootMenu;
 
-    $str .= Page("page_musik", "Musik", RootMenu("RootMenu", $Menu->RootMenu, $Menu), "LinnDS-jukebox", "true", DummyPopups() . PageWidgets());
+    $str .= Page("page_musik", "Musik", RootMenu("RootMenu", $Menu->RootMenu, $Menu), "LinnDS-jukebox", "true", PageWidgets());
 
     for ($i = 0; $i < $Menu->MenuCnt; $i++)
     {
 	if ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NONE) 
 	{
 	    file_put_contents($AppDir . "p" . $i . ".html", 
-		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], -1), "LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
+		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], -1), "LinnDS-jukebox", "false", PageWidgets())));
 	}
 	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_ALPHABET)
 	{
@@ -629,14 +630,14 @@ function MainMenu(&$Menu)
 			HTMLDocument(Page("p" . $i . "_" . $ALPHABET[$alpha], 
 			$Menu->RootMenu[$i] . " - " . $ALPHABET[$alpha],
 			MenuAlbumList("p" . $i . "_" . $ALPHABET[$alpha], $Menu->Menu[$i][$ALPHABET[$alpha]], -1),
-			"LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
+			"LinnDS-jukebox", "false", PageWidgets())));
 		}
 	    }
 	}
 	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NEWEST)
 	{
 	    file_put_contents($AppDir . "p" . $i . ".html", 
-		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], $NEWEST_COUNT), "LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
+		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], $NEWEST_COUNT), "LinnDS-jukebox", "false", PageWidgets())));
 	}
     }
 
@@ -657,7 +658,7 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
 	HTMLDocument(
 	    Page("album-" . $didl->SequenceNo(), "Album", 
 	    Album(AbsolutePath($didl->PlaylistFileName()), $FolderImg),
-	    "LinnDS-jukebox", "false", DummyPopups() . PageWidgets())));
+	    "LinnDS-jukebox", "false", PageWidgets())));
     $AlbumCnt++;
 }
 

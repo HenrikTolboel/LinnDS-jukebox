@@ -21,44 +21,45 @@ $(function() {
 	return true;
    });
 
-   $('body').delegate("a.popupclick", "click", function() {
+   // This one is called when clicking to open a playpopup.
+   $('body').delegate("a.playpopup", "click", function() {
+	var id = $(this).attr('id');
+	var preset = $(this).data("musik").preset;
+	var popupid = $(this).data("musik").popupid;
+	console.log("a.playpopup: " + id + ", " + preset + ", " + popupid);
+	$("#" + popupid).data("musik", {preset: preset, popupid: popupid }); 
+	$("#" + popupid).popup('open', {positionTo: "#" + id } );
+	return true;
+   });
+
+   // This one is called when an entry in the playpopup is clicked
+   $('body').delegate("a.playpopupclick", "click", function() {
 	var volume = $(this).data("musik").volume;
 	var action = $(this).data("musik").action;
-	var preset = $('#globals').data("musik").preset;
-	var id = $('#globals').data("musik").id;
-	console.log("a.popupclick: " + action + " = " + preset + ", " + volume);
+	var t = $(this).closest("div.playpopup");
+	var preset = t.data("musik").preset;
+	var popupid = t.data("musik").popupid;
+	console.log("a.playpopupclick: " + action + " = " + preset + ", " + volume);
 	if (action != "Cancel") {
 	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset } , function (data) {
 		//alert('Load OK' + data);
 	    });
 	}
-	$("#" + id).popup('close');
+	$("#" + popupid).popup('close');
 	return true;
    });
 
    $('body').delegate("button.panelclick", "click", function() {
 	var volume = $(this).data("musik").volume;
 	var action = $(this).data("musik").action;
-	var preset = $('#globals').data("musik").preset;
-	var id = $('#globals').data("musik").id;
-	console.log("button.panelclick: " + action + " = " + preset + ", " + volume);
+	var preset = $(this).data("musik").preset;
+	console.log("button.panelclick: " + action + " = " + volume);
 	if (action != "Cancel") {
 	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset } , function (data) {
 		//alert('Load OK' + data);
 	    });
 	}
 	//$("#" + id).popup('close');
-	return true;
-   });
-
-   $('body').delegate("a.pop", "click", function() {
-	var preset = $(this).data("musik").preset;
-	var id = $(this).data("musik").id;
-	console.log("a.pop: " + id + " = " + preset);
-	$('#globals').data("musik", {preset: preset, id: id }); 
-	var t = $('#play-popup').clone();
-	$("#" + id).empty().append(t);
-	$("#" + id).popup('open', {positionTo: "#" + preset } );
 	return true;
    });
 

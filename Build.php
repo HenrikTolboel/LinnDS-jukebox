@@ -650,7 +650,7 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
     file_put_contents($AppDir . 'album_' . $didl->SequenceNo() . '.html', 
 	HTMLDocument(
 	    Page("album-" . $didl->SequenceNo(), "Album", 
-	    Album(AbsolutePath($didl->PlaylistFileName()), $FolderImg),
+	    Album(AbsolutePath($didl->PlaylistFileName()), $didl->SequenceNo(), $FolderImg),
 	    "LinnDS-jukebox", "false")));
     $AlbumCnt++;
 }

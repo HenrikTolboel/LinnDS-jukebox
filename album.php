@@ -10,12 +10,12 @@
 
 
 require_once("setup.php");
-//require_once("Functions.php");
 
-function Album($DIDLFile, $FolderImg)
+function Album($DIDLFile, $preset, $FolderImg)
 {
     global $LINN_JUKEBOX_URL;
     global $NL;
+    global $SQ;
 
     $cont = "";
     $first = true;
@@ -25,7 +25,6 @@ function Album($DIDLFile, $FolderImg)
 
 
     foreach ($xml->children('urn:linn-co-uk/playlist') as $track) {
-	//$cont .= $track->getName() . "<br />";
 	$URL = "";
 	$DURATION = "";
 	$TITLE = "";
@@ -42,45 +41,33 @@ function Album($DIDLFile, $FolderImg)
 	$DISC_NUMBER = -1;
 	$DISC_COUNT = -1;
 	foreach ($track->children('urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/') as $didl) {
-	    //$cont .= $didl->getName() . "<br />";
 	    foreach ($didl->children() as $item) {
-		//$cont .= $item->getName() ."<br />";
 		foreach ($item->children() as $t) {
-		    //$cont .= $t->getName() . " ";
 		    if ($t->getName() == "res") {
-			//$cont .= "URL = " . $t . "<br />";
 			foreach($t->attributes() as $a => $b) {
 			    if ($a == "duration") {
 				$DURATION = $b;
-				//$cont .= "DURATION = " . $b . "<br />";
 			    }
 			}
 		    }
 		}
 		foreach ($item->children('http://purl.org/dc/elements/1.1/') as $t) {
-		    //$cont .= $t->getName() . " ";
 		    if ($t->getName() == "title") {
 			$TITLE = $t;
-			//$cont .= "TITLE = " . $t ."<br />";
 		    }
 		    else if ($t->getName() == "date") {
 			$YEAR = (int) $t;
-			//$cont .= "YEAR = " . $t ."<br />";
 		    }
 		}
 		foreach ($item->children('urn:schemas-upnp-org:metadata-1-0/upnp/') as $t) {
-		    //$cont .= $t->getName() . " ";
 		    if ($t->getName() == "albumArtURI") {
 			$AlbumArt = $t;
-			//$cont .= "AlbumArt = " . $t ."<br />";
 		    }
 		    else if ($t->getName() == "artworkURI") {
 			$ArtWork = $t;
-			//$cont .= "Artwork = " . $t ."<br />";
 		    }
 		    else if ($t->getName() == "genre") {
 			$Genre = $t;
-			//$cont .= "Genre = " . $t ."<br />";
 		    }
 		    else if ($t->getName() == "album") {
 			$i1 = strpos($t, "/");
@@ -91,24 +78,18 @@ function Album($DIDLFile, $FolderImg)
 			{
 			    $ALBUM = substr($t, $i1+1);
 			}
-			//$cont .= "ALBUM = " . $t ."<br />";
 		    }
 		    else if ($t->getName() == "originalTrackNumber") {
 			$TRACK_NUMBER = (int) $t;
-			//$cont .= "TRACK NUMBER = " . $t ."<br />";
 		    }
 		    else if ($t->getName() == "originalDiscNumber") {
 			$DISC_NUMBER = (int) $t;
-			//$cont .= "DISC NUMBER = " . $t ."<br />";
 		    }
 		    else if ($t->getName() == "originalDiscCount") {
 			$DISC_COUNT = (int) $t;
-			//$cont .= "DISC COUNT = " . $t ."<br />";
 		    }
 		    else if ($t->getName() == "artist") {
-			//$cont .= "ARTIST = " . $t ."<br />";
 			foreach($t->attributes() as $a => $b) {
-			    //$cont .=  $b . " = " . $t . "<br />";
 			    if ($a == "role" && $b == "Performer") {
 				$Artist_Performer = $t;
 			    }
@@ -147,9 +128,17 @@ function Album($DIDLFile, $FolderImg)
 	*/
 
 	if ($first) {
-	    //$cont .= '<img class="album" width="250" src="' . str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_URL, $AlbumArt) . '" />' . $NL;
-	    $cont .= '<img class="album" width="250" src="' . $FolderImg . '" />' . $NL;
-	    //$cont .= '<h3 class="album">0' . $preset . '<br />' . $Artist_Performer . '</h3>' . $NL;
+	    $cont .= '<div class="ui-grid-a">' . $NL;
+		$cont .= '<div class="ui-block-a"><div class="ui-bar">' . $NL;
+		    $cont .= '<img class="album" width="250" src="' . $FolderImg . '" />' . $NL;
+		$cont .= '</div></div>' . $NL;
+		$cont .= '<div class="ui-block-b"><div class="ui-bar">' . $NL;
+		    $cont .= '<button href="#" class="panelclick" data-mini="false" data-musik=' . $SQ . '{"action": "PlayNow", "preset": "' . $preset . '"}' . $SQ . '">Play Now</button>' . $NL;
+		    $cont .= '<button href="#" class="panelclick" data-mini="false" data-musik=' . $SQ . '{"action": "PlayNext", "preset": "' . $preset . '"}' . $SQ . '">Play Next</button>' . $NL;
+		    $cont .= '<button href="#" class="panelclick" data-mini="false" data-musik=' . $SQ . '{"action": "PlayLater", "preset": "' . $preset . '"}' . $SQ . '">Play Later</button>' . $NL;
+		$cont .= '</div></div>' . $NL;
+	    $cont .= '</div><!-- /grid-a -->' . $NL;
+
 	    $cont .= '<h3>' . $Artist_Performer . '</h3>' . $NL;
 	    $cont .= '<p>' . $ALBUM . ' ('. $YEAR . ')</p>' . $NL;
 	    $cont .= '<ul id="' . $id . '" data-role="listview" data-inset="true" data-filter="false">' .$NL;

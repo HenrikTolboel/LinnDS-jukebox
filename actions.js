@@ -42,7 +42,7 @@ $(function() {
 	var volume = $(this).data("musik").volume;
 	var action = $(this).data("musik").action;
 	var preset = $(this).data("musik").preset;
-	console.log("button.panelclick: " + action + " = " + volume);
+	console.log("button.panelclick: " + action + " = " + preset + ", " + volume);
 	if (action != "Cancel") {
 	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset } , function (data) {
 		//alert('Load OK' + data);

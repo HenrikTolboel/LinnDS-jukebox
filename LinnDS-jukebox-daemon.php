@@ -166,7 +166,7 @@ function PrepareXML($xml)
     return $xml;
 }
 
-function InsertDIDL_list($DIDL_URL, $AfterId)
+function InsertDIDL_list($DIDL_URL, $TrackOnly, $AfterId)
 {
     global $NL;
 
@@ -524,12 +524,13 @@ while (true) {
          {
             // Here things happens - we execute the actions sent from the
             // application, by issuing a number of ACTIONs.
-            if (preg_match("/Jukebox PlayNow \"(\d+)\"/m", $data, $matches) > 0)
+            if (preg_match("/Jukebox PlayNow \"(\d+)\" \"(\d+)\"/m", $data, $matches) > 0)
             {
                $JukeBoxPlay = $matches[1];
+               $JukeBoxTrack = $matches[2];
                $State['PlayNext'] = -1;
                $State['PlayLater'] = array();
-               LogWrite("JukeBoxPlayNow: " . $JukeBoxPlay);
+               LogWrite("JukeBoxPlayNow: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
 
 	       if ($State['Standby'] == 'true')
 	       {
@@ -542,21 +543,22 @@ while (true) {
                Send("ACTION Ds/Playlist 1 Stop");
 
                Send("ACTION Ds/Playlist 1 DeleteAll");
-	       InsertDIDL_list(PresetURL($JukeBoxPlay), 0);
+	       InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, 0);
 
                //Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $JukeBoxPlay . "\"");
 
                Send("ACTION Ds/Playlist 1 Play");
                $DataHandled = true;
             }
-            elseif (preg_match("/Jukebox PlayNext \"(\d+)\"/m", $data, $matches) > 0)
+            elseif (preg_match("/Jukebox PlayNext \"(\d+)\" \"(\d+)\"/m", $data, $matches) > 0)
             {
                $JukeBoxPlay = $matches[1];
+               $JukeBoxTrack = $matches[2];
                //$State['PlayNext'] = $JukeBoxPlay;
                //$State['PlayLater'] = array();
-               LogWrite("JukeBoxPlayNext: " . $JukeBoxPlay);
+               LogWrite("JukeBoxPlayNext: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
 
-	       InsertDIDL_list(PresetURL($JukeBoxPlay), $State['Id']);
+	       InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, $State['Id']);
 
 	       if ($State['Standby'] == 'true')
 	       {
@@ -575,14 +577,15 @@ while (true) {
                }
                $DataHandled = true;
             }
-            elseif (preg_match("/Jukebox PlayLater \"(\d+)\"/m", $data, $matches) > 0)
+            elseif (preg_match("/Jukebox PlayLater \"(\d+)\" \"(\d+)\"/m", $data, $matches) > 0)
             {
                $JukeBoxPlay = $matches[1];
+               $JukeBoxTrack = $matches[2];
                //$State['PlayNext'] = -1;
                //array_push($State['PlayLater'], $JukeBoxPlay);
-               LogWrite("JukeBoxPlayLater: " . $JukeBoxPlay);
+               LogWrite("JukeBoxPlayLater: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
 
-	       InsertDIDL_list(PresetURL($JukeBoxPlay), end($State['IdArray']));
+	       InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, end($State['IdArray']));
 
 	       if ($State['Standby'] == 'true')
 	       {

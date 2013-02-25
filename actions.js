@@ -13,9 +13,10 @@ $(function() {
    $('body').delegate("a.playpopup", "click", function() {
 	var id = $(this).attr('id');
 	var preset = $(this).data("musik").preset;
+	var track  = $(this).data("musik").track;
 	var popupid = $(this).data("musik").popupid;
-	console.log("a.playpopup: " + id + ", " + preset + ", " + popupid);
-	$("#" + popupid).data("musik", {preset: preset, popupid: popupid }); 
+	console.log("a.playpopup: " + id + ", " + preset + ", " + track + ", " + popupid);
+	$("#" + popupid).data("musik", {preset: preset, popupid: popupid, track: track }); 
 	$("#" + popupid).popup('open', {positionTo: "#" + id } );
 	return true;
    });
@@ -26,10 +27,11 @@ $(function() {
 	var action = $(this).data("musik").action;
 	var t = $(this).closest("div.playpopup");
 	var preset = t.data("musik").preset;
+	var track  = t.data("musik").track;
 	var popupid = t.data("musik").popupid;
-	console.log("a.playpopupclick: " + action + " = " + preset + ", " + volume);
+	console.log("a.playpopupclick: " + action + " = " + preset + ", " + track + ", " + volume);
 	if (action != "Cancel") {
-	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset } , function (data) {
+	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset, track: track } , function (data) {
 		//alert('Load OK' + data);
 	    });
 	}
@@ -42,9 +44,10 @@ $(function() {
 	var volume = $(this).data("musik").volume;
 	var action = $(this).data("musik").action;
 	var preset = $(this).data("musik").preset;
-	console.log("button.panelclick: " + action + " = " + preset + ", " + volume);
+	var track  = $(this).data("musik").track;
+	console.log("button.panelclick: " + action + " = " + preset + ", " + track + ", " + volume);
 	if (action != "Cancel") {
-	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset } , function (data) {
+	    jQuery.get("Send.php", { action: action, volume: volume, preset: preset, track: track } , function (data) {
 		//alert('Load OK' + data);
 	    });
 	}

@@ -23,20 +23,23 @@ if ($action == "State") {
     $Str = "State";
 }
 elseif ($action == "PlayNow") {
-    $value = $_GET["preset"];
-    $Str = "Jukebox PlayNow \"" . $value . "\"";
+    $preset = $_GET["preset"];
+    $track = $_GET["track"];
+    $Str = "Jukebox PlayNow \"" . $preset . "\" \"" . $track . "\"";
 }
 elseif ($action == "PlayNext") {
-    $value = $_GET["preset"];
-    $Str = "Jukebox PlayNext \"" . $value . "\"";
+    $preset = $_GET["preset"];
+    $track = $_GET["track"];
+    $Str = "Jukebox PlayNext \"" . $preset . "\" \"" . $track . "\"";
 }
 elseif ($action == "PlayLater") {
-    $value = $_GET["preset"];
-    $Str = "Jukebox PlayLater \"" . $value . "\"";
+    $preset = $_GET["preset"];
+    $track = $_GET["track"];
+    $Str = "Jukebox PlayLater \"" . $preset . "\" \"" . $track . "\"";
 }
 elseif ($action == "SetVolume") {
-    $value = $_GET["volume"];
-    $Str = "Volume Set \"" . $value . "\"";
+    $volume = $_GET["volume"];
+    $Str = "Volume Set \"" . $volume . "\"";
 }
 elseif ($action == "IncrVolume") {
     $Str = "Volume Incr";

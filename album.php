@@ -11,7 +11,7 @@
 
 require_once("setup.php");
 
-function Album($DIDLFile, $preset, $FolderImg)
+function Album($id, $DIDLFile, $preset, $FolderImg)
 {
     global $LINN_JUKEBOX_URL;
     global $NL;
@@ -19,6 +19,7 @@ function Album($DIDLFile, $preset, $FolderImg)
 
     $cont = "";
     $first = true;
+    $TrackSeq = 0;
 
     //echo "Album: " .  $DIDLFile . $NL;
     $xml = simplexml_load_file($DIDLFile);
@@ -127,16 +128,17 @@ function Album($DIDLFile, $preset, $FolderImg)
 	$cont .= "<br />";
 	*/
 
+	$TrackSeq++;
 	if ($first) {
 	    $cont .= '<div class="ui-grid-a">' . $NL;
-		$cont .= '<div class="ui-block-a"><div class="ui-bar">' . $NL;
-		    $cont .= '<img class="album" width="250" src="' . $FolderImg . '" />' . $NL;
-		$cont .= '</div></div>' . $NL;
-		$cont .= '<div class="ui-block-b"><div class="ui-bar">' . $NL;
-		    $cont .= '<button href="#" class="panelclick" data-mini="false" data-musik=' . $SQ . '{"action": "PlayNow", "preset": "' . $preset . '"}' . $SQ . '">Play Now</button>' . $NL;
-		    $cont .= '<button href="#" class="panelclick" data-mini="false" data-musik=' . $SQ . '{"action": "PlayNext", "preset": "' . $preset . '"}' . $SQ . '">Play Next</button>' . $NL;
-		    $cont .= '<button href="#" class="panelclick" data-mini="false" data-musik=' . $SQ . '{"action": "PlayLater", "preset": "' . $preset . '"}' . $SQ . '">Play Later</button>' . $NL;
-		$cont .= '</div></div>' . $NL;
+	    $cont .= '<div class="ui-block-a"><div class="ui-bar">' . $NL;
+	    $cont .= '<img class="album" style="width: 100%;" src="' . $FolderImg . '" />' . $NL;
+	    $cont .= '</div></div>' . $NL;
+	    $cont .= '<div class="ui-block-b"><div class="ui-bar">' . $NL;
+	    $cont .= '<button href="#" class="panelclick" data-mini="false" data-musik=' . $SQ . '{"action": "PlayNow", "preset": "' . $preset . '"}' . $SQ . '>Play Now</button>' . $NL;
+	    $cont .= '<button href="#" class="panelclick" data-mini="false" data-musik=' . $SQ . '{"action": "PlayNext", "preset": "' . $preset . '"}' . $SQ . '>Play Next</button>' . $NL;
+	    $cont .= '<button href="#" class="panelclick" data-mini="false" data-musik=' . $SQ . '{"action": "PlayLater", "preset": "' . $preset . '"}' . $SQ . '>Play Later</button>' . $NL;
+	    $cont .= '</div></div>' . $NL;
 	    $cont .= '</div><!-- /grid-a -->' . $NL;
 
 	    $cont .= '<h3>' . $Artist_Performer . '</h3>' . $NL;
@@ -147,13 +149,14 @@ function Album($DIDLFile, $preset, $FolderImg)
 
 	$cont .= '<li>';
 
-	$cont .= '<a href="#"><h3>' . $TRACK_NUMBER . '. ' . $TITLE . '</h3>';
+	$cont .= '<a id ="' . $id . '-' . $TrackSeq . '" href="#" class="playpopup" data-rel="popup" data-musik=' . $SQ . '{"popupid": "' . $id . '-popup", "preset": "' . $preset . '", "track": "' . $TrackSeq . '"}' . $SQ . '><h3>' . $TRACK_NUMBER . '. ' . $TITLE . '</h3>';
 	$cont .= '<p>' . $DURATION . '</p></a>';
 
 	$cont .= "</li>" . $NL;
     }
 
     $cont .= "</ul>";
+    $cont .= PlayPopup($id . "-popup");
 
     return $cont;
 }

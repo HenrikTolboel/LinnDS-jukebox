@@ -447,10 +447,10 @@ function PlayPopup($id)
 
     $str .= '<div class="playpopup" data-role="popup" id="' . $id . '" data-history="false">' . $NL;
     $str .= '<ul data-role="listview" data-inset="true" style="min-width:180px;">' . $NL;
-    $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "PlayNow"}' . $SQ . '">Play Now</a></li>' . $NL;
-    $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "PlayNext"}' . $SQ . '">Play Next</a></li>' . $NL;
-    $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "PlayLater"}' . $SQ . '">Play Later</a></li>' . $NL;
-    $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "Cancel"}' . $SQ . '">Cancel</a></li>' . $NL;
+    $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "PlayNow"}' . $SQ . '>Play Now</a></li>' . $NL;
+    $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "PlayNext"}' . $SQ . '>Play Next</a></li>' . $NL;
+    $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "PlayLater"}' . $SQ . '>Play Later</a></li>' . $NL;
+    $str .= '<li><a href="#" class="playpopupclick" data-musik=' . $SQ . '{"action": "Cancel"}' . $SQ . '>Cancel</a></li>' . $NL;
     $str .= "</ul>" . $NL;
     $str .= '</div><!-- /popup -->' . $NL . $NL;
 
@@ -473,22 +473,22 @@ function KontrolPanel($id)
 	$str .= '</ul>' . $NL;
 
         $str .= '<h4>Source</h4>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Playlist"}' . $SQ . '">Playlist</button>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-TV"}' . $SQ . '">TV</button>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Radio"}' . $SQ . '">Radio</button>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-NetAux"}' . $SQ . '">AirPlay</button>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Off"}' . $SQ . '">Off</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Playlist"}' . $SQ . '>Playlist</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-TV"}' . $SQ . '>TV</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Radio"}' . $SQ . '>Radio</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-NetAux"}' . $SQ . '>AirPlay</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Off"}' . $SQ . '>Off</button>' . $NL;
 
 
 
         $str .= '<h4>Kontrol</h4>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Play"}' . $SQ . '">Play</button>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Pause"}' . $SQ . '">Pause</button>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Stop"}' . $SQ . '">Stop</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Play"}' . $SQ . '>Play</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Pause"}' . $SQ . '>Pause</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Stop"}' . $SQ . '>Stop</button>' . $NL;
         $str .= '<label for="volume">Volume:</label>' . $NL;
         $str .= '<input type="range" name="volume" id="volume" value="35" min="20" max="60" data-mini="true"/>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Next"}' . $SQ . '">Next</button>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Previous"}' . $SQ . '">Previous</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Next"}' . $SQ . '>Next</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Previous"}' . $SQ . '>Previous</button>' . $NL;
 	
     $str .= '</div><!-- /panel -->' . $NL . $NL;
     
@@ -511,7 +511,7 @@ function MenuAlbumList($id, &$ArrayList, $MaxCount)
 	$str .= '<li>';
 
 	$ThisId = $id . '-' . $it->current()->SequenceNo();
-	$str .= '<a id="' . $ThisId . '" class="playpopup" data-rel=popup" href="#" data-musik=' . $SQ . '{"popupid": "' . $id . '-popup", "preset": "' . $it->current()->SequenceNo() . '"}' . $SQ . '>';
+	$str .= '<a id="' . $ThisId . '" class="playpopup" data-rel="popup" href="#" data-musik=' . $SQ . '{"popupid": "' . $id . '-popup", "preset": "' . $it->current()->SequenceNo() . '"}' . $SQ . '>';
 
 	$str .= '<img class="sprite_' . $it->current()->SequenceNo() . '" src="Transparent.gif"/>';
 
@@ -647,10 +647,11 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
     global $AppDir;
 
     $FolderImg = sprintf("folder/folder_%04d.jpg", $didl->SequenceNo());
+    $ThisId = "album-" . $didl->SequenceNo();
     file_put_contents($AppDir . 'album_' . $didl->SequenceNo() . '.html', 
 	HTMLDocument(
-	    Page("album-" . $didl->SequenceNo(), "Album", 
-	    Album(AbsolutePath($didl->PlaylistFileName()), $didl->SequenceNo(), $FolderImg),
+	    Page($ThisId, "Album", 
+	    Album($ThisId, AbsolutePath($didl->PlaylistFileName()), $didl->SequenceNo(), $FolderImg),
 	    "LinnDS-jukebox", "false")));
     $AlbumCnt++;
 }

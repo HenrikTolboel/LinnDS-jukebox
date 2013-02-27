@@ -22,19 +22,21 @@ $string = socket_read($socket, 10000); // Remove connection info sent from serve
 if ($action == "State") {
     $Str = "State";
 }
+$track = 0;
+if (isset($_GET["track"]) && !empty($_GET["track"])) {
+    $track = $_GET["track"];
+}
+
 elseif ($action == "PlayNow") {
     $preset = $_GET["preset"];
-    $track = $_GET["track"];
     $Str = "Jukebox PlayNow \"" . $preset . "\" \"" . $track . "\"";
 }
 elseif ($action == "PlayNext") {
     $preset = $_GET["preset"];
-    $track = $_GET["track"];
     $Str = "Jukebox PlayNext \"" . $preset . "\" \"" . $track . "\"";
 }
 elseif ($action == "PlayLater") {
     $preset = $_GET["preset"];
-    $track = $_GET["track"];
     $Str = "Jukebox PlayLater \"" . $preset . "\" \"" . $track . "\"";
 }
 elseif ($action == "SetVolume") {

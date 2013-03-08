@@ -19,14 +19,13 @@ $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 socket_connect($socket, $HOST, $PORT);
 $string = socket_read($socket, 10000); // Remove connection info sent from server...
 
-if ($action == "State") {
-    $Str = "State";
-}
 $track = 0;
 if (isset($_GET["track"]) && !empty($_GET["track"])) {
     $track = $_GET["track"];
 }
-
+if ($action == "State") {
+    $Str = "State";
+}
 elseif ($action == "PlayNow") {
     $preset = $_GET["preset"];
     $Str = "Jukebox PlayNow \"" . $preset . "\" \"" . $track . "\"";

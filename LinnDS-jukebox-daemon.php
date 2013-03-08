@@ -166,11 +166,11 @@ function PrepareXML($xml)
     return $xml;
 }
 
-function InsertDIDL_list($DIDL_URL, $TrackOnly, $AfterId)
+function InsertDIDL_list($DIDL_URL, $OnlyTrackNo, $AfterId)
 {
     global $NL;
 
-    LogWrite("InsertDIDL_list: " . $DIDL_URL);
+    LogWrite("InsertDIDL_list: " . $DIDL_URL . ", " . $OnlyTrackNo . ", " . $AfterId);
 
     $xml = simplexml_load_file($DIDL_URL);
 
@@ -179,9 +179,17 @@ function InsertDIDL_list($DIDL_URL, $TrackOnly, $AfterId)
 
     $DIDLs = $xml->xpath('//didl:DIDL-Lite');
 
-    Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[0][0]) . "\" \"" . PrepareXML($DIDLs[0]->asXML()) . "\"");
-    for ($i = 1; $i < sizeof($URLs); $i++)
-	Send("ACTION Ds/Playlist 1 Insert \"%NewId%\" \"" . PrepareXML($URLs[$i][0]) . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
+    if ($OnlyTrackNo == 0) {
+	Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[0][0]) . "\" \"" . PrepareXML($DIDLs[0]->asXML()) . "\"");
+	for ($i = 1; $i < sizeof($URLs); $i++)
+	    Send("ACTION Ds/Playlist 1 Insert \"%NewId%\" \"" . PrepareXML($URLs[$i][0]) . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
+    }
+    else
+    {
+	$No = $OnlyTrackNo -1;
+	Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[$No][0]) . "\" \"" . PrepareXML($DIDLs[$No]->asXML()) . "\"");
+
+    }
     Send("ACTION Ds/Playlist 1 IdArray");
 }
 

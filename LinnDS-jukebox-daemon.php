@@ -56,8 +56,6 @@ $AwaitResponse = 0;
 // State contains the "accumulated" state of the linn device.
 $State = array();
 $State['MAX_VOLUME'] = 60;
-$State['PlayNext'] = -1;
-$State['PlayLater'] = array();
 $State['SourceIndex_Playlist'] = -1;
 $State['IdArray'] = array('0');
 $State['Id'] = 0;
@@ -363,6 +361,7 @@ while (true) {
             {
                if (preg_match("/RESPONSE \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"/m", $data, $match) > 0)
                {
+		      $State['IdArray_Token'] = $match[1];
 		      $State['IdArray_base64'] = $match[2];
 		      $State['IdArray'] = unpack("N*", base64_decode($match[2]));
 	       }
@@ -437,23 +436,10 @@ while (true) {
             {
                if (preg_match("/TransportState \"(\w+)\"/m", $data, $matches) > 0)
                {
-                  if (false && count($State['PlayLater']) >= 1 && $matches[1] == "Stopped" && $State['TransportState'] != $matches[1] && $State['SourceIndex'] == $State['SourceIndex_Playlist'])
-                  {
-                     $front = array_shift($State['PlayLater']);
-                     Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $front . "\"");
-                     Send("ACTION Ds/Playlist 1 Play");
-                  }
                   $State['TransportState'] = $matches[1];
                }
                if (preg_match("/Id \"(\d+)\"/m", $data, $matches) > 0)
                {
-                  if (false && $State['PlayNext'] != -1 && $State['Id'] != $matches[1])
-                  {
-                     Send("ACTION Ds/Playlist 1 Stop");
-                     Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $State['PlayNext'] . "\"");
-                     Send("ACTION Ds/Playlist 1 Play");
-                     $State['PlayNext'] = -1;
-                  }
                   $State['Id'] = $matches[1];
 		  //Send("ACTION Ds/Playlist 1 Read \"" . $matches[1] . "\"");
                }
@@ -536,8 +522,6 @@ while (true) {
             {
                $JukeBoxPlay = $matches[1];
                $JukeBoxTrack = $matches[2];
-               $State['PlayNext'] = -1;
-               $State['PlayLater'] = array();
                LogWrite("JukeBoxPlayNow: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
 
 	       if ($State['Standby'] == 'true')
@@ -562,8 +546,6 @@ while (true) {
             {
                $JukeBoxPlay = $matches[1];
                $JukeBoxTrack = $matches[2];
-               //$State['PlayNext'] = $JukeBoxPlay;
-               //$State['PlayLater'] = array();
                LogWrite("JukeBoxPlayNext: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
 
 	       InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, $State['Id']);
@@ -589,8 +571,6 @@ while (true) {
             {
                $JukeBoxPlay = $matches[1];
                $JukeBoxTrack = $matches[2];
-               //$State['PlayNext'] = -1;
-               //array_push($State['PlayLater'], $JukeBoxPlay);
                LogWrite("JukeBoxPlayLater: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
 
 	       InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, end($State['IdArray']));

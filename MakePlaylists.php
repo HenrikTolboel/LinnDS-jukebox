@@ -163,6 +163,8 @@ function PlaylistDir($Dir)
     global $NL;
     global $DIR_DELIM;
 
+    $Res = false;
+
     if (PlaylistFromDir($Dir, $Key, $Playlist, $Info))
     {
 	print "Dir: $Dir -> Key: $Key" . $NL;
@@ -171,7 +173,11 @@ function PlaylistDir($Dir)
 	//file_put_contents($Dir . $DIR_DELIM . $Key .".dpl", $Playlist);
 	file_put_contents($Dir . $DIR_DELIM . "playlist.dpl", $Playlist);
 	file_put_contents($Dir . $DIR_DELIM . "info.xml", $Info);
+
+	$Res = true;
     }
+
+    return $Res;
 }
 
 function PlaylistHere()
@@ -209,6 +215,8 @@ function MakePlaylists($TopDirectory)
 {
     global $NL;
 
+    $Cnt = 0;
+
     try
     {
 	foreach ($TopDirectory as $Dir => $RootMenuNo)
@@ -218,7 +226,8 @@ function MakePlaylists($TopDirectory)
 	    while($it->valid())
 	    {
 		//echo $it->getPathName().$NL;
-		PlaylistDir($it->getPathName());
+		if (PlaylistDir($it->getPathName()))
+		    $Cnt++;
 
 		$it->next();
 	    }
@@ -228,6 +237,8 @@ function MakePlaylists($TopDirectory)
     {
 	echo 'No files Found!' . $NL;
     }
+
+    return $Cnt;
 }
 
 //MakePlaylists($TopDirectory);

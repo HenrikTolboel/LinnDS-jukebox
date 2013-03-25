@@ -273,6 +273,17 @@ class Menus
 	$this->OrderSequenceNo();
     }
 
+    public function NumberOfAlbums()
+    {
+	$Cnt = 0;
+	for ($i=0; $i < $this->MenuCnt; $i++)
+	{
+	    if ($this->SubMenuType[$i] != SUBMENU_TYPE_NEWEST)
+		$Cnt += $this->MenuAlbumCnt[$i];
+	}
+	return $Cnt;
+    }
+
     public function Add($didl)
     {
 	global $NL;
@@ -675,7 +686,7 @@ function CollectFolderImgs(&$didl, &$res)
     copy($img, $newfile);
 }
 
-function Make_CSS($AlbumCnt, $CSS1, $CSS2)
+function Make_CSS(&$Menu, $CSS1, $CSS2)
 {
     global $NL;
     global $AppDir;
@@ -700,11 +711,11 @@ function Make_CSS($AlbumCnt, $CSS1, $CSS2)
 
     $css = "";
     $cnt = 0;
-    for ($k = 0; $cnt < $AlbumCnt; $k++)
+    for ($k = 0; $cnt < $Menu->NumberOfAlbums(); $k++)
     {
-	for ($i = 0; $i < $TileW && $cnt < $AlbumCnt; $i++)
+	for ($i = 0; $i < $TileW && $cnt < $Menu->NumberOfAlbums(); $i++)
 	{
-	    for ($j = 0; $j < $TileH && $cnt < $AlbumCnt; $j++)
+	    for ($j = 0; $j < $TileH && $cnt < $Menu->NumberOfAlbums(); $j++)
 	    {
 		$cnt++;
 		$posx = -1 * ($i * $ImgSize + $i*2 +1);
@@ -724,11 +735,11 @@ function Make_CSS($AlbumCnt, $CSS1, $CSS2)
 
     $css = "";
     $cnt = 0;
-    for ($k = 0; $cnt < $AlbumCnt; $k++)
+    for ($k = 0; $cnt < $Menu->NumberOfAlbums(); $k++)
     {
-	for ($i = 0; $i < $TileW && $cnt < $AlbumCnt; $i++)
+	for ($i = 0; $i < $TileW && $cnt < $Menu->NumberOfAlbums(); $i++)
 	{
-	    for ($j = 0; $j < $TileH && $cnt < $AlbumCnt; $j++)
+	    for ($j = 0; $j < $TileH && $cnt < $Menu->NumberOfAlbums(); $j++)
 	    {
 		$cnt++;
 		$posx = -1 * ($i * $ImgSize + $i*2 +1);
@@ -760,17 +771,18 @@ function Main($DoLevel)
     global $TopDirectory;
     global $AppDir;
 
+    $NumNewPlaylists = 0;
+
     //Create a didl file in each directory containing music
     if ($DoLevel > 3) 
     {
 	echo "Removing old .dpl files" . $NL;
 	UnlinkDPL();
     }
-    if ($DoLevel > 0) 
-    {
-	echo "Making a didl file in each directory..." . $NL;
-	MakePlaylists($TopDirectory);
-    }
+    
+    echo "Making a didl file in each directory..." . $NL;
+    $NumNewPlaylists = MakePlaylists($TopDirectory);
+    echo " - found $NumNewPlaylists new playlists" . $NL;
 
     //Build Menu tree
     echo "Building Menu tree..." . $NL;
@@ -814,7 +826,7 @@ function Main($DoLevel)
 
     $AppDir = "site/";
 
-    if ($DoLevel > 1) 
+    if ($NumNewPlaylists > 0) 
     {
 	$cmd = "rm " . $AppDir . "* " . $AppDir . "*/*";
 	echo "executing " . $cmd . $NL;
@@ -841,22 +853,28 @@ function Main($DoLevel)
     $AlbumCnt = 0;
     $Menu->user_func('Make_AlbumHTML', $AlbumCnt);
 
-    if ($DoLevel > 1) 
+
+    if ($AlbumCnt != $Menu->NumberOfAlbums())
+    {
+	echo "UPS - AlbumCnt is not NumberOfAlbums!!!" . $NL;
+    }
+
+    if ($NumNewPlaylists > 0) 
     {
 	echo "Collecting directory images in " . $AppDir . $NL;
 	$Menu->user_func('CollectFolderImgs', $dummy);
     }
 
-    if ($DoLevel > 1) 
+    if ($NumNewPlaylists > 0) 
     {
 	echo "Making sprites and css file in " . $AppDir . $NL;
-	Make_CSS($AlbumCnt, $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
+	Make_CSS($Menu, $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
     }
 
     echo "Finished..." . $NL;
 }
 
 //Main(1);
-Main(2);
+Main(1);
 
 ?>

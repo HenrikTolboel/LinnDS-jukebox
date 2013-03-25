@@ -519,12 +519,16 @@ function MenuAlbumList($id, &$ArrayList, $MaxCount)
     $it = $ArrayList->getIterator();
     while($it->valid() && ($MaxCount == -1 || $Count < $MaxCount))
     {
+	$Count++;
 	$str .= '<li>';
 
 	$ThisId = $id . '-' . $it->current()->SequenceNo();
 	$str .= '<a id="' . $ThisId . '" class="playpopup" data-rel="popup" href="#" data-musik=' . $SQ . '{"popupid": "' . $id . '-popup", "preset": "' . $it->current()->SequenceNo() . '"}' . $SQ . '>';
 
-	$str .= '<img class="sprite_' . $it->current()->SequenceNo() . '" src="Transparent.gif"/>';
+	if ($MaxCount == -1)
+	    $str .= '<img class="sprite_' . $it->current()->SequenceNo() . '" src="Transparent.gif"/>';
+	else
+	    $str .= '<img class="newest_' . $Count . '" src="Transparent.gif"/>';
 
 	$str .= '<h3>';
 
@@ -548,7 +552,6 @@ function MenuAlbumList($id, &$ArrayList, $MaxCount)
 	$str .= "</li>" . $NL;
 
 	$it->next();
-	$Count++;
     }
 
     $str .= "</ul>" . $NL;
@@ -690,6 +693,7 @@ function Make_CSS(&$Menu, $CSS1, $CSS2)
 {
     global $NL;
     global $AppDir;
+    global $NEWEST_COUNT;
 
     $ImgSize = 80;
     $TileW = 10;
@@ -697,6 +701,21 @@ function Make_CSS(&$Menu, $CSS1, $CSS2)
 
     $SpriteW = $ImgSize * $TileW + 2 * $TileW;
     $SpriteH = $ImgSize * $TileH + 2 * $TileH;
+
+    // Prepare images for Newest page...
+    if ($Menu->NewestMenuNo != -1)
+    {
+	$cnt = 0;
+	$it = $Menu->Menu[$Menu->NewestMenuNo]->getIterator();
+	while($it->valid() && ($MaxCount == -1 || $cnt < $NEWEST_COUNT))
+	{
+	    $FolderImg = sprintf("folder/folder_%04d.jpg", $it->current()->SequenceNo());
+	    $NewestImg = sprintf("folder/newest_%04d.jpg", $cnt);
+	    $cnt++;
+	    copy($AppDir . $FolderImg, $AppDir . $NewestImg);
+	    $it->next();
+	}
+    }
 
     // On an ipad somehow the size of a sprite image should be < 1024 pixels 
     // wide / high - otherwise the display of sprite elements are distorted.
@@ -708,6 +727,17 @@ function Make_CSS(&$Menu, $CSS1, $CSS2)
     shell_exec($cmd1);
     echo $cmd2 . $NL;
     shell_exec($cmd2);
+
+    if ($Menu->NewestMenuNo != -1)
+    {
+	$cmd1 = "montage -background transparent -tile " . $TileW . "x" . $TileH . " -geometry 80x80+1+1 " . $AppDir . "folder/newest_* " . $AppDir . "sprites/newest.jpg";
+	echo $cmd1 . $NL;
+	$cmd2 = "montage -background transparent -tile " . $TileW . "x" . $TileH . " -geometry 160x160+1+1 " . $AppDir . "folder/newest_* " . $AppDir . "sprites/newest@2x.jpg";
+
+	shell_exec($cmd1);
+	echo $cmd2 . $NL;
+	shell_exec($cmd2);
+    }
 
     $css = "";
     $cnt = 0;
@@ -727,6 +757,31 @@ function Make_CSS(&$Menu, $CSS1, $CSS2)
 		$css .= "   background: url(sprite-" . $k . ".jpg) no-repeat top left;\n";
 		$css .= "   background-position: " . $posy . "px " . $posx . "px;\n";
 		$css .= "}\n";
+	    }
+	}
+    }
+
+    if ($Menu->NewestMenuNo != -1)
+    {
+	$cnt = 0;
+	for ($k = 0; $cnt < $NEWEST_COUNT; $k++)
+	{
+	    for ($i = 0; $i < $TileW && $cnt < $NEWEST_COUNT; $i++)
+	    {
+		for ($j = 0; $j < $TileH && $cnt < $NEWEST_COUNT; $j++)
+		{
+		    $cnt++;
+		    $posx = -1 * ($i * $ImgSize + $i*2 +1);
+		    $posy = -1 * ($j * $ImgSize + $j*2 +1);
+		    $css .= ".newest_" . $cnt . $NL;
+		    $css .= "{\n";
+		    $css .= "   width: " . $ImgSize . "px;\n";
+		    $css .= "   height: " . $ImgSize . "px;\n";
+		    //$css .= "   background: url(newest-" . $k . ".jpg) no-repeat top left;\n";
+		    $css .= "   background: url(newest.jpg) no-repeat top left;\n";
+		    $css .= "   background-position: " . $posy . "px " . $posx . "px;\n";
+		    $css .= "}\n";
+		}
 	    }
 	}
     }
@@ -755,6 +810,33 @@ function Make_CSS(&$Menu, $CSS1, $CSS2)
 	    }
 	}
     }
+
+    if ($Menu->NewestMenuNo != -1)
+    {
+	$cnt = 0;
+	for ($k = 0; $cnt < $NEWEST_COUNT; $k++)
+	{
+	    for ($i = 0; $i < $TileW && $cnt < $NEWEST_COUNT; $i++)
+	    {
+		for ($j = 0; $j < $TileH && $cnt < $NEWEST_COUNT; $j++)
+		{
+		    $cnt++;
+		    $posx = -1 * ($i * $ImgSize + $i*2 +1);
+		    $posy = -1 * ($j * $ImgSize + $j*2 +1);
+		    $css .= ".newest_" . $cnt . $NL;
+		    $css .= "{\n";
+		    $css .= "   width: " . $ImgSize . "px;\n";
+		    $css .= "   height: " . $ImgSize . "px;\n";
+		    //$css .= "   background: url(newest@2x-" . $k . ".jpg) no-repeat top left;\n";
+		    $css .= "   background: url(newest@2x.jpg) no-repeat top left;\n";
+		    $css .= "   background-size: " . $SpriteW . "px " . $SpriteH . "px;\n";
+		    $css .= "   background-position: " . $posy . "px " . $posx . "px;\n";
+		    $css .= "}\n";
+		}
+	    }
+	}
+    }
+
 
     file_put_contents($CSS2, $css);
 }
@@ -788,10 +870,7 @@ function Main($DoLevel)
     echo "Building Menu tree..." . $NL;
     $Menu = new Menus($RootMenu, $SubMenuType);
 
-
-
-
-     echo "Find all didl files and add to Menu tree..." . $NL;
+    echo "Find all didl files and add to Menu tree..." . $NL;
     // Find all didl files and add it to the menus
     try
     {

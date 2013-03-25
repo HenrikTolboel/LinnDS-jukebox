@@ -80,7 +80,7 @@ $ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#";
 $ALPHABET_SIZE = strlen($ALPHABET);
 
 // The NEWEST submenus contain this amount newest added albums
-$NEWEST_COUNT = 40;
+$NEWEST_COUNT = 50;
 
 
 // Words to be skipped when sorting e.g. Artist names

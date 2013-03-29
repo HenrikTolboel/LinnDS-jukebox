@@ -11,17 +11,8 @@
 
 require_once("setup.php");
 
-$LINN_JUKEBOX_URL = "http://192.168.0.105/musik";
-$LINN_JUKEBOX_PATH = "/musik";
-$NL = "\n";
-$SQ = "'";
-
 // Debug write out.... Higher number 1,2,3,.. means more output
 $DEBUG = 2;
-
-// This is where your linn is in the network.
-$LINN_HOST = "192.168.0.108";
-$LINN_PORT = 23;
 
 $URI_index_file = dirname($argv[0]) . "/URI_index";
 
@@ -60,6 +51,8 @@ $State['SourceIndex_Playlist'] = -1;
 $State['IdArray'] = array('0');
 $State['Id'] = 0;
 $State['NewId'] = 0;
+$State['PlaylistURLs'] = array();
+$State['PlaylistXMLs'] = array();
 
 // SubscribeType tells the mapping between "EVENT <digits> XXX" subscribed
 // to protokol (e.g. "Ds/Playlist")
@@ -189,6 +182,19 @@ function InsertDIDL_list($DIDL_URL, $OnlyTrackNo, $AfterId)
 
     }
     Send("ACTION Ds/Playlist 1 IdArray");
+}
+
+function CheckPlaylist()
+{
+    global $State;
+
+    foreach ($State['IdArray'] as $value)
+    {
+	if (! isset($State['PlaylistURLs'][$value]))
+	{
+	    Send("ACTION Ds/Playlist 1 Read \"" . $value . "\"");
+	}
+    }
 }
 
 function ReadBlockFromSocket($read_sock)
@@ -342,17 +348,21 @@ while (true) {
             {
                if (preg_match("/RESPONSE \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"/m", $data, $match) > 0)
                {
-		      $State['Id_URL'] = htmlspecialchars_decode($match[1]);
-		      $State['Id_Metadata'] = htmlspecialchars_decode($match[2]);
+		   //$State['PlaylistURLs'][$matches[1]] = htmlspecialchars_decode($match[1]);
+		   //$State['PlaylistXMLs'][$matches[1]] = htmlspecialchars_decode($match[2]);
+		   $State['PlaylistURLs'][$matches[1]] = $match[1];
+		   $State['PlaylistXMLs'][$matches[1]] = $match[2];
 	       }
-               LogWrite("State:");
-               print_r($State);
+               //LogWrite("State:");
+               //print_r($State);
 	    }
-	    elseif (preg_match("/ACTION Ds\/Playlist 1 Insert \"(\d+)\"/m", $front, $matches) > 0)
+	    elseif (preg_match("/ACTION Ds\/Playlist 1 Insert \"(\d+)\" \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"/m", $front, $matches) > 0)
             {
                if (preg_match("/RESPONSE \"([[:ascii:]]+?)\"/m", $data, $match) > 0)
                {
-		      $State['NewId'] = $match[1];
+                   $State['NewId'] = $match[1];
+		   $State['PlaylistURLs'][$State['NewId']] = $matches[2];
+		   $State['PlaylistXMLs'][$State['NewId']] = $matches[3];
 	       }
                //LogWrite("State:");
                //print_r($State);
@@ -364,9 +374,10 @@ while (true) {
 		      $State['IdArray_Token'] = $match[1];
 		      $State['IdArray_base64'] = $match[2];
 		      $State['IdArray'] = unpack("N*", base64_decode($match[2]));
+		      CheckPlaylist();
 	       }
-               LogWrite("State:");
-               print_r($State);
+               //LogWrite("State:");
+               //print_r($State);
 	    }
 
             Send("");
@@ -447,6 +458,7 @@ while (true) {
                {
                   $State['IdArray_base64'] = $matches[1];
                   $State['IdArray'] = unpack("N*", base64_decode($matches[1]));
+		  CheckPlaylist();
                }
                if (preg_match("/Shuffle \"(\w+)\"/m", $data, $matches) > 0)
                {
@@ -535,6 +547,8 @@ while (true) {
                Send("ACTION Ds/Playlist 1 Stop");
 
                Send("ACTION Ds/Playlist 1 DeleteAll");
+	       $State['PlaylistURLs'] = array();
+               $State['PlaylistXMLs'] = array();
 	       InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, 0);
 
                //Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $JukeBoxPlay . "\"");

@@ -23,7 +23,11 @@ $track = 0;
 if (isset($_GET["track"]) && !empty($_GET["track"])) {
     $track = $_GET["track"];
 }
+
 if ($action == "State") {
+    $Str = "State";
+}
+elseif ($action == "Playlist") {
     $Str = "State";
 }
 elseif ($action == "PlayNow") {
@@ -81,8 +85,8 @@ elseif ($action == "Source-Off") {
 
 socket_write($socket, $Str . $NL);
 
-if ($action == "State") {
-    $string = socket_read($socket, 10000);
+if ($Str == "State") {
+    $string = socket_read($socket, 100000);
 }
 
 socket_close($socket);
@@ -92,6 +96,13 @@ if ($action == "State") {
     //echo print_r($State, TRUE);
     $a['MAX_VOLUME'] = $State['MAX_VOLUME'];
     $a['Volume'] = $State['Volume'];
+    echo json_encode($a);
+}
+elseif ($action == "Playlist") {
+    $State = unserialize($string);
+    //echo print_r($State, TRUE);
+    $a['PlaylistXMLs'] = $State['PlaylistXMLs'];
+    $a['Id'] = $State['Id'];
     echo json_encode($a);
 }
 

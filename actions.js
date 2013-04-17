@@ -58,7 +58,7 @@ $(function() {
    });
     
    // Change Kontrol volume slider
-   $("input#volume").live("change", function() {
+   $(document).on("change", "input#volume", function() {
        var vol = $(this).val();
       console.log("volume = " + vol);
       jQuery.get("Send.php", { action: "SetVolume", volume: vol } , function (data) {

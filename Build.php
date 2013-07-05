@@ -120,7 +120,7 @@ class DIDLPreset
     {
 	$F = strtoupper(substr($this->SortSkipWords($this->Artist()), 0, 1));
 
-	if ($F >= "A" && $F < "Z")
+	if ($F >= "A" && $F <= "Z")
 	    return $F;
 	else
 	    return "#";

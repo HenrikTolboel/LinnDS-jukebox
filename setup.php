@@ -115,6 +115,7 @@ function ProtectPath($Path)
     $Path = str_replace("a%CC%8A", "%C3%A5", $Path); // danish å encoded wrong
     $Path = str_replace("e%CC%81", "%C3%A9", $Path); // é encoded wrong
     $Path = str_replace("U%CC%88", "%C3%9C", $Path); // Ü encoded wrong
+    $Path = str_replace("u%CC%88", "%C3%BC", $Path); // ü encoded wrong
     $Path = str_replace("XXXplusXXX", "+", $Path);
     //http://www.w3schools.com/tags/ref_urlencode.asp
     //echo "ProtectPath-res: " . $Path . $NL;

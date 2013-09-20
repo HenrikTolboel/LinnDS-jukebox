@@ -137,6 +137,7 @@ function PlayListFromDir($Dir, &$Key, &$Playlist, &$Info)
   <Genre>$GENRE</Genre>
   <MusicTime>$MaxMTimeMusic</MusicTime>
   <Playlist>$PLAYLIST</Playlist>
+  <NoTracks>$cnt</NoTracks>
   <Art>$ART</Art>
 </Info>
 

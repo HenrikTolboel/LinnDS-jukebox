@@ -42,6 +42,10 @@ elseif ($action == "PlayLater") {
     $preset = $_GET["preset"];
     $Str = "Jukebox PlayLater \"" . $preset . "\" \"" . $track . "\"";
 }
+elseif ($action == "PlayRandomTracks") {
+    $preset = $_GET["preset"];
+    $Str = "Jukebox PlayRandomTracks \"" . $preset . "\" \"" . $track . "\"";
+}
 elseif ($action == "SetVolume") {
     $volume = $_GET["volume"];
     $Str = "Volume Set \"" . $volume . "\"";

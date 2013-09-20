@@ -119,7 +119,7 @@ function PresetURL($num)
     global $URI_index;
     global $URI_index_file;
 
-    LogWrite("PresetURL: " . $URI_index[$num]);
+    LogWrite("PresetURL: " . $URI_index[$num]['URI']);
     if (file_exists($URI_index_file))
     {
 	clearstatcache(true,$URI_index_file);
@@ -134,7 +134,7 @@ function PresetURL($num)
     
     if ($State['URI_index_mtime'] > 0)
     {
-	$dpl = $URI_index[$num];
+	$dpl = $URI_index[$num]['URI'];
 	$dpl = ProtectPath($dpl);
 	$dpl = AbsolutePath($dpl);
 
@@ -588,6 +588,35 @@ while (true) {
                LogWrite("JukeBoxPlayLater: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
 
 	       InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, end($State['IdArray']));
+
+	       if ($State['Standby'] == 'true')
+	       {
+		   Send('ACTION Ds/Product 1 SetStandby "false"');
+		   Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceIndex_Playlist'] . '"');
+	       }
+	       elseif ($State['SourceIndex'] != $State['SourceIndex_Playlist'])
+		   Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceIndex_Playlist'] . '"');
+	       if ($State['TransportState'] == "Stopped")
+		   Send("ACTION Ds/Playlist 1 Play");
+
+               if ($DEBUG > 0)
+               {
+                  //LogWrite($data);
+                  //print_r($State);
+               }
+              $DataHandled = true;
+            }
+            elseif (preg_match("/Jukebox PlayRandomTracks \"(\d+)\" \"(\d+)\"/m", $data, $matches) > 0)
+            {
+               $JukeBoxFirstAlbum = $matches[1];
+               $JukeBoxLastAlbum = $matches[2];
+               LogWrite("JukeBoxPlayRandomTracks: " . $JukeBoxFirstAlbum . ", " . $JukeBoxLastAlbum);
+
+	       for ($i = 0; $i < 50; $i++) {
+		   $RandomPreset = rand($JukeBoxFirstAlbum, $JukeBoxLastAlbum);
+		   $RandomTrack = rand(1, $URI_index[$RandomPreset]['NoTracks']);
+		   InsertDIDL_list(PresetURL($RandomPreset), $RandomTrack, end($State['IdArray']));
+	       }
 
 	       if ($State['Standby'] == 'true')
 	       {

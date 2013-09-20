@@ -155,6 +155,14 @@ class DIDLPreset
 	    return (int)$this->Value[MusicTime];
     }
 
+    public function NoTracks()
+    {
+	if ($this->Value[File]->getExtension() == "dpl")
+	    return 0;
+	else
+	    return (int)$this->Value[NoTracks];
+    }
+
     private function SortSkipWords($Str)
     {
 	global $SortSkipList;
@@ -500,6 +508,7 @@ function KontrolPanel($id)
         $str .= '<input type="range" name="volume" id="volume" value="35" min="20" max="60" data-mini="true"/>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Next"}' . $SQ . '>Next</button>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Previous"}' . $SQ . '>Previous</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "PlayRandomTracks", "preset": "1", "track": "852"}' . $SQ . '>Add 50 random tracks</button>' . $NL;
 	
     $str .= '</div><!-- /panel -->' . $NL . $NL;
     
@@ -672,7 +681,8 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
 
 function Make_URI_Array(&$didl, &$URI_Array)
 {
-    $URI_Array[$didl->SequenceNo()] = $didl->URI();
+    $URI_Array[$didl->SequenceNo()][URI] = $didl->URI();
+    $URI_Array[$didl->SequenceNo()][NoTracks] = $didl->NoTracks();
 }
 
 function CollectFolderImgs(&$didl, &$res)

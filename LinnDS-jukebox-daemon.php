@@ -15,6 +15,7 @@ require_once("setup.php");
 $DEBUG = 2;
 
 $URI_index_file = dirname($argv[0]) . "/URI_index";
+$Log_file = dirname($argv[0]) . "/logfile.txt";
 
 // Create a socket to your linn LPEC interface, and connect...
 $lpec_socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -24,17 +25,17 @@ socket_connect($lpec_socket, $LINN_HOST, $LINN_PORT);
 $port = 9050;
 
 // create a streaming socket, of type TCP/IP
-$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+$new_client_socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 
 // set the option to reuse the port
-socket_set_option($sock, SOL_SOCKET, SO_REUSEADDR, 1);
+socket_set_option($new_client_socket, SOL_SOCKET, SO_REUSEADDR, 1);
 
 // "bind" the socket to the address to "localhost", on port $port
 // so this means that all connections on this port are now our resposibility to send/recv data, disconnect, etc..
-socket_bind($sock, 0, $port);
+socket_bind($new_client_socket, 0, $port);
 
 // start listen for connections
-socket_listen($sock);
+socket_listen($new_client_socket);
 
 // Queue is a queue of outstanding commands to be sent to Linn.
 // The currently executing command is still in the queue, removed when the
@@ -79,12 +80,18 @@ else
     $URI_index_mtime = 0;
 }
 
+$LogFile = fopen($Log_file, 'a');
+
+LogWrite("############################## Restarted ######################################");
+
 function LogWrite($Str)
 {
+   global $LogFile;
    global $Queue;
    // Write to log
    //print date("D M j G:i:s T Y") . " : " . $Str . "\n";
-   print $Str . "\n";
+   //print $Str . "\n";
+   fwrite($LogFile, $Str . "\n");
    //print_r($Queue);
 }
 
@@ -201,13 +208,13 @@ function ReadBlockFromSocket($read_sock)
 {
      global $NL;
 
-      // read until newline or 10240 bytes
+      // read until newline or 30000 bytes
       // socket_read while show errors when the client is disconnected, so silence the error messages
       //LogWrite("ReadBlockFromSocket: begin");
       $res = "";
 
       do {
-	  $data = @socket_read($read_sock, 10240, PHP_NORMAL_READ);
+	  $data = @socket_read($read_sock, 30000, PHP_NORMAL_READ);
 
 	  if ($data === false) {
 	      if ($res != "")
@@ -226,22 +233,34 @@ function ReadBlockFromSocket($read_sock)
       return $res;
 }
 
+function DeleteAll()
+{
+    global $State;
+
+    Send("ACTION Ds/Playlist 1 DeleteAll");
+    $State['PlaylistURLs'] = array();
+    $State['PlaylistXMLs'] = array();
+    $State['IdArray'] = array('0');
+    $State['Id'] = 0;
+    $State['NewId'] = 0;
+}
+
 print "LinnDS-jukebox-daemon starts...\n\n";
 
 // create a list of all the clients that will be connected to us..
 // add the listening socket to this list
-$clients = array($sock, $lpec_socket);
+$clients = array($new_client_socket, $lpec_socket);
 
 while (true) {
-   $read = $clients;
+   $read = $clients;  // reset list to all sockets
 
    if (socket_select($read, $write = NULL, $except = NULL, NULL) < 1)
       continue;
 
    // check if there is a client trying to connect
-   if (in_array($sock, $read)) {
+   if (in_array($new_client_socket, $read)) {
       // accept the client, and add him to the $clients array
-      $clients[] = $newsock = socket_accept($sock);
+      $clients[] = $newsock = socket_accept($new_client_socket);
      
       // send the client a welcome message
       socket_write($newsock, "Welcome to LinnDS-jukebox-daemon\n".
@@ -251,7 +270,7 @@ while (true) {
       echo "New client connected: {$ip}\n";
      
       // remove the listening socket from the clients-with-data array
-      $key = array_search($sock, $read);
+      $key = array_search($new_client_socket, $read);
       unset($read[$key]);
    }
 
@@ -546,9 +565,7 @@ while (true) {
 
                Send("ACTION Ds/Playlist 1 Stop");
 
-               Send("ACTION Ds/Playlist 1 DeleteAll");
-	       $State['PlaylistURLs'] = array();
-               $State['PlaylistXMLs'] = array();
+	       DeleteAll();
 	       InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, 0);
 
                //Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $JukeBoxPlay . "\"");
@@ -611,6 +628,9 @@ while (true) {
                $JukeBoxFirstAlbum = $matches[1];
                $JukeBoxLastAlbum = $matches[2];
                LogWrite("JukeBoxPlayRandomTracks: " . $JukeBoxFirstAlbum . ", " . $JukeBoxLastAlbum);
+
+	       if ($State['TransportState'] == "Stopped")
+		   DeleteAll();
 
 	       for ($i = 0; $i < 50; $i++) {
 		   $RandomPreset = rand($JukeBoxFirstAlbum, $JukeBoxLastAlbum);
@@ -786,5 +806,8 @@ while (true) {
    } // end of reading foreach
 
 } // End of while(true)
+
+// close listening socket
+socket_close($new_client_socket);
 
 ?>

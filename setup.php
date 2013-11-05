@@ -28,6 +28,9 @@ $manifestfile = $PRESETS_DIR ."/" . "manifest.xml";
 $LINN_JUKEBOX_URL = "http://192.168.0.105/musik";
 $LINN_JUKEBOX_PATH = "/musik";
 
+$LINN_JUKEBOX_URL = "http://192.168.0.179/musik";
+$LINN_JUKEBOX_PATH = "/volume1/web/musik";
+
 // This is where your linn is in the network.
 $LINN_HOST = "192.168.0.108";
 $LINN_PORT = 23;
@@ -113,6 +116,7 @@ function ProtectPath($Path)
     $Path = str_replace("+", "XXXplusXXX", $Path);
     $Path = implode("/", array_map("rawurlencode", explode("/", $Path)));
     $Path = str_replace("a%CC%8A", "%C3%A5", $Path); // danish å encoded wrong
+    $Path = str_replace("A%CC%8A", "%C3%85", $Path); // danish Å encoded wrong
     $Path = str_replace("e%CC%81", "%C3%A9", $Path); // é encoded wrong
     $Path = str_replace("U%CC%88", "%C3%9C", $Path); // Ü encoded wrong
     $Path = str_replace("u%CC%88", "%C3%BC", $Path); // ü encoded wrong

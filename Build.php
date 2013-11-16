@@ -689,7 +689,7 @@ function CollectFolderImgs(&$didl, &$res)
 {
     global $AppDir;
 
-    $img = $didl->ImageFileName();
+    $img = AbsolutePath($didl->ImageFileName());
     
     if (strlen($img) <= 4 || !file_exists($img))
     {

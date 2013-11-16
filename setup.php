@@ -35,18 +35,19 @@ $LINN_JUKEBOX_PATH = "/volume1/web/musik";
 $LINN_HOST = "192.168.0.108";
 $LINN_PORT = 23;
 
+$BUILD_PATH = "/Users/henrik/nobackup/MusicLib";
 
 // These directories are scanned for ".dpl" files
 // Each directory maps into one of the RootMenu entries.
 $TopDirectory = array();
-$TopDirectory["/Users/henrik/Music/MusicLib/EAC"]                = 0;
-$TopDirectory["/Users/henrik/Music/MusicLib/Linn"]               = 1;
-$TopDirectory["/Users/henrik/Music/MusicLib/Opsamlinger"]        = 2;
-$TopDirectory["/Users/henrik/Music/MusicLib/EAC Classical"]      = 3;
-$TopDirectory["/Users/henrik/Music/MusicLib/Børn"]               = 4;
-$TopDirectory["/Users/henrik/Music/MusicLib/Børn - opsamlinger"] = 5;
-$TopDirectory["/Users/henrik/Music/MusicLib/Diverse"]            = 6;
-$TopDirectory["/Users/henrik/Music/MusicLib/Jul"]                = 6;
+$TopDirectory["$BUILD_PATH/EAC"]                = 0;
+$TopDirectory["$BUILD_PATH/Linn"]               = 1;
+$TopDirectory["$BUILD_PATH/Opsamlinger"]        = 2;
+$TopDirectory["$BUILD_PATH/EAC Classical"]      = 3;
+$TopDirectory["$BUILD_PATH/Børn"]               = 4;
+$TopDirectory["$BUILD_PATH/Børn - opsamlinger"] = 5;
+$TopDirectory["$BUILD_PATH/Diverse"]            = 6;
+$TopDirectory["$BUILD_PATH/Jul"]                = 6;
 
 
 // These are the RootMenu entries. The names are those displayed there
@@ -102,9 +103,20 @@ $SortSkipList = array("The ", "the ");
 function RelativePath($Path)
 {
     global $LINN_JUKEBOX_URL;
+    global $BUILD_PATH;
 
     $Path = str_replace("/Users/henrik/Documents", "LINN_JUKEBOX_URL", $Path);
-    $Path = str_replace("/Users/henrik/Music/MusicLib", "LINN_JUKEBOX_URL", $Path);
+    $Path = str_replace("$BUILD_PATH", "LINN_JUKEBOX_URL", $Path);
+    return $Path;
+}
+
+function RelativeBuildPath($Path)
+{
+    global $LINN_JUKEBOX_URL;
+    global $BUILD_PATH;
+
+    $Path = str_replace("/Users/henrik/Documents", "BUILD_PATH", $Path);
+    $Path = str_replace("$BUILD_PATH", "BUILD_PATH", $Path);
     return $Path;
 }
 
@@ -139,8 +151,10 @@ function ProtectPath($Path)
 function AbsolutePath($Path)
 {
     global $LINN_JUKEBOX_PATH;
+    global $BUILD_PATH;
 
     $Path = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_PATH, $Path);
+    $Path = str_replace("BUILD_PATH", $BUILD_PATH, $Path);
 
     return $Path;
 }

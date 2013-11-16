@@ -12,7 +12,7 @@
 require_once("setup.php");
 
 // Debug write out.... Higher number 1,2,3,.. means more output
-$DEBUG = 3;
+$DEBUG = 2;
 
 $URI_index_file = dirname($argv[0]) . "/URI_index";
 $Log_file = dirname($argv[0]) . "/logfile.txt";
@@ -83,6 +83,14 @@ else
 $LogFile = fopen($Log_file, 'a');
 
 LogWrite("############################## Restarted ######################################");
+
+function DebugWrite($level, $Str)
+{
+    global $DEBUG;
+
+    if ($DEBUG >= $level)
+	LogWrite("DEBUG:$level: " . $Str);
+}
 
 function LogWrite($Str)
 {
@@ -256,6 +264,7 @@ function PrepareXML($xml)
 
 function InsertDIDL_list($DIDL_URL, $OnlyTrackNo, $AfterId)
 {
+    global $State;
     global $NL;
 
     LogWrite("InsertDIDL_list: " . $DIDL_URL . ", " . $OnlyTrackNo . ", " . $AfterId);
@@ -269,6 +278,8 @@ function InsertDIDL_list($DIDL_URL, $OnlyTrackNo, $AfterId)
 
     if ($OnlyTrackNo == 0) {
 	Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[0][0]) . "\" \"" . PrepareXML($DIDLs[0]->asXML()) . "\"");
+	if ($State['TransportState'] == "Stopped")
+	    Send("ACTION Ds/Playlist 1 Play");
 	for ($i = 1; $i < sizeof($URLs); $i++)
 	    Send("ACTION Ds/Playlist 1 Insert \"%NewId%\" \"" . PrepareXML($URLs[$i][0]) . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
     }
@@ -276,6 +287,8 @@ function InsertDIDL_list($DIDL_URL, $OnlyTrackNo, $AfterId)
     {
 	$No = $OnlyTrackNo -1;
 	Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[$No][0]) . "\" \"" . PrepareXML($DIDLs[$No]->asXML()) . "\"");
+	if ($State['TransportState'] == "Stopped")
+	    Send("ACTION Ds/Playlist 1 Play");
 
     }
     Send("ACTION Ds/Playlist 1 IdArray");
@@ -334,6 +347,20 @@ function DeleteAll()
     $State['Id'] = 0;
     $State['NewId'] = 0;
 }
+
+function SelectPlaylist()
+{
+    global $State;
+
+    if ($State['Standby'] == 'true')
+    {
+	Send('ACTION Ds/Product 1 SetStandby "false"');
+	Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
+    }
+    elseif ($State['SourceIndex'] != $State['SourceName']['Playlist'])
+	Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
+}
+
 
 LogWrite("LinnDS-jukebox-daemon starts...");
 
@@ -440,13 +467,13 @@ while (true) {
 
 		$State['SourceName'][$D[2]] = $F[0];
 
-		if ($F[1] == "Playlist")
+		if ($D[1] == "Playlist")
 		{
 		    // We have the Playlist service. subscribe...
 		    Send("SUBSCRIBE Ds/Playlist");
 		    //Send("SUBSCRIBE Ds/Jukebox");
 		}
-		elseif ($F[1] == "Radio")
+		elseif ($D[1] == "Radio")
 		{
 		    // We have the Radio service. subscribe...
 		    //Send("SUBSCRIBE Ds/Radio");
@@ -643,22 +670,18 @@ while (true) {
 		$JukeBoxTrack = $D[1];
 		LogWrite("JukeBoxPlayNow: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
 
-		if ($State['Standby'] == 'true')
-		{
-		    Send('ACTION Ds/Product 1 SetStandby "false"');
-		    Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
-		}
-		elseif ($State['SourceIndex'] != $State['SourceName']['Playlist'])
-		    Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
+		SelectPlaylist();
 
-		Send("ACTION Ds/Playlist 1 Stop");
+		if ($State['TransportState'] != "Stopped")
+		    Send("ACTION Ds/Playlist 1 Stop");
 
 		DeleteAll();
 		InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, 0);
 
 		//Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $JukeBoxPlay . "\"");
 
-		Send("ACTION Ds/Playlist 1 Play");
+		if ($State['TransportState'] == "Stopped")
+		    Send("ACTION Ds/Playlist 1 Play");
 		$DataHandled = true;
             }
 	    elseif (strpos($data, "Jukebox PlayNext ") !== false) {
@@ -669,13 +692,7 @@ while (true) {
 
 		InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, $State['Id']);
 
-		if ($State['Standby'] == 'true')
-		{
-		    Send('ACTION Ds/Product 1 SetStandby "false"');
-		    Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
-		}
-		elseif ($State['SourceIndex'] != $State['SourceName']['Playlist'])
-		    Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
+		SelectPlaylist();
 
 		if ($State['TransportState'] == "Stopped")
 		    Send("ACTION Ds/Playlist 1 Play");
@@ -693,15 +710,10 @@ while (true) {
 		$JukeBoxTrack = $D[1];
 		LogWrite("JukeBoxPlayLater: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
 
+		SelectPlaylist();
+
 		InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, end($State['IdArray']));
 
-		if ($State['Standby'] == 'true')
-		{
-		    Send('ACTION Ds/Product 1 SetStandby "false"');
-		    Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
-		}
-		elseif ($State['SourceIndex'] != $State['SourceName']['Playlist'])
-		    Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
 
 		if ($State['TransportState'] == "Stopped")
 		    Send("ACTION Ds/Playlist 1 Play");
@@ -719,6 +731,8 @@ while (true) {
 		$JukeBoxLastAlbum = $D[1];
 		LogWrite("JukeBoxPlayRandomTracks: " . $JukeBoxFirstAlbum . ", " . $JukeBoxLastAlbum);
 
+		SelectPlaylist();
+
 		if ($State['TransportState'] == "Stopped")
 		    DeleteAll();
 
@@ -727,14 +741,6 @@ while (true) {
 		    $RandomTrack = rand(1, $URI_index[$RandomPreset]['NoTracks']);
 		    InsertDIDL_list(PresetURL($RandomPreset), $RandomTrack, end($State['IdArray']));
 		}
-
-		if ($State['Standby'] == 'true')
-		{
-		    Send('ACTION Ds/Product 1 SetStandby "false"');
-		    Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
-		}
-		elseif ($State['SourceIndex'] != $State['SourceName']['Playlist'])
-		    Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
 
 		if ($State['TransportState'] == "Stopped")
 		    Send("ACTION Ds/Playlist 1 Play");
@@ -877,8 +883,8 @@ while (true) {
 		}
 		elseif (strpos($data, "Source NetAux") !== false) {
 		    //Source NetAux
-		    if ($State['SourceIndex'] != $State['SourceName']['NetAux'])
-			Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['NetAux'] . '"');
+		    if ($State['SourceIndex'] != $State['SourceName']['Net Aux'])
+			Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Net Aux'] . '"');
 		    $DataHandled = true;
 		}
 	    }

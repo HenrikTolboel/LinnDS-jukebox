@@ -739,7 +739,10 @@ while (true) {
 		for ($i = 0; $i < 50; $i++) {
 		    $RandomPreset = rand($JukeBoxFirstAlbum, $JukeBoxLastAlbum);
 		    $RandomTrack = rand(1, $URI_index[$RandomPreset]['NoTracks']);
-		    InsertDIDL_list(PresetURL($RandomPreset), $RandomTrack, end($State['IdArray']));
+		    if ($i == 0)
+			InsertDIDL_list(PresetURL($RandomPreset), $RandomTrack, end($State['IdArray']));
+		    else
+			InsertDIDL_list(PresetURL($RandomPreset), $RandomTrack, "%NewId%");
 		}
 
 		if ($State['TransportState'] == "Stopped")

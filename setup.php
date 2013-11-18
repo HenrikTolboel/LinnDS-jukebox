@@ -154,6 +154,16 @@ function AbsolutePath($Path)
     global $BUILD_PATH;
 
     $Path = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_PATH, $Path);
+    $Path = str_replace("BUILD_PATH", $LINN_JUKEBOX_PATH, $Path);
+
+    return $Path;
+}
+function AbsoluteBuildPath($Path)
+{
+    global $LINN_JUKEBOX_PATH;
+    global $BUILD_PATH;
+
+    $Path = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_PATH, $Path);
     $Path = str_replace("BUILD_PATH", $BUILD_PATH, $Path);
 
     return $Path;

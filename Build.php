@@ -674,7 +674,7 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
     file_put_contents($AppDir . 'album_' . $didl->SequenceNo() . '.html', 
 	HTMLDocument(
 	    Page($ThisId, "Album", 
-	    Album($ThisId, AbsolutePath($didl->PlaylistFileName()), $didl->SequenceNo(), $FolderImg),
+	    Album($ThisId, AbsoluteBuildPath($didl->PlaylistFileName()), $didl->SequenceNo(), $FolderImg),
 	    "LinnDS-jukebox", "false")));
     $AlbumCnt++;
 }
@@ -689,7 +689,7 @@ function CollectFolderImgs(&$didl, &$res)
 {
     global $AppDir;
 
-    $img = AbsolutePath($didl->ImageFileName());
+    $img = AbsolutePBuildath($didl->ImageFileName());
     
     if (strlen($img) <= 4 || !file_exists($img))
     {

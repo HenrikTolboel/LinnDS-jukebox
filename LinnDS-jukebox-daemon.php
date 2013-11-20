@@ -278,8 +278,7 @@ function InsertDIDL_list($DIDL_URL, $OnlyTrackNo, $AfterId)
 
     if ($OnlyTrackNo == 0) {
 	Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[0][0]) . "\" \"" . PrepareXML($DIDLs[0]->asXML()) . "\"");
-	if ($State['TransportState'] == "Stopped")
-	    Send("ACTION Ds/Playlist 1 Play");
+	Play();
 	for ($i = 1; $i < sizeof($URLs); $i++)
 	    Send("ACTION Ds/Playlist 1 Insert \"%NewId%\" \"" . PrepareXML($URLs[$i][0]) . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"");
     }
@@ -287,11 +286,8 @@ function InsertDIDL_list($DIDL_URL, $OnlyTrackNo, $AfterId)
     {
 	$No = $OnlyTrackNo -1;
 	Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[$No][0]) . "\" \"" . PrepareXML($DIDLs[$No]->asXML()) . "\"");
-	if ($State['TransportState'] == "Stopped")
-	    Send("ACTION Ds/Playlist 1 Play");
-
+	Play();
     }
-    Send("ACTION Ds/Playlist 1 IdArray");
 }
 
 function CheckPlaylist()
@@ -355,12 +351,34 @@ function SelectPlaylist()
     if ($State['Standby'] == 'true')
     {
 	Send('ACTION Ds/Product 1 SetStandby "false"');
+	$State['Standby'] = false;
 	Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
     }
     elseif ($State['SourceIndex'] != $State['SourceName']['Playlist'])
 	Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
 }
 
+function Stop()
+{
+    global $State;
+
+    if ($State['TransportState'] != "Stopped")
+    {
+	Send("ACTION Ds/Playlist 1 Stop");
+	$State['TransportState'] = "Stopped";
+    }
+}
+
+function Play()
+{
+    global $State;
+
+    if ($State['TransportState'] == "Stopped")
+    {
+	Send("ACTION Ds/Playlist 1 Play");
+	$State['TransportState'] = "Starting";
+    }
+}
 
 LogWrite("LinnDS-jukebox-daemon starts...");
 
@@ -584,7 +602,6 @@ while (true) {
 	       if (strpos($data, "Id ") !== false)
                {
                   $State['Id'] = $E[Id];
-		  //Send("ACTION Ds/Playlist 1 Read \"" . $matches[1] . "\"");
                }
 	       if (strpos($data, "IdArray ") !== false)
                {
@@ -672,16 +689,15 @@ while (true) {
 
 		SelectPlaylist();
 
-		if ($State['TransportState'] != "Stopped")
-		    Send("ACTION Ds/Playlist 1 Stop");
+		Stop();
 
 		DeleteAll();
 		InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, 0);
 
 		//Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $JukeBoxPlay . "\"");
 
-		if ($State['TransportState'] == "Stopped")
-		    Send("ACTION Ds/Playlist 1 Play");
+		Play();
+		Send("ACTION Ds/Playlist 1 IdArray");
 		$DataHandled = true;
             }
 	    elseif (strpos($data, "Jukebox PlayNext ") !== false) {
@@ -690,12 +706,12 @@ while (true) {
 		$JukeBoxTrack = $D[1];
 		LogWrite("JukeBoxPlayNext: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
 
-		InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, $State['Id']);
-
 		SelectPlaylist();
 
-		if ($State['TransportState'] == "Stopped")
-		    Send("ACTION Ds/Playlist 1 Play");
+		InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, $State['Id']);
+
+		Play();
+		Send("ACTION Ds/Playlist 1 IdArray");
 
 		if ($DEBUG > 0)
 		{
@@ -715,8 +731,8 @@ while (true) {
 		InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, end($State['IdArray']));
 
 
-		if ($State['TransportState'] == "Stopped")
-		    Send("ACTION Ds/Playlist 1 Play");
+		Play();
+		Send("ACTION Ds/Playlist 1 IdArray");
 
 		if ($DEBUG > 0)
 		{
@@ -745,8 +761,8 @@ while (true) {
 			InsertDIDL_list(PresetURL($RandomPreset), $RandomTrack, "%NewId%");
 		}
 
-		if ($State['TransportState'] == "Stopped")
-		    Send("ACTION Ds/Playlist 1 Play");
+		Play();
+		Send("ACTION Ds/Playlist 1 IdArray");
 
 		if ($DEBUG > 0)
 		{
@@ -801,10 +817,10 @@ while (true) {
 
 	    if (strpos($data, "Control Play") !== false) {
 		//Control Play
-		if ($State['TransportState'] != "Playing")
+		if ($State['TransportState'] == "Stopped")
 		{
 		    LogWrite("ControlPlay: ");
-		    Send("ACTION Ds/Playlist 1 Play");
+		    Play();
 		}
 		$DataHandled = true;
             }
@@ -822,7 +838,7 @@ while (true) {
 		if ($State['TransportState'] != "Stopped")
 		{
 		    LogWrite("ControlStop: ");
-		    Send("ACTION Ds/Playlist 1 Stop");
+		    Stop();
 		}
 		$DataHandled = true;
             }
@@ -854,6 +870,7 @@ while (true) {
 		if ($State['Standby'] == "false")
 		{
 		    Send('ACTION Ds/Product 1 SetStandby "true"');
+		    $State['Standby'] = true;
 		}
 		$DataHandled = true;
             }
@@ -862,14 +879,14 @@ while (true) {
 	       if ($State['Standby'] == "true")
 	       {
 		   Send('ACTION Ds/Product 1 SetStandby "false"');
+		   $State['Standby'] = true;
 	       }
 
 		if (strpos($data, "Source Playlist") !== false) {
 		    //Source Playlist
 		    if ($State['SourceIndex'] != $State['SourceName']['Playlist'])
 		       Send('ACTION Ds/Product 1 SetSourceIndex "' . $State['SourceName']['Playlist'] . '"');
-		   if ($State['TransportState'] == "Stopped")
-		       Send("ACTION Ds/Playlist 1 Play");
+		    Play();
 		    $DataHandled = true;
 		}
 		elseif (strpos($data, "Source TV") !== false) {

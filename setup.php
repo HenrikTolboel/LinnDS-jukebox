@@ -47,7 +47,7 @@ $TopDirectory["$BUILD_PATH/EAC Classical"]      = 3;
 $TopDirectory["$BUILD_PATH/Børn"]               = 4;
 $TopDirectory["$BUILD_PATH/Børn - opsamlinger"] = 5;
 $TopDirectory["$BUILD_PATH/Diverse"]            = 6;
-$TopDirectory["$BUILD_PATH/Jul"]                = 6;
+$TopDirectory["$BUILD_PATH/Jul"]                = 8;
 
 
 // These are the RootMenu entries. The names are those displayed there
@@ -60,6 +60,7 @@ $RootMenu[4] = "Børn - Kunstner / Album";
 $RootMenu[5] = "Børn - Opsamlinger";
 $RootMenu[6] = "Diverse";
 $RootMenu[7] = "Newest";
+$RootMenu[8] = "Jul";
 
 
 // Currently we have 3 types of sub menus of the root menus.
@@ -78,6 +79,7 @@ $SubMenuType[4] = SUBMENU_TYPE_ALPHABET;
 $SubMenuType[5] = SUBMENU_TYPE_NONE;
 $SubMenuType[6] = SUBMENU_TYPE_NONE;
 $SubMenuType[7] = SUBMENU_TYPE_NEWEST;
+$SubMenuType[8] = SUBMENU_TYPE_NONE;
 
 // The ALPHABET submenus are ordered into these groups
 $ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#";

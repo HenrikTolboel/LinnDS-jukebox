@@ -435,8 +435,8 @@ function RootMenu($id, $RootMenu, &$Menu)
 	$str .= '<li>';
 	if ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NONE) 
 	{
-	    $str .= '<a href="p' . $i . ".html" . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
-	    $str .= '<span class="ui-li-count">' . $Menu->MenuAlbumCnt[$i] .'</span>';
+	    $str .= '<a href="p' . $i . ".html" . $DQ . $prefetch .'>' . $RootMenu[$i];
+	    $str .= '<span class="ui-li-count">' . $Menu->MenuAlbumCnt[$i] .'</span></a>';
 	}
 	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NEWEST) 
 	{
@@ -444,8 +444,8 @@ function RootMenu($id, $RootMenu, &$Menu)
 	}
 	else
 	{
-	    $str .= '<a href="#p' . $i . $DQ . $prefetch .'>' . $RootMenu[$i] .'</a>';
-	    $str .= '<span class="ui-li-count">' . $Menu->MenuAlbumCnt[$i] .'</span>';
+	    $str .= '<a href="#p' . $i . $DQ . $prefetch .'>' . $RootMenu[$i];
+	    $str .= '<span class="ui-li-count">' . $Menu->MenuAlbumCnt[$i] .'</span></a>';
 	}
 
         $str .= '</li>' . $NL;

@@ -28,8 +28,8 @@ $manifestfile = $PRESETS_DIR ."/" . "manifest.xml";
 $LINN_JUKEBOX_URL = "http://192.168.0.105/musik";
 $LINN_JUKEBOX_PATH = "/musik";
 
-$LINN_JUKEBOX_URL = "http://192.168.0.179/musik";
-$LINN_JUKEBOX_PATH = "/volume1/web/musik";
+$LINN_JUKEBOX_URL = "http://192.168.0.179/MusicLib";
+$LINN_JUKEBOX_PATH = "/volume1/web/MusicLib";
 
 // This is where your linn is in the network.
 $LINN_HOST = "192.168.0.108";

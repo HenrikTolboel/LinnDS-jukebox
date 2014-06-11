@@ -484,7 +484,7 @@ function PlayPopup($id)
     return $str;
 }
 
-function KontrolPanel($id)
+function KontrolPanel($id, $first_random_albumno, $last_random_albumno)
 {
     global $SQ;
     global $DQ;
@@ -516,7 +516,7 @@ function KontrolPanel($id)
         $str .= '<input type="range" name="volume" class="volume" value="35" min="20" max="60" data-mini="true"/>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Next"}' . $SQ . '>Next</button>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Previous"}' . $SQ . '>Previous</button>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "PlayRandomTracks", "preset": "1", "track": "919"}' . $SQ . '>Add 50 random tracks</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "PlayRandomTracks", "preset": "' . $first_random_albumno . '", "track": "' . $last_random_albumno . '"}' . $SQ . '>Add 50 random tracks</button>' . $NL;
 	
     $str .= '</div><!-- /panel -->' . $NL . $NL;
     
@@ -633,18 +633,18 @@ function MainMenu(&$Menu)
     global $NEWEST_COUNT;
     global $RootMenu;
 
-    $str .= Page("page_musik", "Musik", RootMenu("RootMenu", $Menu->RootMenu, $Menu), "LinnDS-jukebox", KontrolPanel("page_musik"), "true");
+    $str .= Page("page_musik", "Musik", RootMenu("RootMenu", $Menu->RootMenu, $Menu), "LinnDS-jukebox", KontrolPanel("page_musik", 1, $Menu->MenuAlbumCnt[0]), "true");
 
     for ($i = 0; $i < $Menu->MenuCnt; $i++)
     {
 	if ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NONE) 
 	{
 	    file_put_contents($AppDir . "p" . $i . ".html", 
-		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], -1), "LinnDS-jukebox", KontrolPanel("p" . $i), "false")));
+		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], -1), "LinnDS-jukebox", KontrolPanel("p" . $i, 1, $Menu->MenuAlbumCnt[0]), "false")));
 	}
 	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_ALPHABET)
 	{
-	    $str .= Page("p" . $i, $RootMenu[$i], MenuAlphabetPage("p" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", KontrolPanel("p" . $i), "false");
+	    $str .= Page("p" . $i, $RootMenu[$i], MenuAlphabetPage("p" . $i, $Menu->Menu[$i]), "LinnDS-jukebox", KontrolPanel("p" . $i, 1, $Menu->MenuAlbumCnt[0]), "false");
 
 	    for ($alpha = 0; $alpha < $ALPHABET_SIZE; $alpha++)
 	    {
@@ -654,14 +654,14 @@ function MainMenu(&$Menu)
 			HTMLDocument(Page("p" . $i . "_" . $ALPHABET[$alpha], 
 			$Menu->RootMenu[$i] . " - " . $ALPHABET[$alpha],
 			MenuAlbumList("p" . $i . "_" . $ALPHABET[$alpha], $Menu->Menu[$i][$ALPHABET[$alpha]], -1),
-			"LinnDS-jukebox", KontrolPanel("p" . $i . "_" . $ALPHABET[$alpha]), "false")));
+			"LinnDS-jukebox", KontrolPanel("p" . $i . "_" . $ALPHABET[$alpha], 1, $Menu->MenuAlbumCnt[0]), "false")));
 		}
 	    }
 	}
 	elseif ($Menu->SubMenuType[$i] == SUBMENU_TYPE_NEWEST)
 	{
 	    file_put_contents($AppDir . "p" . $i . ".html", 
-		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], $NEWEST_COUNT), "LinnDS-jukebox", KontrolPanel("p" . $i), "false")));
+		HTMLDocument(Page("p" . $i, $RootMenu[$i], MenuAlbumList("p" . $i, $Menu->Menu[$i], $NEWEST_COUNT), "LinnDS-jukebox", KontrolPanel("p" . $i, 1, $Menu->MenuAlbumCnt[0]), "false")));
 	}
     }
 
@@ -683,7 +683,7 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
 	HTMLDocument(
 	    Page($ThisId, "Album", 
 	    Album($ThisId, AbsoluteBuildPath($didl->PlaylistFileName()), $didl->SequenceNo(), $FolderImg),
-	    "LinnDS-jukebox", KontrolPanel($ThisId), "false")));
+	    "LinnDS-jukebox", KontrolPanel($ThisId, 1, $Menu->MenuAlbumCnt[0]), "false")));
     $AlbumCnt++;
 }
 

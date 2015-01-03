@@ -37,6 +37,7 @@ $LINN_PORT = 23;
 
 $IsJul = 0;
 
+$BUILD_PATH1 = "/Volumes/MacDATA/Users/henrik/nobackup/MusicLib";
 $BUILD_PATH = "/Users/henrik/nobackup/MusicLib";
 
 // These directories are scanned for ".dpl" files
@@ -121,8 +122,10 @@ function RelativePath($Path)
 {
     global $LINN_JUKEBOX_URL;
     global $BUILD_PATH;
+    global $BUILD_PATH1;
 
     $Path = str_replace("/Users/henrik/Documents", "LINN_JUKEBOX_URL", $Path);
+    $Path = str_replace("$BUILD_PATH1", "LINN_JUKEBOX_URL", $Path);
     $Path = str_replace("$BUILD_PATH", "LINN_JUKEBOX_URL", $Path);
     return $Path;
 }
@@ -131,8 +134,10 @@ function RelativeBuildPath($Path)
 {
     global $LINN_JUKEBOX_URL;
     global $BUILD_PATH;
+    global $BUILD_PATH1;
 
     $Path = str_replace("/Users/henrik/Documents", "BUILD_PATH", $Path);
+    $Path = str_replace("$BUILD_PATH1", "BUILD_PATH", $Path);
     $Path = str_replace("$BUILD_PATH", "BUILD_PATH", $Path);
     return $Path;
 }

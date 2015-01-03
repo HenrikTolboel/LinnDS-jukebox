@@ -50,11 +50,20 @@ elseif ($action == "SetVolume") {
     $volume = $_GET["volume"];
     $Str = "Volume Set \"" . $volume . "\"";
 }
+elseif ($action == "ResetVolume") {
+    $Str = "Volume Reset";
+}
 elseif ($action == "IncrVolume") {
     $Str = "Volume Incr";
 }
+elseif ($action == "IncrVolume5") {
+    $Str = "Volume Incr5";
+}
 elseif ($action == "DecrVolume") {
     $Str = "Volume Decr";
+}
+elseif ($action == "DecrVolume5") {
+    $Str = "Volume Decr5";
 }
 elseif ($action == "Control-Play") {
     $Str = "Control Play";
@@ -90,14 +99,14 @@ elseif ($action == "Source-Off") {
 socket_write($socket, $Str . $NL);
 
 if ($Str == "State") {
-    $string = socket_read($socket, 100000);
+    $string = socket_read($socket, 10000000);
 }
 
 socket_close($socket);
 
 if ($action == "State") {
     $State = unserialize($string);
-    //echo print_r($State, TRUE);
+    echo print_r($State, TRUE);
     $a['MAX_VOLUME'] = $State['MAX_VOLUME'];
     $a['Volume'] = $State['Volume'];
     echo json_encode($a);

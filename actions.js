@@ -134,13 +134,13 @@ function getStatus() {
     $.getJSON("Send.php", { action: "State", volume: 0, preset: 0 } , function (data) {
 	//$('div#status').html(data.status);
 	//$('div#lastupdate').html(data.lastupdate);
-	var myslider = $('#volume');
-	if (myslider.val() != data.Volume)
-	{
+	var myslider = $('input.volume');
+	//if (myslider.val() != data.Volume)
+	//{
 	    myslider.val(data.Volume);
 	    myslider.attr('max', data.MAX_VOLUME);
 	    myslider.slider('refresh');
-	}
+	//}
     });
     setTimeout("getStatus()",10000);
 }

@@ -499,6 +499,14 @@ function KontrolPanel($id, $first_random_albumno, $last_random_albumno)
 	    $str .= '</li>' . $NL;
 	$str .= '</ul>' . $NL;
 
+        $str .= '<h4>Volume</h4>' . $NL;
+	$str .= '<div data-role="controlgroup" data-type="horizontal">' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "DecrVolume5"}' . $SQ . '>-5</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "DecrVolume"}' . $SQ . '>-1</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "ResetVolume"}' . $SQ . '>0</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "IncrVolume"}' . $SQ . '>+1</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "IncrVolume5"}' . $SQ . '>+5</button>' . $NL;
+	$str .= '</div>' . $NL;
         $str .= '<h4>Source</h4>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-Playlist"}' . $SQ . '>Playlist</button>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Source-TV"}' . $SQ . '>TV</button>' . $NL;
@@ -508,14 +516,18 @@ function KontrolPanel($id, $first_random_albumno, $last_random_albumno)
 
 
 
-        $str .= '<h4>Kontrol</h4>' . $NL;
+        $str .= '<h4>Playlist Kontrol</h4>' . $NL;
+	$str .= '<div data-role="controlgroup" data-type="horizontal">' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Play"}' . $SQ . '>Play</button>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Pause"}' . $SQ . '>Pause</button>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Stop"}' . $SQ . '>Stop</button>' . $NL;
-        $str .= '<label for="volume">Volume:</label>' . $NL;
-        $str .= '<input type="range" name="volume" class="volume" value="35" min="20" max="60" data-mini="true"/>' . $NL;
-	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Next"}' . $SQ . '>Next</button>' . $NL;
+	$str .= '</div>' . $NL;
+        //$str .= '<label for="volume">Volume:</label>' . $NL;
+        //$str .= '<input type="range" name="volume" class="volume" value="35" min="20" max="60" data-mini="true"/>' . $NL;
+	$str .= '<div data-role="controlgroup" data-type="horizontal">' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Previous"}' . $SQ . '>Previous</button>' . $NL;
+	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "Control-Next"}' . $SQ . '>Next</button>' . $NL;
+	$str .= '</div>' . $NL;
 	$str .= '<button href="#" class="panelclick" data-mini="true" data-musik=' . $SQ . '{"action": "PlayRandomTracks", "preset": "' . $first_random_albumno . '", "track": "' . $last_random_albumno . '"}' . $SQ . '>Add 50 random tracks</button>' . $NL;
 	
     $str .= '</div><!-- /panel -->' . $NL . $NL;

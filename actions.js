@@ -144,3 +144,75 @@ function getStatus() {
     });
     setTimeout("getStatus()",10000);
 }
+
+
+function AlbumEntry(id, preset, filtertext, values) {
+    var html = "";
+
+    html += '<li data-filtertext="' + filtertext + '">';
+    html += '<a id="' + id + '-' + preset + '" class="playpopup" data-rel="popup" href="#" data-musik=' + "'" + '{"popupid": "' + id + '-popup", "preset": "' + preset + '"}' + "'" + '>';
+    html += '<img class="sprite_' + preset + '" src="Transparent.gif"/>';
+
+    html += '<h3>';
+
+    if (values.ArtistPerformer == "Various")
+    {
+	html += values.Album;
+	html += '</h3>';
+	html += '<p>' + ' (' + values.Year + ')</p>';  
+	html += '</a>';
+    }
+    else
+    {
+	html += values.ArtistPerformer;
+	html += '</h3>';
+	html += '<p>' + values.Album + ' (' + values.Year + ')</p>';  
+	html += '</a>';
+    }
+
+    html += '<a href="album_' + preset + '.html"></a>';
+
+    html += '</li>';
+
+    return html;
+}
+
+function TrackEntry(id, preset, trackseq, filtertext, values) {
+    var html = "";
+    html += '<li data-filtertext="' + filtertext + '">';
+    html += '<a id ="' + id  + '-' + preset + '-' + trackseq + '" href="#" class="playpopup" data-rel="popup" data-musik=' + "'" + '{"popupid": "' + id + '-popup", "preset": "' + preset + '", "track": "' + trackseq + '"}' + "'" + '>';
+    html += '<img class="sprite_' + preset + '" src="Transparent.gif"/>';
+    html += '<h3>' + values.ArtistPerformer + ' - ' + values.Album + '</h3>';
+    html += '<h3>' + values.TrackNumber + '. ' + values.Title + '</h3> ';
+    html += '<p>' + values.Duration + '</p>';
+    html += '</a>';
+    html += '<a href="album_' + preset + '.html"></a>';
+    html += '</li>';
+
+    return html;
+}
+
+
+$( document ).on( "pagecreate", "#page_musik", function() {
+    $( "#autocomplete" ).on( "filterablebeforefilter", function ( e, data ) {
+        var $ul = $( this ),
+            $input = $( data.input ),
+            filtertext = $input.val(),
+            html = "",
+            id = "RootMenu";
+        $ul.html( "" );
+        if ( filtertext && filtertext.length > 2 ) {
+            $ul.html( "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>" );
+            $ul.listview( "refresh" );
+            jQuery.getJSON("QueryDB.php", { action: filtertext }, function ( response ) {                 
+		$.each( response, function ( i, val ) {
+		    //html += AlbumEntry(id, val.Preset, filtertext, val);
+		    html += TrackEntry(id, val.Preset, val.TrackSeq, filtertext, val);
+                });
+                $ul.html( html );
+                $ul.listview( "refresh" );
+                $ul.trigger( "updatelayout");
+            });
+        }
+    });
+});

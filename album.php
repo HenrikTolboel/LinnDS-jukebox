@@ -16,6 +16,7 @@ function Album($id, $DIDLFile, $preset, $FolderImg)
     global $LINN_JUKEBOX_URL;
     global $NL;
     global $SQ;
+    global $DATABASE;
 
     $cont = "";
     $first = true;
@@ -24,6 +25,7 @@ function Album($id, $DIDLFile, $preset, $FolderImg)
     //echo "Album: " .  $DIDLFile . $NL;
     $xml = simplexml_load_file($DIDLFile);
 
+$stmt = $DATABASE->prepare('INSERT INTO Tracks (Preset, TrackSeq, URL, Duration, Title, Year, AlbumArt, ArtWork, Genre, ArtistPerformer, ArtistComposer, ArtistAlbumArtist, ArtistConductor, Album, TrackNumber, DiscNumber, DiscCount) VALUES  (:Preset, :TrackSeq, :URL, :Duration, :Title, :Year, :AlbumArt, :ArtWork, :Genre, :ArtistPerformer, :ArtistComposer, :ArtistAlbumArtist, :ArtistConductor, :Album, :TrackNumber, :DiscNumber, :DiscCount)');
 
     foreach ($xml->children('urn:linn-co-uk/playlist') as $track) {
 	$URL = "";
@@ -108,6 +110,10 @@ function Album($id, $DIDLFile, $preset, $FolderImg)
 		}
 	    }
 	}
+
+	// Sequence number inside playlist file
+	$TrackSeq++;
+
 	// Skriv noget ud...
 	/*
 	$cont .= $URL . "<br />";
@@ -128,7 +134,6 @@ function Album($id, $DIDLFile, $preset, $FolderImg)
 	$cont .= "<br />";
 	*/
 
-	$TrackSeq++;
 	if ($first) {
 	    $cont .= '<div class="ui-grid-a">' . $NL;
 	    $cont .= '<div class="ui-block-a"><div class="ui-bar">' . $NL;
@@ -153,7 +158,32 @@ function Album($id, $DIDLFile, $preset, $FolderImg)
 	$cont .= '<p>' . $DURATION . '</p></a>';
 
 	$cont .= "</li>" . $NL;
+
+
+	$stmt->bindParam(':Preset', $preset);
+	$stmt->bindParam(':TrackSeq', $TrackSeq);
+	$stmt->bindParam(':URL', $URL);
+	$stmt->bindParam(':Duration', $DURATION);
+	$stmt->bindParam(':Title', $TITLE);
+	$stmt->bindParam(':Year', $YEAR);
+	$stmt->bindParam(':AlbumArt', $AlbumArt);
+	$stmt->bindParam(':ArtWork', $ArtWork);
+	$stmt->bindParam(':Genre', $Genre);
+	$stmt->bindParam(':ArtistPerformer', $Artist_Performer);
+	$stmt->bindParam(':ArtistComposer', $Artist_Composer);
+	$stmt->bindParam(':ArtistAlbumArtist', $Artist_AlbumArtist);
+	$stmt->bindParam(':ArtistConductor', $Artist_Conductor);
+	$stmt->bindParam(':Album', $ALBUM);
+	$stmt->bindParam(':TrackNumber', $TRACK_NUMBER);
+	$stmt->bindParam(':DiscNumber', $DISC_NUMBER);
+	$stmt->bindParam(':DiscCount', $DISC_COUNT);
+
+
+	$result = $stmt->execute();
+
+	$stmt->reset();
     }
+    $stmt->close();
 
     $cont .= "</ul>";
     $cont .= PlayPopup($id . "-popup");

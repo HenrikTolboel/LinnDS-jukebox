@@ -429,7 +429,14 @@ function RootMenu($id, $RootMenu, &$Menu)
     global $DQ;
     global $NL;
 
-    $str= '<ul data-role="listview" data-filter="false">' . $NL;
+    $str = '';
+
+    $str .= '<form class="ui-filterable">' . $NL;
+    $str .= '<input id="autocomplete-input" data-type="search" placeholder="Søg...">' . $NL;
+    $str .= '</form>' . $NL;
+    $str .= '<ul id="autocomplete" data-role="listview" data-inset="true" data-filter="true" data-input="#autocomplete-input"></ul>' . $NL;
+
+    $str .= '<ul data-role="listview" data-filter="false">' . $NL;
     for ($i=0; $i < $Menu->MenuCnt; $i++)
     {
 	if ($i == 0 || $Menu->SubMenuType[$i] == SUBMENU_TYPE_NEWEST) 
@@ -460,6 +467,8 @@ function RootMenu($id, $RootMenu, &$Menu)
     }
 
     $str .= "</ul>" . $NL;
+
+    $str .= PlayPopup($id . "-popup");
 
     return $str;
 }
@@ -872,6 +881,15 @@ function Make_CSS(&$Menu, $CSS1, $CSS2)
 }
 
 
+function CreateDatabase()
+{
+    global $DATABASE;
+
+    unlink('mysqlitedb.db');
+    $DATABASE = new SQLite3('mysqlitedb.db', SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
+
+    $DATABASE->exec('CREATE TABLE IF NOT EXISTS Tracks (Preset INTEGER, TrackSeq INTEGER, URL STRING, Duration STRING, Title STRING, Year STRING, AlbumArt STRING, ArtWork STRING, Genre STRING, ArtistPerformer STRING, ArtistComposer STRING, ArtistAlbumArtist STRING, ArtistConductor STRING, Album STRING, TrackNumber STRING, DiscNumber STRING, DiscCount STRING)');
+}
 
 // ########## Main  #######################################################################
 
@@ -882,6 +900,7 @@ function Main($DoLevel)
     global $SubMenuType;
     global $TopDirectory;
     global $AppDir;
+    global $DATABASE;
 
     $NumNewPlaylists = 0;
 
@@ -895,6 +914,8 @@ function Main($DoLevel)
     echo "Making a didl file in each directory..." . $NL;
     $NumNewPlaylists = MakePlaylists($TopDirectory);
     echo " - found $NumNewPlaylists new playlists" . $NL;
+
+    CreateDatabase();
 
     //Build Menu tree
     echo "Building Menu tree..." . $NL;
@@ -979,6 +1000,9 @@ function Main($DoLevel)
 	echo "Making sprites and css file in " . $AppDir . $NL;
 	Make_CSS($Menu, $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
     }
+
+    $DATABASE->close();
+    copy('mysqlitedb.db', $AppDir . 'mysqlitedb.db');
 
     echo "Finished..." . $NL;
 }

@@ -122,11 +122,17 @@ function PlayListFromDir($Dir, &$Key, &$Playlist, &$Info)
 	$PLAYLIST = str_replace("&", "&amp;", $PLAYLIST);
 
 	$ART = RelativeBuildPath($Dir . $DIR_DELIM . "folder.jpg");
-	$ART = str_replace("&", "&amp;", $ART);
 	
+	$ART = str_replace("&", "&amp;", $ART);
 	$ALBUM = str_replace("&", "&amp;", $ALBUM);
 	$GENRE = str_replace("&", "&amp;", $GENRE);
 	$ARTIST = str_replace("&", "&amp;", $ARTIST);
+
+	$ART = str_replace('"', "&quot;", $ART);
+	$ALBUM = str_replace('"', "&quot;", $ALBUM);
+	$GENRE = str_replace('"', "&quot;", $GENRE);
+	$ARTIST = str_replace('"', "&quot;", $ARTIST);
+	$Artist = str_replace('"', "&quot;", $Artist);
 
 	$Info = <<<EOT
 <?xml version="1.0" encoding="UTF-8"?>

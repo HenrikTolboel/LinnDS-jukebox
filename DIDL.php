@@ -13,6 +13,9 @@ require_once("setup.php");
 function DIDL_Song($TrackURI, $AlbumArtURI, $Artist, $Album, $Title, $Date, $Genre, $TrackNo, $Duration, $DiscNo, $DiscCount)
 {
     $ext = pathinfo($TrackURI, PATHINFO_EXTENSION);
+    $Artist = str_replace('"', "&quot;", $Artist);
+    $Album = str_replace('"', "&quot;", $Album);
+    $Title = str_replace('"', "&quot;", $Title);
 
     $TRACK_URI = $TrackURI;
     $TRACK_DURATION = $Duration;

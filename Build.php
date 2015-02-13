@@ -11,7 +11,8 @@
 
 require_once("setup.php");
 require_once("MakePlaylists.php");
-require_once("album.php");
+//require_once("album.php");
+require_once("tracks.php");
 require_once("FileUtils.php");
 
 
@@ -30,6 +31,7 @@ class DIDLPreset
 	$this->Value[File] = new SplFileInfo($FileName);
 	if ($this->Value[File]->getExtension() == "dpl")
 	{
+	    print("dpl");
 	    $this->Value[Info] = explode("+", $this->Value[File]->getBasename('.dpl'));
 	    $this->Value[Path] = explode("/", RelativePath($this->Value[File]->getPath()));
 	}
@@ -124,6 +126,12 @@ class DIDLPreset
 	    return $F;
 	else
 	    return "#";
+    }
+    public function SortArtist()
+    {
+	$SA = $this->SortSkipWords($this->Artist());
+
+	return $SA;
     }
     public function Album()
     {
@@ -708,10 +716,36 @@ function Make_AlbumHTML(&$didl, &$AlbumCnt)
     $AlbumCnt++;
 }
 
+function Make_Tracks(&$didl, &$DB)
+{
+    Tracks($DB, AbsoluteBuildPath($didl->PlaylistFileName()), $didl->SequenceNo());
+}
+
 function Make_URI_Array(&$didl, &$URI_Array)
 {
     $URI_Array[$didl->SequenceNo()][URI] = $didl->URI();
     $URI_Array[$didl->SequenceNo()][NoTracks] = $didl->NoTracks();
+}
+
+function Make_Album(&$didl, &$DB)
+{
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':Preset', $didl->SequenceNo());
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':NoTracks', $didl->NoTracks());
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':URI', $didl->URI());
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':ArtistFirst', $didl->ArtistFirst());
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':Artist', $didl->Artist());
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':SortArtist', $didl->SortArtist());
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':Album', $didl->Album());
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':Date', $didl->Date());
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':Genre', $didl->Genre());
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':MusicTime', $didl->MusicTime());
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':ImageURI', $didl->ImageURI());
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':TopDirectory', $didl->TopDirectory());
+    $DB[INSERT_URIINDEX_STMT]->bindParam(':RootMenuNo', $didl->RootMenuNo());
+
+    $result = $DB[INSERT_URIINDEX_STMT]->execute();
+
+    $DB[INSERT_URIINDEX_STMT]->reset();
 }
 
 function CollectFolderImgs(&$didl, &$res)
@@ -881,14 +915,22 @@ function Make_CSS(&$Menu, $CSS1, $CSS2)
 }
 
 
-function CreateDatabase()
+function CreateDatabase($DatabaseFileName)
 {
-    global $DATABASE;
+    $DB = array();
+    $DB[FILENAME] = $DatabaseFileName;
+    unlink($DB[FILENAME]);
+    $DB[DATABASE] = new SQLite3($DB[FILENAME], SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
 
-    unlink('mysqlitedb.db');
-    $DATABASE = new SQLite3('mysqlitedb.db', SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
+    $DB[DATABASE]->exec('CREATE TABLE IF NOT EXISTS Tracks (Preset INTEGER, TrackSeq INTEGER, URL STRING, Duration STRING, Title STRING, Year STRING, AlbumArt STRING, ArtWork STRING, Genre STRING, ArtistPerformer STRING, ArtistComposer STRING, ArtistAlbumArtist STRING, ArtistConductor STRING, Album STRING, TrackNumber STRING, DiscNumber STRING, DiscCount STRING)');
 
-    $DATABASE->exec('CREATE TABLE IF NOT EXISTS Tracks (Preset INTEGER, TrackSeq INTEGER, URL STRING, Duration STRING, Title STRING, Year STRING, AlbumArt STRING, ArtWork STRING, Genre STRING, ArtistPerformer STRING, ArtistComposer STRING, ArtistAlbumArtist STRING, ArtistConductor STRING, Album STRING, TrackNumber STRING, DiscNumber STRING, DiscCount STRING)');
+    $DB[DATABASE]->exec('CREATE TABLE IF NOT EXISTS Album (Preset INTEGER, NoTracks INTEGER, URI STRING, ArtistFirst STRING, SortArtist STRING, Artist STRING, Album STRING, Date STRING, Genre STRING, MusicTime INTEGER, ImageURI STRING, TopDirectory STRING, RootMenuNo INTEGER)');
+
+    $DB[INSERT_URIINDEX_STMT] = $DB[DATABASE]->prepare('INSERT INTO Album (Preset, NoTracks, URI, ArtistFirst, SortArtist, Artist, Album, Date, Genre, MusicTime, ImageURI, TopDirectory, RootMenuNo) VALUES  (:Preset, :NoTracks, :URI, :ArtistFirst, :SortArtist, :Artist, :Album, :Date, :Genre, :MusicTime, :ImageURI, :TopDirectory, :RootMenuNo)');
+
+    $DB[INSERT_TRACKS_STMT] = $DB[DATABASE]->prepare('INSERT INTO Tracks (Preset, TrackSeq, URL, Duration, Title, Year, AlbumArt, ArtWork, Genre, ArtistPerformer, ArtistComposer, ArtistAlbumArtist, ArtistConductor, Album, TrackNumber, DiscNumber, DiscCount) VALUES  (:Preset, :TrackSeq, :URL, :Duration, :Title, :Year, :AlbumArt, :ArtWork, :Genre, :ArtistPerformer, :ArtistComposer, :ArtistAlbumArtist, :ArtistConductor, :Album, :TrackNumber, :DiscNumber, :DiscCount)');
+
+    return $DB;
 }
 
 // ########## Main  #######################################################################
@@ -900,7 +942,7 @@ function Main($DoLevel)
     global $SubMenuType;
     global $TopDirectory;
     global $AppDir;
-    global $DATABASE;
+    global $DATABASE_FILENAME;
 
     $NumNewPlaylists = 0;
 
@@ -915,7 +957,7 @@ function Main($DoLevel)
     $NumNewPlaylists = MakePlaylists($TopDirectory);
     echo " - found $NumNewPlaylists new playlists" . $NL;
 
-    CreateDatabase();
+    $DATABASE = CreateDatabase($DATABASE_FILENAME);
 
     //Build Menu tree
     echo "Building Menu tree..." . $NL;
@@ -963,6 +1005,8 @@ function Main($DoLevel)
 	shell_exec($cmd);
     }
 
+    copy("index.php", $AppDir . "index.php");
+    copy("html_parts.php", $AppDir . "html_parts.php");
     copy("actions.js", $AppDir . "actions.js");
     copy("musik.css", $AppDir . "musik.css");
     copy("LinnDS-jukebox-daemon.php", $AppDir . "LinnDS-jukebox-daemon.php");
@@ -970,24 +1014,33 @@ function Main($DoLevel)
     copy("Transparent.gif", $AppDir . "Transparent.gif");
     copy("setup.php", $AppDir . "setup.php");
     copy("Send.php", $AppDir . "Send.php");
+    copy("QueryAlbum.php", $AppDir . "QueryAlbum.php");
+    copy("QueryAlbumList.php", $AppDir . "QueryAlbumList.php");
+    copy("QueryAlphabetPresent.php", $AppDir . "QueryAlphabetPresent.php");
+    copy("QueryDB.php", $AppDir . "QueryDB.php");
 
-    echo "Writing MainMenu to " . $AppDir . $NL;
-    file_put_contents($AppDir . "index.html", HTMLDocument(MainMenu($Menu)));
+    //echo "Writing MainMenu to " . $AppDir . $NL;
+    //file_put_contents($AppDir . "index.html", HTMLDocument(MainMenu($Menu)));
 
-    echo "Making URI_Index in " . $AppDir . $NL;
-    $URI_Array = array();
-    $Menu->user_func('Make_URI_Array', $URI_Array);
-    file_put_contents($AppDir . "URI_index", serialize($URI_Array));
+    //echo "Making URI_Index in " . $AppDir . $NL;
+    //$URI_Array = array();
+    //$Menu->user_func('Make_URI_Array', $URI_Array);
+    //file_put_contents($AppDir . "URI_index", serialize($URI_Array));
 
-    echo "Making album files in " . $AppDir . $NL;
-    $AlbumCnt = 0;
-    $Menu->user_func('Make_AlbumHTML', $AlbumCnt);
+    echo "Inserting Album into Database" . $NL;
+    $Menu->user_func('Make_Album', $DATABASE);
 
+    //echo "Making album files in " . $AppDir . $NL;
+    //$AlbumCnt = 0;
+    //$Menu->user_func('Make_AlbumHTML', $AlbumCnt);
 
-    if ($AlbumCnt != $Menu->NumberOfAlbums())
-    {
-	echo "UPS - AlbumCnt is not NumberOfAlbums!!!" . $NL;
-    }
+    echo "Inserting Tracks into Database" . $NL;
+    $Menu->user_func('Make_Tracks', $DATABASE);
+
+    //if ($AlbumCnt != $Menu->NumberOfAlbums())
+    //{
+	//echo "UPS - AlbumCnt is not NumberOfAlbums!!!" . $NL;
+    //}
 
     if ($NumNewPlaylists > 0) 
     {
@@ -1001,8 +1054,8 @@ function Main($DoLevel)
 	Make_CSS($Menu, $AppDir . "sprites/sprites.css", $AppDir . "sprites/sprites@2x.css");
     }
 
-    $DATABASE->close();
-    copy('mysqlitedb.db', $AppDir . 'mysqlitedb.db');
+    $DATABASE[DATABASE]->close();
+    copy($DATABASE[FILENAME], $AppDir . $DATABASE[FILENAME]);
 
     echo "Finished..." . $NL;
 }

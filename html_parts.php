@@ -1,0 +1,108 @@
+<?php
+/*!
+* LinnDS-jukebox
+*
+* Copyright (c) 2012-2013 Henrik Tolbøl, http://tolbøl.dk
+*
+* Licensed under the MIT license:
+* http://www.opensource.org/licenses/mit-license.php
+*/
+
+require_once("setup.php");
+
+function playpopup_popup($id)
+{
+    global $NL;
+    $html = <<<EOT
+	<div class="playpopup" data-role="popup" id="$id-popup" data-history="false">
+	    <ul data-role="listview" data-inset="true" style="min-width:180px;">
+		<li><a href="#" class="playpopupclick" data-musik='{"action": "PlayNow"}'>Play Now</a></li>
+		<li><a href="#" class="playpopupclick" data-musik='{"action": "PlayNext"}'>Play Next</a></li>
+		<li><a href="#" class="playpopupclick" data-musik='{"action": "PlayLater"}'>Play Later</a></li>
+		<li><a href="#" class="playpopupclick" data-musik='{"action": "Cancel"}'>Cancel</a></li>
+	    </ul>
+	</div><!-- /popup -->
+EOT;
+
+    return $html . $NL;
+}
+
+function KontrolPanel_button($id)
+{
+    global $NL;
+    $html = <<<EOT
+	<a id="$id-KontrolPanel" class="ui-btn-left" href="#$id-KontrolPanelPanel" data-icon="bars">Kontrol</a>
+EOT;
+
+    return $html . $NL;
+}
+
+function KontrolPanel_panel($id)
+{
+    global $NL;
+    $html = <<<EOT
+    <div data-role="panel" id="$id-KontrolPanelPanel" data-position="left" data-position-fixed="true">
+	<ul data-role="listview" data-theme="a" data-divider-theme="a" style="margin-top:-16px;margin-bottom:16px;" class="nav-search">
+	    <li data-icon="delete" style="background-color:#111;">
+		<a href="#" data-rel="close">Close</a>
+	    </li>
+	</ul>
+	<h4>Volume</h4>
+	<div data-role="controlgroup" data-type="horizontal">
+	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "DecrVolume5"}'>-5</button>
+	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "DecrVolume"}'>-1</button>
+	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "ResetVolume"}'>0</button>
+	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "IncrVolume"}'>+1</button>
+	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "IncrVolume5"}'>+5</button>
+	</div>
+	<h4>Source</h4>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Playlist"}'>Playlist</button>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-TV"}'>TV</button>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Radio"}'>Radio</button>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-NetAux"}'>AirPlay</button>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Off"}'>Off</button>
+	<h4>Playlist Kontrol</h4>
+	<div data-role="controlgroup" data-type="horizontal">
+	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Control-Play"}'>Play</button>
+	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Control-Pause"}'>Pause</button>
+	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Control-Stop"}'>Stop</button>
+	</div>
+	<div data-role="controlgroup" data-type="horizontal">
+	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Control-Previous"}'>Previous</button>
+	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Control-Next"}'>Next</button>
+	</div>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "PlayRandomTracks", "preset": "1", "track": "1005"}'>Add 50 random tracks</button>
+    </div><!-- /panel -->
+EOT;
+
+    return $html . $NL;
+}
+
+function AlphabetList($id)
+{
+    global $ALPHABET;
+    global $ALPHABET_SIZE;
+    global $NL;
+
+    $space = "    ";
+
+    $html = $space . $space . '<div class="ui-grid-c">' . $NL;
+    $class = "ui-block-a";
+    for ($alpha = 0; $alpha < $ALPHABET_SIZE; $alpha++)
+    {
+	$Letter = $ALPHABET[$alpha];
+	$LetterId = $Letter;
+
+	if ($Letter == "#")
+	    $LetterId = "NUM";
+
+	$html .= $space . $space . $space . '<div id="' . $id . '-' . $LetterId . '" class="' . $class . '"><a href="#" class="alphabetclick" data-role="button">' . $Letter . '</a></div>' . $NL;
+
+	$class = "ui-block-b";
+    }
+    $html .= $space . $space . '</div>' . $NL;
+    return $html;
+}
+
+
+?>

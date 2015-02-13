@@ -3,7 +3,7 @@
 /*!
 * LinnDS-jukebox-daemon
 *
-* Copyright (c) 2011-2013 Henrik Tolbøl, http://tolbøl.dk
+* Copyright (c) 2011-2015 Henrik Tolbøl, http://tolbøl.dk
 *
 * Licensed under the MIT license:
 * http://www.opensource.org/licenses/mit-license.php
@@ -14,7 +14,6 @@ require_once("setup.php");
 // Debug write out.... Higher number 1,2,3,.. means more output
 $DEBUG = 2;
 
-$URI_index_file = dirname($argv[0]) . "/URI_index";
 $Log_file = dirname($argv[0]) . "/logfile.txt";
 
 // Create a socket to your linn LPEC interface, and connect...
@@ -68,18 +67,6 @@ $SubscribeType['Ds/Volume'] = -1;
 $SubscribeType['Ds/Radio'] = -1;
 $SubscribeType['Ds/Info'] = -1;
 $SubscribeType['Ds/Time'] = -1;
-
-// Load index over # -> DPL URI's
-if (file_exists($URI_index_file))
-{
-    $State['URI_index_mtime'] = filemtime($URI_index_file);
-    $URI_index = unserialize(file_get_contents($URI_index_file));
-    $State['URI_index'] = "Loaded";
-}
-else
-{
-    $URI_index_mtime = 0;
-}
 
 $LogFile = fopen($Log_file, 'a');
 
@@ -224,41 +211,53 @@ function Send($Str)
     return $Res;
 }
 
-function PresetURL($num)
+function PresetURL($preset)
 {
-    global $State;
-    global $LINN_JUKEBOX_URL;
-    global $LINN_JUKEBOX_PATH;
-    global $URI_index;
-    global $URI_index_file;
+    global $DATABASE_FILENAME;
 
-    LogWrite("PresetURL: " . $URI_index[$num]['URI']);
-    if (file_exists($URI_index_file))
-    {
-	clearstatcache(true,$URI_index_file);
+    $db = new SQLite3($DATABASE_FILENAME);
+    $stmt = $db->prepare("SELECT URI FROM Album WHERE Preset == :q1");
+    $stmt->bindValue(":q1", $preset);
+
+    $result = $stmt->execute();
+
+    $R = array();
+    $i = 0;
+
+    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+	$R[$i] = $row;
+	$i++;
     }
-    $mt = filemtime($URI_index_file);
-    if (file_exists($URI_index_file) && filemtime($URI_index_file) > $State['URI_index_mtime'])
-    {
-	$State['URI_index_mtime'] = filemtime($URI_index_file);
-	$URI_index = unserialize(file_get_contents($URI_index_file));
-	LogWrite("Load URI_index");
-    }
+
+    $stmt->close();
+    $db->close();
     
-    if ($State['URI_index_mtime'] > 0)
-    {
-	$dpl = $URI_index[$num]['URI'];
-	$dpl = ProtectPath($dpl);
-	$dpl = AbsolutePath($dpl);
+    return AbsolutePath(ProtectPath($R[0][URI]));
+}
 
-	LogWrite("dpl: " . $dpl);
 
-	return $dpl;
+function NumberOfTracks($Preset)
+{
+    global $DATABASE_FILENAME;
+
+    $db = new SQLite3($DATABASE_FILENAME);
+    $stmt = $db->prepare("SELECT NoTracks FROM Album WHERE Preset == :q1");
+    $stmt->bindValue(":q1", $preset);
+
+    $result = $stmt->execute();
+
+    $R = array();
+    $i = 0;
+
+    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+	$R[$i] = $row;
+	$i++;
     }
-    else
-    {
-	return $LINN_JUKEBOX_URL . "/_Presets/" . $num . ".dpl";
-    }
+
+    $stmt->close();
+    $db->close();
+    
+    return $R[0][NoTracks];
 }
 
 function PrepareXML($xml)
@@ -806,7 +805,7 @@ while ($Continue) {
 
 		for ($i = 0; $i < 50; $i++) {
 		    $RandomPreset = rand($JukeBoxFirstAlbum, $JukeBoxLastAlbum);
-		    $RandomTrack = rand(1, $URI_index[$RandomPreset]['NoTracks']);
+		    $RandomTrack = rand(1, NumberOfTracks($RandomPreset));
 		    if ($i == 0)
 		    {
 			if (InsertDIDL_list(PresetURL($RandomPreset), $RandomTrack, end($State['IdArray'])) == false)

@@ -8,20 +8,22 @@
 * http://www.opensource.org/licenses/mit-license.php
 */
 
-$PRESETS_DIR  = "../_Presets";
-$CACHE_DIR  = "./tmp";
+//$PRESETS_DIR  = "../_Presets";
+//$CACHE_DIR  = "./tmp";
 
-$DO_CACHE = false;
-$DO_CACHE = true;
+//$DO_CACHE = false;
+//$DO_CACHE = true;
 
-$USE_DIALOG = true;
+//$USE_DIALOG = true;
 
 $NL = "\n";
 $SQ = "'";
 $DQ = '"';
 $DIR_DELIM = "/";
 
-$manifestfile = $PRESETS_DIR ."/" . "manifest.xml";
+$DATABASE_FILENAME = "LinnDS-jukebox.db";
+
+//$manifestfile = $PRESETS_DIR ."/" . "manifest.xml";
 
 // These 2 "path" are equal on your music server. I.e. files search in the 
 // http url are found locally in the path...

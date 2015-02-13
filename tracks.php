@@ -11,14 +11,10 @@
 
 require_once("setup.php");
 
-function Album($id, $DIDLFile, $preset, $FolderImg)
+function Tracks(&$DB, $DIDLFile, $preset)
 {
-    global $LINN_JUKEBOX_URL;
     global $NL;
-    global $SQ;
 
-    $cont = "";
-    $first = true;
     $TrackSeq = 0;
 
     //echo "Album: " .  $DIDLFile . $NL;
@@ -77,7 +73,8 @@ function Album($id, $DIDLFile, $preset, $FolderImg)
 			else
 			{
 			    $ALBUM = substr($t, $i1+1);
-			}
+			    return AbsolutePath(ProtectPath($R[0][URI]));
+
 		    }
 		    else if ($t->getName() == "originalTrackNumber") {
 			$TRACK_NUMBER = (int) $t;
@@ -111,56 +108,28 @@ function Album($id, $DIDLFile, $preset, $FolderImg)
 	// Sequence number inside playlist file
 	$TrackSeq++;
 
-	// Skriv noget ud...
-	/*
-	$cont .= $URL . "<br />";
-	$cont .= $DURATION . "<br />";
-	$cont .= $TITLE . "<br />";
-	$cont .= $YEAR . "<br />";
-	$cont .= $AlbumArt . "<br />";
-	$cont .= $ArtWork . "<br />";
-	$cont .= $Genre . "<br />";
-	$cont .= $Artist_Performer . "<br />";
-	$cont .= $Artist_Composer . "<br />";
-	$cont .= $Artist_AlbumArtist . "<br />";
-	$cont .= $Artist_Conductor . "<br />";
-	$cont .= $ALBUM . "<br />";
-	$cont .= $TRACK_NUMBER . "<br />";
-	$cont .= $DISC_NUMBER . "<br />";
-	$cont .= $DISC_COUNT . "<br />";
-	$cont .= "<br />";
-	*/
+	$DB[INSERT_TRACKS_STMT]->bindParam(':Preset', $preset);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':TrackSeq', $TrackSeq);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':URL', $URL);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':Duration', $DURATION);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':Title', $TITLE);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':Year', $YEAR);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':AlbumArt', $AlbumArt);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':ArtWork', $ArtWork);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':Genre', $Genre);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':ArtistPerformer', $Artist_Performer);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':ArtistComposer', $Artist_Composer);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':ArtistAlbumArtist', $Artist_AlbumArtist);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':ArtistConductor', $Artist_Conductor);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':Album', $ALBUM);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':TrackNumber', $TRACK_NUMBER);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':DiscNumber', $DISC_NUMBER);
+	$DB[INSERT_TRACKS_STMT]->bindParam(':DiscCount', $DISC_COUNT);
 
-	if ($first) {
-	    $cont .= '<div class="ui-grid-a">' . $NL;
-	    $cont .= '<div class="ui-block-a"><div class="ui-bar">' . $NL;
-	    $cont .= '<img class="album" style="width: 100%;" src="' . $FolderImg . '" />' . $NL;
-	    $cont .= '</div></div>' . $NL;
-	    $cont .= '<div class="ui-block-b"><div class="ui-bar">' . $NL;
-	    $cont .= '<button href="#" class="panelclick" data-mini="false" data-musik=' . $SQ . '{"action": "PlayNow", "preset": "' . $preset . '"}' . $SQ . '>Play Now</button>' . $NL;
-	    $cont .= '<button href="#" class="panelclick" data-mini="false" data-musik=' . $SQ . '{"action": "PlayNext", "preset": "' . $preset . '"}' . $SQ . '>Play Next</button>' . $NL;
-	    $cont .= '<button href="#" class="panelclick" data-mini="false" data-musik=' . $SQ . '{"action": "PlayLater", "preset": "' . $preset . '"}' . $SQ . '>Play Later</button>' . $NL;
-	    $cont .= '</div></div>' . $NL;
-	    $cont .= '</div><!-- /grid-a -->' . $NL;
 
-	    $cont .= '<h3>' . $Artist_Performer . '</h3>' . $NL;
-	    $cont .= '<p>' . $ALBUM . ' ('. $YEAR . ')</p>' . $NL;
-	    $cont .= '<ul id="' . $id . '" data-role="listview" data-inset="true" data-filter="false">' .$NL;
-	    $first = false;
-	}
+	$result = $DB[INSERT_TRACKS_STMT]->execute();
 
-	$cont .= '<li>';
-
-	$cont .= '<a id ="' . $id . '-' . $TrackSeq . '" href="#" class="playpopup" data-rel="popup" data-musik=' . $SQ . '{"popupid": "' . $id . '-popup", "preset": "' . $preset . '", "track": "' . $TrackSeq . '"}' . $SQ . '><h3>' . $TRACK_NUMBER . '. ' . $TITLE . '</h3>';
-	$cont .= '<p>' . $DURATION . '</p></a>';
-
-	$cont .= "</li>" . $NL;
+	$DB[INSERT_TRACKS_STMT]->reset();
     }
-
-    $cont .= "</ul>";
-    $cont .= PlayPopup($id . "-popup");
-
-    return $cont;
 }
-
 ?>

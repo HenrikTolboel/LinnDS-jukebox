@@ -73,7 +73,7 @@ function Tracks(&$DB, $DIDLFile, $preset)
 			else
 			{
 			    $ALBUM = substr($t, $i1+1);
-			    return AbsolutePath(ProtectPath($R[0][URI]));
+			}
 
 		    }
 		    else if ($t->getName() == "originalTrackNumber") {

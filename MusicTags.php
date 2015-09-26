@@ -112,7 +112,12 @@ class MusicTags {
     public function getDIDL()
     {
 	$this->Arr[TrackURI] = ProtectPath(RelativePath($this->Arr[FileNamePath]));
-	$this->Arr[AlbumArtURI] =  ProtectPath(RelativePath(pathinfo($this->Arr[FileNamePath], PATHINFO_DIRNAME) . "/folder.jpg"));
+	if (file_exists(pathinfo($this->Arr[FileNamePath], PATHINFO_DIRNAME) . "/folder.jpg"))
+	    $this->Arr[AlbumArtURI] =  ProtectPath(RelativePath(pathinfo($this->Arr[FileNamePath], PATHINFO_DIRNAME) . "/folder.jpg"));
+	elseif (file_exists(pathinfo($this->Arr[FileNamePath], PATHINFO_DIRNAME) . "/folder.png"))
+	    $this->Arr[AlbumArtURI] =  ProtectPath(RelativePath(pathinfo($this->Arr[FileNamePath], PATHINFO_DIRNAME) . "/folder.png"));
+	else
+	    $this->Arr[AlbumArtURI] =  ProtectPath(RelativePath(pathinfo($this->Arr[FileNamePath], PATHINFO_DIRNAME) . "/folder.jpg"));
 	return DIDL_Song($this->Arr[TrackURI], $this->Arr[AlbumArtURI], 
 	    $this->Arr[Artist], $this->Arr[Album], $this->Arr[Title], $this->Arr[Date], $this->Arr[Genre], 
 	    $this->Arr[TrackNo], $this->Arr[Duration], $this->Arr[DiscNo], $this->Arr[DiscCount]);

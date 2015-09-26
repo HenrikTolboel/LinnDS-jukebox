@@ -51,6 +51,7 @@ $State['Volume'] = -1;
 $State['IdArray'] = array('0');
 $State['Id'] = 0;
 $State['NewId'] = 0;
+$State['RevNo'] = 0;
 $State['PlaylistURLs'] = array();
 $State['PlaylistXMLs'] = array();
 $State['SourceName'] = array();
@@ -91,33 +92,145 @@ function LogWrite($Str)
     //print_r($Queue);
 }
 
-/** 
- * strposall 
- * 
- * Find all occurrences of a needle in a haystack 
- * 
- * @param string $haystack 
- * @param string $needle 
- * @return array or false 
- */ 
-function strposall($haystack,$needle){ 
-    
+function CreateDatabase($DatabaseFileName)
+{
+    $DB = array();
+    $DB[FILENAME] = $DatabaseFileName;
+    $DB[DATABASE] = new SQLite3($DB[FILENAME], SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
+
+    $DB[DATABASE]->exec('CREATE TABLE IF NOT EXISTS Queue (LinnId INTEGER, Preset INTEGER, TrackSeq INTEGER, URL STRING, XML STRING)');
+    $DB[DATABASE]->exec('CREATE TABLE IF NOT EXISTS State (Id STRING, Value STRING)');
+    $DB[DATABASE]->exec('CREATE TABLE IF NOT EXISTS Sequence (Seq INTEGER, LinnId INTEGER)');
+
+
+    $DB[INSERT_QUEUE_STMT] = $DB[DATABASE]->prepare('INSERT INTO Queue (LinnId, Preset, TrackSeq, URL, XML) VALUES (:LinnId, :Preset, :TrackSeq, :URL, :XML)');
+    $DB[UPDATE_QUEUE_STMT] = $DB[DATABASE]->prepare('UPDATE Queue set LinnId = :LinnId where (LinnId == :LinnId) OR (LinnId == -1 and URL == :URL)');
+    $DB[DELETE_QUEUE_STMT] = $DB[DATABASE]->prepare('DELETE FROM Queue');
+
+    $DB[INSERT_STATE_STMT] = $DB[DATABASE]->prepare('INSERT INTO State (Id, Value) VALUES (:Id, :Value)');
+    $DB[UPDATE_STATE_STMT] = $DB[DATABASE]->prepare('UPDATE State set Value = :Value WHERE Id = :Id');
+
+    $DB[INSERT_SEQUENCE_STMT] = $DB[DATABASE]->prepare('INSERT INTO Sequence (Seq, LinnId) VALUES (:Seq, :LinnId)');
+    $DB[DELETE_SEQUENCE_STMT] = $DB[DATABASE]->prepare('DELETE FROM Sequence');
+    return $DB;
+}
+
+function InsertQueueDB($DB, $LinnId, $Preset, $TrackSeq, $URL, $XML)
+{
+    $DB[INSERT_QUEUE_STMT]->bindParam(':LinnId', $LinnId);
+    $DB[INSERT_QUEUE_STMT]->bindParam(':Preset', $Preset);
+    $DB[INSERT_QUEUE_STMT]->bindParam(':TrackSeq', $TrackSeq);
+    $DB[INSERT_QUEUE_STMT]->bindParam(':URL', $URL);
+    $DB[INSERT_QUEUE_STMT]->bindParam(':XML', $XML);
+
+    $result = $DB[INSERT_QUEUE_STMT]->execute();
+
+    $r = $DB[DATABASE]->changes();
+    LogWrite("InsertQueueDB: $LinnId, $Preset, $TrackSeq, $URL -> $r");
+    $DB[INSERT_QUEUE_STMT]->reset();
+}
+
+function UpdateQueueDB($DB, $LinnId, $Preset, $TrackSeq, $URL, $XML)
+{
+    $DB[UPDATE_QUEUE_STMT]->bindParam(':LinnId', $LinnId);
+    $DB[UPDATE_QUEUE_STMT]->bindParam(':URL', $URL);
+
+    $result = $DB[UPDATE_QUEUE_STMT]->execute();
+
+    $r = $DB[DATABASE]->changes();
+    LogWrite("UpdateQueueDB: $LinnId, $Preset, $TrackSeq, $URL -> $r");
+    if ($DB[DATABASE]->changes() < 1)
+    {
+	InsertQueueDB($DB, $LinnId, $Preset, $TrackSeq, $URL, $XML);
+    }
+
+    $DB[UPDATE_QUEUE_STMT]->reset();
+}
+
+function DeleteQueueDB($DB)
+{
+    $result = $DB[DELETE_QUEUE_STMT]->execute();
+
+    $r = $DB[DATABASE]->changes();
+    LogWrite("DeleteQueueDB: -> $r");
+
+    $DB[DELETE_QUEUE_STMT]->reset();
+}
+
+function SetStateDB($DB, $Id, $Value)
+{
+    $DB[UPDATE_STATE_STMT]->bindParam(':Id', $Id);
+    $DB[UPDATE_STATE_STMT]->bindParam(':Value', $Value);
+
+    $result = $DB[UPDATE_STATE_STMT]->execute();
+
+    $r = $DB[DATABASE]->changes();
+    LogWrite("SetStateDB: $Id, $Value -> $r");
+    if ($DB[DATABASE]->changes() < 1)
+    {
+	$DB[INSERT_STATE_STMT]->bindParam(':Id', $Id);
+	$DB[INSERT_STATE_STMT]->bindParam(':Value', $Value);
+
+	$result = $DB[INSERT_STATE_STMT]->execute();
+
+	$r = $DB[DATABASE]->changes();
+	LogWrite("SetStateDB-Insert: $Id, $Value -> $r");
+	$DB[INSERT_STATE_STMT]->reset();
+    }
+
+    $DB[UPDATE_STATE_STMT]->reset();
+}
+
+function InsertSequenceDB($DB, $Seq, $LinnId)
+{
+    $DB[INSERT_SEQUENCE_STMT]->bindParam(':Seq', $Seq);
+    $DB[INSERT_SEQUENCE_STMT]->bindParam(':LinnId', $LinnId);
+
+    $result = $DB[INSERT_SEQUENCE_STMT]->execute();
+
+    $r = $DB[DATABASE]->changes();
+    LogWrite("InsertSequenceDB: $Seq, $LinnId -> $r");
+    $DB[INSERT_SEQUENCE_STMT]->reset();
+}
+
+function DeleteSequenceDB($DB)
+{
+    $result = $DB[DELETE_SEQUENCE_STMT]->execute();
+
+    $r = $DB[DATABASE]->changes();
+    LogWrite("DeleteSequenceDB: -> $r");
+
+    $DB[DELETE_SEQUENCE_STMT]->reset();
+}
+
+function strposall($haystack,$needle)
+{ 
+    /** 
+    * strposall 
+    * 
+    * Find all occurrences of a needle in a haystack 
+    * 
+    * @param string $haystack 
+    * @param string $needle 
+    * @return array or false 
+    */ 
+
     $s=0; 
     $i=0; 
-    
+
     while (is_integer($i)){ 
-        
-        $i = strpos($haystack,$needle,$s); 
-        
-        if (is_integer($i)) { 
-            $aStrPos[] = $i; 
-            $s = $i+strlen($needle); 
-        } 
+	
+	$i = strpos($haystack,$needle,$s); 
+	
+	if (is_integer($i)) { 
+	    $aStrPos[] = $i; 
+	    $s = $i+strlen($needle); 
+	} 
     } 
     if (isset($aStrPos)) { 
-        return $aStrPos; 
+	return $aStrPos; 
     } else { 
-        return false; 
+	return false; 
     } 
 } 
 
@@ -155,7 +268,7 @@ function getEvent($str) {
     //format: EVENT <subscribe-no> <seq-no> Key1 "Value1" Key2 "Value2" ...
     //Result: associative array
     //        b[Key1] = Value1 ...
-    
+
     $a = strposall($str, " ");
     $start = $a[2]+1;
 
@@ -231,7 +344,7 @@ function PresetURL($preset)
 
     $stmt->close();
     $db->close();
-    
+
     return AbsolutePath(ProtectPath($R[0][URI]));
 }
 
@@ -242,7 +355,7 @@ function NumberOfTracks($Preset)
 
     $db = new SQLite3($DATABASE_FILENAME);
     $stmt = $db->prepare("SELECT NoTracks FROM Album WHERE Preset == :q1");
-    $stmt->bindValue(":q1", $preset);
+    $stmt->bindValue(":q1", $Preset);
 
     $result = $stmt->execute();
 
@@ -256,7 +369,7 @@ function NumberOfTracks($Preset)
 
     $stmt->close();
     $db->close();
-    
+
     return $R[0][NoTracks];
 }
 
@@ -269,13 +382,14 @@ function PrepareXML($xml)
     return $xml;
 }
 
-function InsertDIDL_list($DIDL_URL, $OnlyTrackNo, $AfterId)
+function InsertDIDL_list($DB, $Preset, $TrackSeq, $AfterId)
 {
     global $State;
     global $NL;
 
+    $DIDL_URL = PresetURL($Preset);
     $Res = true;
-    LogWrite("InsertDIDL_list: " . $DIDL_URL . ", " . $OnlyTrackNo . ", " . $AfterId);
+    LogWrite("InsertDIDL_list: " . $DIDL_URL . ", " . $TrackSeq . ", " . $AfterId);
 
     $xml = simplexml_load_file($DIDL_URL);
 
@@ -284,39 +398,52 @@ function InsertDIDL_list($DIDL_URL, $OnlyTrackNo, $AfterId)
 
     $DIDLs = $xml->xpath('//didl:DIDL-Lite');
 
-    if ($OnlyTrackNo == 0) {
+    if ($TrackSeq == 0) {
+	InsertQueueDB($DB, -1, $Preset, 1, PrepareXML($URLs[0][0]), PrepareXML($DIDLs[0]->asXML()));
 	if (Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[0][0]) . "\" \"" . PrepareXML($DIDLs[0]->asXML()) . "\"") == false)
 	    $Res = false;
 	if (Play() == false)
 	    $Res = false;
 	for ($i = 1; $i < sizeof($URLs); $i++)
+	{
+	    InsertQueueDB($DB, -1, $Preset, $i+1, PrepareXML($URLs[$i][0]), PrepareXML($DIDLs[$i]->asXML()));
 	    if (Send("ACTION Ds/Playlist 1 Insert \"%NewId%\" \"" . PrepareXML($URLs[$i][0]) . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"") == false)
+	    {
 		$Res = false;
+	    }
+	}
     }
     else
     {
-	$No = $OnlyTrackNo -1;
+	$No = $TrackSeq -1;
+	InsertQueueDB($DB, -1, $Preset, $TrackSeq, PrepareXML($URLs[$No][0]), PrepareXML($DIDLs[$No]->asXML()));
 	if (Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[$No][0]) . "\" \"" . PrepareXML($DIDLs[$No]->asXML()) . "\"") == false)
 	    $Res = false;
 	if (Play() == false)
 	    $Res = false;
     }
+    IncrRevNoDB($DB);
     return $Res;
 }
 
-function CheckPlaylist()
+function CheckPlaylist($DB)
 {
     global $State;
 
     $Res = true;
+    DeleteSequenceDB($DB);
+    $seq = 0;
     foreach ($State['IdArray'] as $value)
     {
+	InsertSequenceDB($DB, $seq, $value);
+	$seq++;
 	if (! isset($State['PlaylistURLs'][$value]))
 	{
 	    if (Send("ACTION Ds/Playlist 1 Read \"" . $value . "\"") == false)
 		$Res = false;
 	}
     }
+    IncrRevNoDB($DB);
     return $Res;
 }
 
@@ -349,13 +476,14 @@ function ReadBlockFromSocket($read_sock)
     return $res;
 }
 
-function DeleteAll()
+function DeleteAll($DB)
 {
     global $State;
 
     $Res = true;
     if (Send("ACTION Ds/Playlist 1 DeleteAll") == false)
 	$Res = false;
+    DeleteQueueDB($DB);
     $State['PlaylistURLs'] = array();
     $State['PlaylistXMLs'] = array();
     $State['IdArray'] = array('0');
@@ -363,6 +491,16 @@ function DeleteAll()
     $State['NewId'] = 0;
     return $Res;
 }
+
+function IncrRevNoDB($DB)
+{
+    global $State;
+
+    $State['RevNo'] = $State['RevNo'] + 1;
+    SetStateDB($DB, "RevNo", $State['RevNo']);
+
+}
+
 
 function SelectPlaylist()
 {
@@ -419,376 +557,386 @@ LogWrite("LinnDS-jukebox-daemon starts...");
 // add the listening socket to this list
 $clients = array($new_client_socket, $lpec_socket);
 
+$DB = CreateDatabase($QUEUEDB_FILENAME);
+
+IncrRevNoDB($DB);
 $Continue = true;
 while ($Continue) {
-    $read = $clients;  // reset list to all sockets
+$read = $clients;  // reset list to all sockets
 
-    if (socket_select($read, $write = NULL, $except = NULL, NULL) < 1)
+if (socket_select($read, $write = NULL, $except = NULL, NULL) < 1)
+    continue;
+
+// check if there is a client trying to connect
+if (in_array($new_client_socket, $read)) {
+    // accept the client, and add him to the $clients array
+    $clients[] = $newsock = socket_accept($new_client_socket);
+
+    // send the client a welcome message
+    socket_write($newsock, "Welcome to LinnDS-jukebox-daemon\n".
+    "There are ".(count($clients) - 1)." client(s) connected\n");
+
+    socket_getpeername($newsock, $ip);
+    LogWrite("New client connected: {$ip}");
+
+    // remove the listening socket from the clients-with-data array
+    $key = array_search($new_client_socket, $read);
+    unset($read[$key]);
+}
+
+// loop through all the clients that have data to read from
+foreach ($read as $read_sock) {
+    $data = ReadBlockFromSocket($read_sock);
+ 
+    // check if the client is disconnected
+    if ($data === false) {
+
+	// remove client for $clients array
+	$key = array_search($read_sock, $clients);
+	unset($clients[$key]);
+	LogWrite("client disconnected.");
+	// continue to the next client to read from, if any
 	continue;
-
-    // check if there is a client trying to connect
-    if (in_array($new_client_socket, $read)) {
-	// accept the client, and add him to the $clients array
-	$clients[] = $newsock = socket_accept($new_client_socket);
-
-	// send the client a welcome message
-	socket_write($newsock, "Welcome to LinnDS-jukebox-daemon\n".
-	"There are ".(count($clients) - 1)." client(s) connected\n");
-
-	socket_getpeername($newsock, $ip);
-	LogWrite("New client connected: {$ip}");
-
-	// remove the listening socket from the clients-with-data array
-	$key = array_search($new_client_socket, $read);
-	unset($read[$key]);
     }
+ 
+    // trim off the trailing/beginning white spaces
+    $data = trim($data);
+ 
+// check if there is any data after trimming off the spaces
+if (!empty($data)) {
+     $DataHandled = false;
+     if ($DEBUG > 1)
+	LogWrite($data);
+     if (strpos($data, "ALIVE Ds") !== false)
+     {
+	Send("SUBSCRIBE Ds/Product");
+	$DataHandled = true;
+     }
+     elseif (strpos($data, "ALIVE") !== false)
+     {
+	LogWrite("ALIVE ignored : " . $data);
+	$DataHandled = true;
+     }
+     elseif (strpos($data, "ERROR") !== false)
+     {
+	LogWrite("ERROR ignored : " . $data);
+	$DataHandled = true;
+     }
+     elseif (strpos($data, "SUBSCRIBE") !== false)
+     {
+	// SUBSCRIBE are sent by Linn when a SUBSCRIBE finishes, thus
+	// we send the possible next command (Send) after removing
+	// previous command.
+	// We record the Number to Subscribe action in the array to
+	// help do less work with the events.
+	$front = array_shift($Queue);
+	if ($DEBUG > 1)
+	   LogWrite("Command: " . $front . " -> " . $data);
+	$S1 = substr($front, 10);
+	$S2 = substr($data, 10);
+	$SubscribeType[$S1] = $S2;
+	Send("");
+	$DataHandled = true;
+     }
+     elseif (strpos($data, "RESPONSE") !== false)
+     {
+	// RESPONSE are sent by Linn when an ACTION finishes, thus we
+	// send the possible next command (Send) after removing
+	// previous command.
+	$front = array_shift($Queue);
+	if ($DEBUG > 0)
+	   LogWrite("Command: " . $front . " -> " . $data);
 
-    // loop through all the clients that have data to read from
-    foreach ($read as $read_sock) {
-	$data = ReadBlockFromSocket($read_sock);
-     
-	// check if the client is disconnected
-	if ($data === false) {
-
-	    // remove client for $clients array
-	    $key = array_search($read_sock, $clients);
-	    unset($clients[$key]);
-	    LogWrite("client disconnected.");
-	    // continue to the next client to read from, if any
-	    continue;
-	}
-     
-	// trim off the trailing/beginning white spaces
-	$data = trim($data);
-     
-    // check if there is any data after trimming off the spaces
-    if (!empty($data)) {
-         $DataHandled = false;
-         if ($DEBUG > 1)
-            LogWrite($data);
-         if (strpos($data, "ALIVE Ds") !== false)
-         {
-            Send("SUBSCRIBE Ds/Product");
-            $DataHandled = true;
-         }
-         elseif (strpos($data, "ALIVE") !== false)
-         {
-            LogWrite("ALIVE ignored : " . $data);
-            $DataHandled = true;
-         }
-         elseif (strpos($data, "ERROR") !== false)
-         {
-            LogWrite("ERROR ignored : " . $data);
-            $DataHandled = true;
-         }
-         elseif (strpos($data, "SUBSCRIBE") !== false)
-         {
-            // SUBSCRIBE are sent by Linn when a SUBSCRIBE finishes, thus
-            // we send the possible next command (Send) after removing
-            // previous command.
-            // We record the Number to Subscribe action in the array to
-            // help do less work with the events.
-            $front = array_shift($Queue);
-            if ($DEBUG > 1)
-               LogWrite("Command: " . $front . " -> " . $data);
-            $S1 = substr($front, 10);
-            $S2 = substr($data, 10);
-            $SubscribeType[$S1] = $S2;
-            Send("");
-            $DataHandled = true;
-         }
-         elseif (strpos($data, "RESPONSE") !== false)
-         {
-	    // RESPONSE are sent by Linn when an ACTION finishes, thus we
-            // send the possible next command (Send) after removing
-            // previous command.
-            $front = array_shift($Queue);
-            if ($DEBUG > 0)
-               LogWrite("Command: " . $front . " -> " . $data);
-
-	    if (strpos($front, "ACTION Ds/Product 1 Source ") !== false) {
-		//ACTION Ds/Product 1 Source \"(\d+)\"
-		//RESPONSE \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"
-		$F = getParameters($front);
-		$D = getParameters($data);
-
-		//$State['Source_SystemName'][$F[0]] = $D[0];
-		//$State['Source_Type'][$F[0]] = $D[1];
-		//$State['Source_Name'][$F[0]] = $D[2];
-		//$State['Source_Visible'][$F[0]] = $D[3];
-
-		$State['SourceName'][$D[2]] = $F[0];
-
-		if ($D[1] == "Playlist")
-		{
-		    // We have the Playlist service. subscribe...
-		    Send("SUBSCRIBE Ds/Playlist");
-		    //Send("SUBSCRIBE Ds/Jukebox");
-		}
-		elseif ($D[1] == "Radio")
-		{
-		    // We have the Radio service. subscribe...
-		    //Send("SUBSCRIBE Ds/Radio");
-		}
-	    }
-	    elseif (strpos($front, "ACTION Ds/Playlist 1 Read ") !== false) {
-		//ACTION Ds/Playlist 1 Read \"(\d+)\"
-		//RESPONSE \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"
-		$F = getParameters($front);
-		$D = getParameters($data);
-
-		//$State['PlaylistURLs'][$F[0]] = htmlspecialchars_decode($D[0]);
-		//$State['PlaylistXMLs'][$F[0]] = htmlspecialchars_decode($D[1]);
-		$State['PlaylistURLs'][$F[0]] = $D[0];
-		$State['PlaylistXMLs'][$F[0]] = $D[1];
-	    }
-	    elseif (strpos($front, "ACTION Ds/Playlist 1 Insert ") !== false) {
-		//ACTION Ds/Playlist 1 Insert \"(\d+)\" \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"
-		//RESPONSE \"([[:ascii:]]+?)\"
-		$F = getParameters($front);
-		$D = getParameters($data);
-
-		$State['NewId'] = $D[0];
-		$State['PlaylistURLs'][$State['NewId']] = $F[1];
-		$State['PlaylistXMLs'][$State['NewId']] = $F[2];
-	    }
-	    elseif (strpos($front, "ACTION Ds/Playlist 1 IdArray") !== false) {
-		//ACTION Ds/Playlist 1 IdArray
-		//RESPONSE \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"
-		$F = getParameters($front);
-		$D = getParameters($data);
-
-		$State['IdArray_Token'] = $D[0];
-		$State['IdArray_base64'] = $D[1];
-		$State['IdArray'] = unpack("N*", base64_decode($D[1]));
-		CheckPlaylist();
-	    }
-
-            Send("");
-            $DataHandled = true;
-         }
-         elseif (strpos($data, "EVENT ") !== false)
-         {
-            // EVENTs are sent by Your linn - those that were subscribed
-            // to. We think the below ones are interesting....
-
-	    $E = getEvent($data);
-            if (strpos($data, "EVENT " . $SubscribeType['Ds/Product']) !== false)
-            {
-	       if (strpos($data, "SourceIndex ") !== false)
-               {
-                  $State['SourceIndex'] = $E[SourceIndex];
-               }
-	       if (strpos($data, "ProductModel ") !== false)
-               {
-                  $State['ProductModel'] = $E[ProductModel];
-               }
-	       if (strpos($data, "ProductName ") !== false)
-               {
-                  $State['ProductName'] = $E[ProductName];
-               }
-	       if (strpos($data, "ProductRoom ") !== false)
-               {
-                  $State['ProductRoom'] = $E[ProductRoom];
-               }
-	       if (strpos($data, "ProductType ") !== false)
-               {
-                  $State['ProductType'] = $E[ProductType];
-               }
-	       if (strpos($data, "Standby ") !== false)
-               {
-                  $State['Standby'] = $E[Standby];
-               }
-	       if (strpos($data, "ProductUrl ") !== false)
-               {
-                  $State['ProductUrl'] = $E[ProductUrl];
-               }
-	       if (strpos($data, "Attributes ") !== false)
-               {
-                  $State['Attributes'] = $E[Attributes];
-		  if (strpos($State['Attributes'], "Volume") !== false) // We have a Volume service
-		  {
-		    Send("SUBSCRIBE Ds/Volume");
-		  }
-		  if (strpos($State['Attributes'], "Info") !== false) // We have a Info service
-		  {
-		    //Send("SUBSCRIBE Ds/Info");
-		  }
-		  if (strpos($State['Attributes'], "Time") !== false) // We have a Time service
-		  {
-		    //Send("SUBSCRIBE Ds/Time");
-		  }
-               }
-	       if (strpos($data, "SourceCount ") !== false)
-               {
-                  for ($i = 0; $i < $E[SourceCount]; $i++) {
-                     Send("ACTION Ds/Product 1 Source \"" . $i . "\"");
-                  }
-               }
-               $DataHandled = true;
-            }
-	    elseif (strpos($data, "EVENT " . $SubscribeType['Ds/Playlist']) !== false)
-            {
-	       if (strpos($data, "TransportState ") !== false)
-               {
-                  $State['TransportState'] = $E[TransportState];
-               }
-	       if (strpos($data, "Id ") !== false)
-               {
-                  $State['Id'] = $E[Id];
-               }
-	       if (strpos($data, "IdArray ") !== false)
-               {
-                  $State['IdArray_base64'] = $E[IdArray];
-                  $State['IdArray'] = unpack("N*", base64_decode($State['IdArray_base64']));
-		  CheckPlaylist();
-               }
-	       if (strpos($data, "Shuffle ") !== false)
-               {
-                  $State['Shuffle'] = $E[Shuffle];
-               }
-	       if (strpos($data, "Repeat ") !== false)
-               {
-                  $State['Repeat'] = $E[Repeat];
-               }
-	       if (strpos($data, "TrackDuration ") !== false)
-               {
-                  $State['TrackDuration'] = $E[TrackDuration];
-               }
-	       if (strpos($data, "TrackCodecName ") !== false)
-               {
-                  $State['TrackCodecName'] = $E[TrackCodecName];
-               }
-	       if (strpos($data, "TrackSampleRate ") !== false)
-               {
-                  $State['TrackSampleRate'] = $E[TrackSampleRate];
-               }
-	       if (strpos($data, "TrackBitRate ") !== false)
-               {
-                  $State['TrackBitRate'] = $E[TrackBitRate];
-               }
-	       if (strpos($data, "TrackLossless ") !== false)
-               {
-                  $State['TrackLossless'] = $E[TrackLossless];
-               }
-               $DataHandled = true;
-            }
-            elseif (strpos($data, "EVENT " . $SubscribeType['Ds/Volume']) !== false)
-            {
-	       if (strpos($data, "Volume ") !== false)
-               {
-                  $State['Volume'] = $E[Volume];
-               }
-	       if (strpos($data, "Mute ") !== false)
-               {
-                  $State['Mute'] = $E[Mute];
-               }
-               $DataHandled = true;
-            }
-            elseif (strpos($data, "EVENT " . $SubscribeType['Ds/Jukebox']) !== false)
-            {
-	       if (strpos($data, "CurrentPreset ") !== false)
-               {
-                  $State['CurrentPreset'] = $E[CurrentPreset];
-               }
-	       if (strpos($data, "CurrentBookmark ") !== false)
-               {
-                  $State['CurrentBookmark'] = $E[CurrentBookmark];
-               }
-               $DataHandled = true;
-            }
-	    else
-	    {
-		LogWrite("UNKNOWN : " . $data);
-		$DataHandled = true;
-	    }
-
-            if ($DEBUG > 0)
-            {
-               //LogWrite("State:");
-               //print_r($State);
-            }
-         }
-         elseif (strpos($data, "Jukebox") !== false)
-         {
-	    // Here things happens - we execute the actions sent from the
-            // application, by issuing a number of ACTIONs.
+	if (strpos($front, "ACTION Ds/Product 1 Source ") !== false) {
+	    //ACTION Ds/Product 1 Source \"(\d+)\"
+	    //RESPONSE \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"
+	    $F = getParameters($front);
 	    $D = getParameters($data);
 
-	    if (strpos($data, "Jukebox PlayNow ") !== false) {
-		//Jukebox PlayNow \"(\d+)\" \"(\d+)\"
-		$JukeBoxPlay = $D[0];
-		$JukeBoxTrack = $D[1];
-		LogWrite("JukeBoxPlayNow: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
+	    //$State['Source_SystemName'][$F[0]] = $D[0];
+	    //$State['Source_Type'][$F[0]] = $D[1];
+	    //$State['Source_Name'][$F[0]] = $D[2];
+	    //$State['Source_Visible'][$F[0]] = $D[3];
 
-		if (SelectPlaylist() == false)
-		    $Continue = false;
+	    $State['SourceName'][$D[2]] = $F[0];
 
-		if (Stop() == false)
-		    $Continue = false;
+	    if ($D[1] == "Playlist")
+	    {
+		// We have the Playlist service. subscribe...
+		Send("SUBSCRIBE Ds/Playlist");
+		//Send("SUBSCRIBE Ds/Jukebox");
+	    }
+	    elseif ($D[1] == "Radio")
+	    {
+		// We have the Radio service. subscribe...
+		//Send("SUBSCRIBE Ds/Radio");
+	    }
+	}
+	elseif (strpos($front, "ACTION Ds/Playlist 1 Read ") !== false) {
+	    //ACTION Ds/Playlist 1 Read \"(\d+)\"
+	    //RESPONSE \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"
+	    $F = getParameters($front);
+	    $D = getParameters($data);
 
-		if (DeleteAll() == false)
-		    $Continue = false;
-		if (InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, 0) == false)
-		    $Continue = false;
+	    //$State['PlaylistURLs'][$F[0]] = htmlspecialchars_decode($D[0]);
+	    //$State['PlaylistXMLs'][$F[0]] = htmlspecialchars_decode($D[1]);
+	    $State['PlaylistURLs'][$F[0]] = $D[0];
+	    $State['PlaylistXMLs'][$F[0]] = $D[1];
+	    UpdateQueueDB($DB, $F[0], -1, -1, $D[0], $D[1]);
+	}
+	elseif (strpos($front, "ACTION Ds/Playlist 1 Insert ") !== false) {
+	    //ACTION Ds/Playlist 1 Insert \"(\d+)\" \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"
+	    //RESPONSE \"([[:ascii:]]+?)\"
+	    $F = getParameters($front);
+	    $D = getParameters($data);
 
-		//Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $JukeBoxPlay . "\"");
+	    $State['NewId'] = $D[0];
+	    $State['PlaylistURLs'][$State['NewId']] = $F[1];
+	    $State['PlaylistXMLs'][$State['NewId']] = $F[2];
+	    UpdateQueueDB($DB, $D[0], -1, -1, $F[1], $F[2]);
+	}
+	elseif (strpos($front, "ACTION Ds/Playlist 1 IdArray") !== false) {
+	    //ACTION Ds/Playlist 1 IdArray
+	    //RESPONSE \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"
+	    $F = getParameters($front);
+	    $D = getParameters($data);
 
-		if (Play() == false)
-		    $Continue = false;
-		if (Send("ACTION Ds/Playlist 1 IdArray") == false)
-		    $Continue = false;
-		$DataHandled = true;
-            }
-	    elseif (strpos($data, "Jukebox PlayNext ") !== false) {
-		//Jukebox PlayNext \"(\d+)\" \"(\d+)\"
-		$JukeBoxPlay = $D[0];
-		$JukeBoxTrack = $D[1];
-		LogWrite("JukeBoxPlayNext: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
+	    $State['IdArray_Token'] = $D[0];
+	    $State['IdArray_base64'] = $D[1];
+	    $State['IdArray'] = unpack("N*", base64_decode($D[1]));
+	    CheckPlaylist($DB);
+	}
 
-		if (SelectPlaylist() == false)
-		    $Continue = false;
+	Send("");
+	$DataHandled = true;
+     }
+     elseif (strpos($data, "EVENT ") !== false)
+     {
+	// EVENTs are sent by Your linn - those that were subscribed
+	// to. We think the below ones are interesting....
 
-		if (InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, $State['Id']) == false)
-		    $Continue = false;
+	$E = getEvent($data);
+	if (strpos($data, "EVENT " . $SubscribeType['Ds/Product']) !== false)
+	{
+	   if (strpos($data, "SourceIndex ") !== false)
+	   {
+	      $State['SourceIndex'] = $E[SourceIndex];
+	   }
+	   if (strpos($data, "ProductModel ") !== false)
+	   {
+	      $State['ProductModel'] = $E[ProductModel];
+	   }
+	   if (strpos($data, "ProductName ") !== false)
+	   {
+	      $State['ProductName'] = $E[ProductName];
+	   }
+	   if (strpos($data, "ProductRoom ") !== false)
+	   {
+	      $State['ProductRoom'] = $E[ProductRoom];
+	   }
+	   if (strpos($data, "ProductType ") !== false)
+	   {
+	      $State['ProductType'] = $E[ProductType];
+	   }
+	   if (strpos($data, "Standby ") !== false)
+	   {
+	      $State['Standby'] = $E[Standby];
+	      SetStateDB($DB, "Standby", $E[Standby]);
+	   }
+	   if (strpos($data, "ProductUrl ") !== false)
+	   {
+	      $State['ProductUrl'] = $E[ProductUrl];
+	   }
+	   if (strpos($data, "Attributes ") !== false)
+	   {
+	      $State['Attributes'] = $E[Attributes];
+	      if (strpos($State['Attributes'], "Volume") !== false) // We have a Volume service
+	      {
+		Send("SUBSCRIBE Ds/Volume");
+	      }
+	      if (strpos($State['Attributes'], "Info") !== false) // We have a Info service
+	      {
+		//Send("SUBSCRIBE Ds/Info");
+	      }
+	      if (strpos($State['Attributes'], "Time") !== false) // We have a Time service
+	      {
+		//Send("SUBSCRIBE Ds/Time");
+	      }
+	   }
+	   if (strpos($data, "SourceCount ") !== false)
+	   {
+	      for ($i = 0; $i < $E[SourceCount]; $i++) {
+		 Send("ACTION Ds/Product 1 Source \"" . $i . "\"");
+	      }
+	   }
+	   $DataHandled = true;
+	}
+	elseif (strpos($data, "EVENT " . $SubscribeType['Ds/Playlist']) !== false)
+	{
+	   if (strpos($data, "TransportState ") !== false)
+	   {
+	      $State['TransportState'] = $E[TransportState];
+	      SetStateDB($DB, "TransportState", $E[TransportState]);
+	   }
+	   if (strpos($data, "Id ") !== false)
+	   {
+	      $State['Id'] = $E[Id];
+	      SetStateDB($DB, "LinnId", $E[Id]);
+	   }
+	   if (strpos($data, "IdArray ") !== false)
+	   {
+	      $State['IdArray_base64'] = $E[IdArray];
+	      $State['IdArray'] = unpack("N*", base64_decode($State['IdArray_base64']));
+	      CheckPlaylist($DB);
+	   }
+	   if (strpos($data, "Shuffle ") !== false)
+	   {
+	      $State['Shuffle'] = $E[Shuffle];
+	   }
+	   if (strpos($data, "Repeat ") !== false)
+	   {
+	      $State['Repeat'] = $E[Repeat];
+	   }
+	   if (strpos($data, "TrackDuration ") !== false)
+	   {
+	      $State['TrackDuration'] = $E[TrackDuration];
+	   }
+	   if (strpos($data, "TrackCodecName ") !== false)
+	   {
+	      $State['TrackCodecName'] = $E[TrackCodecName];
+	   }
+	   if (strpos($data, "TrackSampleRate ") !== false)
+	   {
+	      $State['TrackSampleRate'] = $E[TrackSampleRate];
+	   }
+	   if (strpos($data, "TrackBitRate ") !== false)
+	   {
+	      $State['TrackBitRate'] = $E[TrackBitRate];
+	   }
+	   if (strpos($data, "TrackLossless ") !== false)
+	   {
+	      $State['TrackLossless'] = $E[TrackLossless];
+	   }
+	   $DataHandled = true;
+	}
+	elseif (strpos($data, "EVENT " . $SubscribeType['Ds/Volume']) !== false)
+	{
+	   if (strpos($data, "Volume ") !== false)
+	   {
+	      $State['Volume'] = $E[Volume];
+	      SetStateDB($DB, "Volume", $E[Volume]);
+	   }
+	   if (strpos($data, "Mute ") !== false)
+	   {
+	      $State['Mute'] = $E[Mute];
+	      SetStateDB($DB, "Mute", $E[Mute]);
+	   }
+	   $DataHandled = true;
+	}
+	elseif (strpos($data, "EVENT " . $SubscribeType['Ds/Jukebox']) !== false)
+	{
+	   if (strpos($data, "CurrentPreset ") !== false)
+	   {
+	      $State['CurrentPreset'] = $E[CurrentPreset];
+	   }
+	   if (strpos($data, "CurrentBookmark ") !== false)
+	   {
+	      $State['CurrentBookmark'] = $E[CurrentBookmark];
+	   }
+	   $DataHandled = true;
+	}
+	else
+	{
+	    LogWrite("UNKNOWN : " . $data);
+	    $DataHandled = true;
+	}
 
-		if (Play() == false)
-		    $Continue = false;
-		if (Send("ACTION Ds/Playlist 1 IdArray") == false)
-		    $Continue = false;
+	if ($DEBUG > 0)
+	{
+	   //LogWrite("State:");
+	   //print_r($State);
+	}
+     }
+     elseif (strpos($data, "Jukebox") !== false)
+     {
+	// Here things happens - we execute the actions sent from the
+	// application, by issuing a number of ACTIONs.
+	$D = getParameters($data);
 
-		if ($DEBUG > 0)
-		{
-		    //LogWrite($data);
-		    //print_r($State);
-		}
-		$DataHandled = true;
-            }
-	    elseif (strpos($data, "Jukebox PlayLater ") !== false) {
-		//Jukebox PlayLater \"(\d+)\" \"(\d+)\"
-		$JukeBoxPlay = $D[0];
-		$JukeBoxTrack = $D[1];
-		LogWrite("JukeBoxPlayLater: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
+	if (strpos($data, "Jukebox PlayNow ") !== false) {
+	    //Jukebox PlayNow \"(\d+)\" \"(\d+)\"
+	    $JukeBoxPlay = $D[0];
+	    $JukeBoxTrack = $D[1];
+	    LogWrite("JukeBoxPlayNow: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
 
-		if (SelectPlaylist() == false)
-		    $Continue = false;
+	    if (SelectPlaylist() == false)
+		$Continue = false;
 
-		if (InsertDIDL_list(PresetURL($JukeBoxPlay), $JukeBoxTrack, end($State['IdArray'])) == false)
-		    $Continue = false;
+	    if (Stop() == false)
+		$Continue = false;
 
+	    if (DeleteAll($DB) == false)
+		$Continue = false;
+	    if (InsertDIDL_list($DB, $JukeBoxPlay, $JukeBoxTrack, 0) == false)
+		$Continue = false;
 
-		if (Play() == false)
-		    $Continue = false;
-		Send("ACTION Ds/Playlist 1 IdArray");
+	    //Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $JukeBoxPlay . "\"");
 
-		if ($DEBUG > 0)
-		{
+	    if (Play() == false)
+		$Continue = false;
+	    if (Send("ACTION Ds/Playlist 1 IdArray") == false)
+		$Continue = false;
+	    $DataHandled = true;
+	}
+	elseif (strpos($data, "Jukebox PlayNext ") !== false) {
+	    //Jukebox PlayNext \"(\d+)\" \"(\d+)\"
+	    $JukeBoxPlay = $D[0];
+	    $JukeBoxTrack = $D[1];
+	    LogWrite("JukeBoxPlayNext: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
+
+	    if (SelectPlaylist() == false)
+		$Continue = false;
+
+	    if (InsertDIDL_list($DB, $JukeBoxPlay, $JukeBoxTrack, $State['Id']) == false)
+		$Continue = false;
+
+	    if (Play() == false)
+		$Continue = false;
+	    if (Send("ACTION Ds/Playlist 1 IdArray") == false)
+		$Continue = false;
+
+	    if ($DEBUG > 0)
+	    {
 		//LogWrite($data);
 		//print_r($State);
-		}
-		$DataHandled = true;
-            }
-	    elseif (strpos($data, "Jukebox PlayRandomTracks ") !== false) {
+	    }
+	    $DataHandled = true;
+	}
+	elseif (strpos($data, "Jukebox PlayLater ") !== false) {
+	    //Jukebox PlayLater \"(\d+)\" \"(\d+)\"
+	    $JukeBoxPlay = $D[0];
+	    $JukeBoxTrack = $D[1];
+	    LogWrite("JukeBoxPlayLater: " . $JukeBoxPlay . ", " . $JukeBoxTrack);
+
+	    if (SelectPlaylist() == false)
+		$Continue = false;
+
+	    if (InsertDIDL_list($DB, $JukeBoxPlay, $JukeBoxTrack, end($State['IdArray'])) == false)
+		$Continue = false;
+
+
+	    if (Play() == false)
+		$Continue = false;
+	    Send("ACTION Ds/Playlist 1 IdArray");
+
+	    if ($DEBUG > 0)
+	    {
+	    //LogWrite($data);
+	    //print_r($State);
+	    }
+	    $DataHandled = true;
+	}
+	elseif (strpos($data, "Jukebox PlayRandomTracks ") !== false) {
 		//Jukebox PlayRandomTracks \"(\d+)\" \"(\d+)\"
 		$JukeBoxFirstAlbum = $D[0];
 		$JukeBoxLastAlbum = $D[1];
@@ -799,7 +947,7 @@ while ($Continue) {
 
 		if ($State['TransportState'] == "Stopped")
 		{
-		    if (DeleteAll() == false)
+		    if (DeleteAll($DB) == false)
 			$Continue = false;
 		}
 
@@ -808,12 +956,12 @@ while ($Continue) {
 		    $RandomTrack = rand(1, NumberOfTracks($RandomPreset));
 		    if ($i == 0)
 		    {
-			if (InsertDIDL_list(PresetURL($RandomPreset), $RandomTrack, end($State['IdArray'])) == false)
+			if (InsertDIDL_list($DB, $RandomPreset, $RandomTrack, end($State['IdArray'])) == false)
 			    $Continue = false;
 		    }
 		    else
 		    {
-			if (InsertDIDL_list(PresetURL($RandomPreset), $RandomTrack, "%NewId%") == false)
+			if (InsertDIDL_list($DB, $RandomPreset, $RandomTrack, "%NewId%") == false)
 			    $Continue = false;
 		    }
 		}

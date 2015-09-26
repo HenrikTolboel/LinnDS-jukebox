@@ -10,72 +10,56 @@
 
 require_once("setup.php");
 
-$queuedb = new SQLite3($QUEUEDB_FILENAME);
-
-$QueueStmt = $queuedb->prepare("SELECT Q.LinnId, Q.Preset, Q.TrackSeq FROM Queue Q, Sequence S WHERE Q.LinnId == S.LinnId ORDER BY S.Seq");
-
-
-$result = $QueueStmt->execute();
-
-$Queue = array();
-$QueueCount = 0;
-while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-    $Queue[$QueueCount] = $row;
-    $QueueCount++;
-}
-
-$QueueStmt->close();
-
-$QueueStateStmt = $queuedb->prepare("SELECT * FROM State");
-
-$result = $QueueStateStmt->execute();
-
-$State = array();
-while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-    $State[$row[Id]] = $row[Value];
-}
-
-$QueueStateStmt->close();
-
-$queuedb->close();
+$RevNo = $_GET["RevNo"];
 
 $db = new SQLite3($DATABASE_FILENAME);
 
-$TrackStmt = $db->prepare("SELECT :PlayState AS PlayState, * FROM Tracks WHERE Preset == :Preset AND TrackSeq == :TrackSeq");
+$Queue = array();
+$Queue[0] = array();
 
-$PlayState = "Played";
-for ($i = 0; $i < $QueueCount; $i++)
+$Stmt = $db->prepare("SELECT MAX(Seq) As MaxSeq, MAX(LinnId) AS MaxLinnId FROM Sequence");
+$result = $Stmt->execute();
+
+while ($row = $result->fetchArray(SQLITE3_ASSOC)) 
 {
-    if ($Queue[$i][LinnId] == $State[LinnId])
-    {
-	$PlayState = "Playing";
-	$TrackStmt->bindValue(":PlayState", $PlayState);
-	$PlayState = "Pending";
-    }
-    else
-    {
-	$TrackStmt->bindValue(":PlayState", $PlayState);
-    }
-    $TrackStmt->bindValue(":Preset", $Queue[$i][Preset]);
-    $TrackStmt->bindValue(":TrackSeq", $Queue[$i][TrackSeq]);
-
-    $result = $TrackStmt->execute();
-    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-	$R[$i] = $row;
-    }
-
-    $TrackStmt->reset();
+    $Queue[0][MaxSeq] = $row[MaxSeq];
+    $Queue[0][MaxLinnId] = $row[MaxLinnId];
 }
+$Stmt->close();
 
-$TrackStmt->close();
+$Stmt = $db->prepare("SELECT * FROM State");
+$result = $Stmt->execute();
+
+while ($row = $result->fetchArray(SQLITE3_ASSOC)) 
+{
+    $Queue[0][$row[Id]] = $row[Value];
+}
+$Stmt->close();
+
+if ($RevNo == -1 || $Queue[0][RevNo] != $RevNo)
+{
+    $QueueStmt = $db->prepare("SELECT S.Seq-L.Seq AS PlayState, Q.LinnId AS LinnId, S.Seq AS Seq, T.* FROM Queue Q, Sequence S, Tracks T, (SELECT S2.Seq FROM Sequence S2, (SELECT ST.value FROM State ST where ST.Id == 'LinnId') L2 WHERE S2.LinnId == L2.value) L WHERE Q.LinnId == S.LinnId AND Q.Preset == T.Preset AND Q.TrackSeq == T.TrackSeq ORDER BY S.Seq");
+
+
+    $result = $QueueStmt->execute();
+
+    $QueueCount = 1;
+    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+	if ($row[PlayState] < 0)
+	    $row[PlayState] = "Played";
+	else if ($row[PlayState] > 0)
+	    $row[PlayState] = "Pending";
+	else
+	    $row[PlayState] = "Playing";
+	$Queue[$QueueCount] = $row;
+	$QueueCount++;
+    }
+
+    $QueueStmt->close();
+}
 
 $db->close();
 
-
 //print_r($Queue);
-//print_r($State);
-//print_r($R);
-
-echo json_encode($R);
-
+echo json_encode($Queue);
 ?>

@@ -19,10 +19,10 @@ require_once("html_parts.php");
 
 	<title>LinnDS-jukebox</title> 
 
-<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<link rel="stylesheet" href="../resources/jquery.mobile-1.4.5.min.css" />
 <link rel="stylesheet" href="sprites/sprites.css" />
 <link rel="stylesheet" href="sprites/sprites@2x.css" media="(-webkit-min-device-pixel-ratio: 2)"/>
-<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="../resources/jquery-1.11.2.min.js"></script>
 <link rel="stylesheet" href="musik.css" />
 <script src="actions.js"></script>
 <script>
@@ -35,7 +35,7 @@ require_once("html_parts.php");
     //getStatus();
 
 </script>
-<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<script src="../resources/jquery.mobile-1.4.5.min.js"></script>
 
 </head>
 <body>
@@ -44,6 +44,7 @@ require_once("html_parts.php");
 	<h1>Musik</h1>
 <?php
 echo KontrolPanel_button("musik");
+echo QueuePanel_button("musik");
 ?>
 
     </div><!-- /header -->
@@ -55,7 +56,7 @@ echo KontrolPanel_button("musik");
 	<ul id="autocomplete" data-role="listview" data-inset="true" data-filter="true" data-input="#autocomplete-input"></ul>
 
 	<ul id="main" data-role="listview" data-filter="false">
-	    <li><a href="#" class="menuclick" data-musik='{"menu": "0", "type": "alphabet", "title": "Kunstner / Album"}'>Kunstner / Album<span class="ui-li-count">1005</span></a></li>
+	    <li><a href="#" class="menuclick" data-musik='{"menu": "0", "type": "alphabet", "title": "Kunstner / Album"}'>Kunstner / Album<span class="ui-li-count">1035</span></a></li>
 	    <li><a href="#" class="menuclick" data-musik='{"menu": "1", "type": "alphabet", "title": "Linn / Album"}'>Linn / Album<span class="ui-li-count">30</span></a></li>
 	    <li><a href="#" class="menuclick" data-musik='{"menu": "2", "type": "none", "title": "Opsamlinger"}'>Opsamlinger<span class="ui-li-count">20</span></a></li>
 	    <li><a href="#" class="menuclick" data-musik='{"menu": "3", "type": "alphabet", "title": "Klassisk / Album"}'>Klassisk / Album<span class="ui-li-count">36</span></a></li>
@@ -87,6 +88,7 @@ echo KontrolPanel_panel("musik");
 	<h1 id="alphabet-title">Alphabet</h1>
 <?php
 echo KontrolPanel_button("alphabet");
+echo QueuePanel_button("alphabet");
 ?>
 
     </div><!-- /header -->
@@ -113,13 +115,16 @@ echo KontrolPanel_panel("alphabet");
 	<h1 id="albumlist-title">Kunstner / Album - A</h1>
 <?php
 echo KontrolPanel_button("albumlist");
+echo QueuePanel_button("albumlist");
 ?>
 
     </div><!-- /header -->
 
     <div data-role="content">
 	<ul id="albumlist-list" data-role="listview" data-filter="false">
+<!--
 	    <li><a id="albumlist-1" class="playpopup" data-rel="popup" href="#" data-musik='{"popupid": "albumlist-popup", "preset": "1"}'><img class="sprite_1" src="Transparent.gif"/><h3>Artist</h3><p>Album (Year)</p></a><a href="#"></a></li>
+-->
 	</ul>
 
 <?php
@@ -145,6 +150,7 @@ echo KontrolPanel_panel("albumlist");
 	<h1 id="album-title">Album</h1>
 <?php
 echo KontrolPanel_button("album");
+echo QueuePanel_button("album");
 ?>
 
     </div><!-- /header -->
@@ -163,8 +169,10 @@ echo KontrolPanel_button("album");
 	<h3 id="album-artist">Artist</h3>
 	<p id="album-album">Album (Year)</p>
 	<ul id="album-list" data-role="listview" data-inset="true" data-filter="false">
+<!--
 	<li><a id ="album-1" href="#" class="playpopup" data-rel="popup" data-musik='{"popupid": "album-popup", "preset": "194", "track": "1"}'><h3>1. Title</h3><p>Duration</p></a></li>
 	<li><a id ="album-2" href="#" class="playpopup" data-rel="popup" data-musik='{"popupid": "album-popup", "preset": "194", "track": "2"}'><h3>2. Title</h3><p>Duration</p></a></li>
+-->
 	</ul>
 
 <?php
@@ -180,6 +188,42 @@ echo playpopup_popup("album");
 
 <?php
 echo KontrolPanel_panel("album");
+?>
+
+</div><!-- /page -->
+
+
+<div data-role="page" data-dom-cache="false" id="queue">
+    <div data-role="header" data-position="fixed">
+	<h1 id="queue-title">Queue</h1>
+<?php
+echo KontrolPanel_button("queue");
+echo HomePanel_button("queue");
+?>
+
+    </div><!-- /header -->
+
+    <div data-role="content">
+	<ul id="queue-list" data-role="listview" data-filter="false">
+<!--
+	<li><a id ="album-1" href="#" class="playpopup" data-rel="popup" data-musik='{"popupid": "queue-popup", "preset": "194", "track": "1"}'><h3>1. Title</h3><p>Duration</p></a></li>
+	<li><a id ="album-2" href="#" class="playpopup" data-rel="popup" data-musik='{"popupid": "queue-popup", "preset": "194", "track": "2"}'><h3>2. Title</h3><p>Duration</p></a></li>
+-->
+	</ul>
+
+<?php
+echo queuepopup_popup("queue");
+?>
+
+    </div><!-- /content -->
+
+    <div data-role="footer">
+	<h4>LinnDS-jukebox</h4>
+    </div><!-- /footer -->
+
+
+<?php
+echo KontrolPanel_panel("queue");
 ?>
 
 </div><!-- /page -->

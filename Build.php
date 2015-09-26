@@ -1018,6 +1018,7 @@ function Main($DoLevel)
     copy("QueryAlbumList.php", $AppDir . "QueryAlbumList.php");
     copy("QueryAlphabetPresent.php", $AppDir . "QueryAlphabetPresent.php");
     copy("QueryDB.php", $AppDir . "QueryDB.php");
+    copy("QueryPlayingNowDB.php", $AppDir . "QueryPlayingNowDB.php");
 
     //echo "Writing MainMenu to " . $AppDir . $NL;
     //file_put_contents($AppDir . "index.html", HTMLDocument(MainMenu($Menu)));

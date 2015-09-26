@@ -27,6 +27,25 @@ EOT;
     return $html . $NL;
 }
 
+function queuepopup_popup($id)
+{
+    global $NL;
+    $html = <<<EOT
+	<div class="queuepopup" data-role="popup" id="$id-popup" data-history="false">
+	    <ul data-role="listview" data-inset="true" style="min-width:180px;">
+		<li><a href="#" class="queuepopupclick" data-musik='{"action": "QueueDelete"}'>Delete</a></li>
+		<li><a href="#" class="queuepopupclick" data-musik='{"action": "QueueJumpTo"}'>Jump To</a></li>
+		<li><a href="#" class="queuepopupclick" data-musik='{"action": "QueueJumpToNow"}'>Jump Now</a></li>
+		<li><a href="#" class="queuepopupclick" data-musik='{"action": "QueueMoveUp"}'>Move Up</a></li>
+		<li><a href="#" class="queuepopupclick" data-musik='{"action": "QueueMoveDown"}'>Move Down</a></li>
+		<li><a href="#" class="queuepopupclick" data-musik='{"action": "Cancel"}'>Cancel</a></li>
+	    </ul>
+	</div><!-- /popup -->
+EOT;
+
+    return $html . $NL;
+}
+
 function KontrolPanel_button($id)
 {
     global $NL;
@@ -55,12 +74,6 @@ function KontrolPanel_panel($id)
 	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "IncrVolume"}'>+1</button>
 	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "IncrVolume5"}'>+5</button>
 	</div>
-	<h4>Source</h4>
-	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Playlist"}'>Playlist</button>
-	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-TV"}'>TV</button>
-	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Radio"}'>Radio</button>
-	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-NetAux"}'>AirPlay</button>
-	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Off"}'>Off</button>
 	<h4>Playlist Kontrol</h4>
 	<div data-role="controlgroup" data-type="horizontal">
 	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Control-Play"}'>Play</button>
@@ -71,8 +84,34 @@ function KontrolPanel_panel($id)
 	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Control-Previous"}'>Previous</button>
 	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Control-Next"}'>Next</button>
 	</div>
-	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "PlayRandomTracks", "preset": "1", "track": "1005"}'>Add 50 random tracks</button>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "PlayRandomTracks", "preset": "1", "track": "1035"}'>Add 50 random tracks</button>
+	<h4>Source</h4>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Playlist"}'>Playlist</button>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-TV"}'>TV</button>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Radio"}'>Radio</button>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-NetAux"}'>AirPlay</button>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Off"}'>Off</button>
     </div><!-- /panel -->
+EOT;
+
+    return $html . $NL;
+}
+
+function QueuePanel_button($id)
+{
+    global $NL;
+    $html = <<<EOT
+	<a id="$id-QueuePanel" class="queueclick ui-btn-right" href="#queue" data-icon="bars">Queue</a>
+EOT;
+
+    return $html . $NL;
+}
+
+function HomePanel_button($id)
+{
+    global $NL;
+    $html = <<<EOT
+	<a id="$id-HomePanel" class="queueclick ui-btn-right" href="#musik" data-icon="home">Home</a>
 EOT;
 
     return $html . $NL;

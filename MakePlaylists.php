@@ -121,7 +121,12 @@ function PlayListFromDir($Dir, &$Key, &$Playlist, &$Info)
 	$PLAYLIST = RelativeBuildPath($Dir . $DIR_DELIM . "playlist.dpl");
 	$PLAYLIST = str_replace("&", "&amp;", $PLAYLIST);
 
-	$ART = RelativeBuildPath($Dir . $DIR_DELIM . "folder.jpg");
+	if (file_exists($Dir . $DIR_DELIM . "folder.jpg"))
+	    $ART = RelativeBuildPath($Dir . $DIR_DELIM . "folder.jpg");
+	elseif (file_exists($Dir . $DIR_DELIM . "folder.png"))
+	    $ART = RelativeBuildPath($Dir . $DIR_DELIM . "folder.png");
+	else
+	    $ART = RelativeBuildPath($Dir . $DIR_DELIM . "folder.jpg");
 	
 	$ART = str_replace("&", "&amp;", $ART);
 	$ALBUM = str_replace("&", "&amp;", $ALBUM);

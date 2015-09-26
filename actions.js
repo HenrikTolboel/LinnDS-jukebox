@@ -173,7 +173,7 @@ $(function() {
 	jQuery.getJSON("QueryAlbum.php", { preset: PlayData.preset }, function ( response ) {                 
 	    $.each( response, function ( i, val ) {
 		if (first) {
-		    $("img.album").attr("src", AbsoluteURL(val.AlbumArt));
+		    $("img.album").attr("src", val.AlbumArt);
 		    $("#album-title").html("Album");
 		    $("#album-artist").html(val.ArtistPerformer);
 		    $("#album-album").html(val.Album + " (" + val.Year + ")");
@@ -378,14 +378,6 @@ $(function() {
 	});
 	setTimeout("getStatus()",10000);
     }
-
-    function AbsoluteURL(Path)
-    {
-	var LINN_JUKEBOX_URL = "http://192.168.0.179/MusicLib";
-
-	return Path.replace("LINN_JUKEBOX_URL", LINN_JUKEBOX_URL);
-    }
-
 
     function AlbumListEntry(id, preset, values) {
 	//<li><a id="p0_D-187" class="playpopup" data-rel="popup" href="#" data-musik='{"popupid": "p0_D-popup", "preset": "187"}'>

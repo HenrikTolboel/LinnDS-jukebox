@@ -38,7 +38,7 @@ $R = array();
 $i = 0;
 // fetchArray(SQLITE3_NUM | SQLITE_ASSOC | SQLITE_BOTH) - default both
 while ($row = $resultAlbum->fetchArray(SQLITE3_ASSOC)) {
-    $R[$i] = $row;
+    $R[$i] = AbsoluteURL($row);
     $i++;
 }
 

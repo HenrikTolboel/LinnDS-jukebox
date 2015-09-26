@@ -51,7 +51,7 @@ if ($RevNo == -1 || $Queue[0][RevNo] != $RevNo)
 	    $row[PlayState] = "Pending";
 	else
 	    $row[PlayState] = "Playing";
-	$Queue[$QueueCount] = $row;
+	$Queue[$QueueCount] = AbsoluteURL($row);
 	$QueueCount++;
     }
 

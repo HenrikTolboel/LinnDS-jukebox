@@ -26,6 +26,9 @@ class MusicDB extends SQLite3
     private $numberOfTracksStmt = 0;
     private $presetURLStmt = 0;
 
+    private $insertAlbumStmt = 0;
+    private $insertTracksStmt = 0;
+
     function __construct()
     {
 	global $DATABASE_FILENAME;
@@ -118,6 +121,22 @@ class MusicDB extends SQLite3
 	return $this->presetURLStmt;
     }
 
+    function InsertAlbumStmt()
+    {
+	if ($this->insertAlbumStmt == 0)
+	    $this->insertAlbumStmt = $this->prepare('INSERT INTO Album (Preset, NoTracks, URI, ArtistFirst, SortArtist, Artist, Album, Date, Genre, MusicTime, ImageURI, TopDirectory, RootMenuNo) VALUES  (:Preset, :NoTracks, :URI, :ArtistFirst, :SortArtist, :Artist, :Album, :Date, :Genre, :MusicTime, :ImageURI, :TopDirectory, :RootMenuNo)');
+
+	return $this->insertAlbumStmt;
+    }
+
+    function InsertTracksStmt()
+    {
+	if ($this->insertTracksStmt == 0)
+	    $this->insertTracksStmt = $this->prepare('INSERT INTO Tracks (Preset, TrackSeq, URL, Duration, Title, Year, AlbumArt, ArtWork, Genre, ArtistPerformer, ArtistComposer, ArtistAlbumArtist, ArtistConductor, Album, TrackNumber, DiscNumber, DiscCount) VALUES  (:Preset, :TrackSeq, :URL, :Duration, :Title, :Year, :AlbumArt, :ArtWork, :Genre, :ArtistPerformer, :ArtistComposer, :ArtistAlbumArtist, :ArtistConductor, :Album, :TrackNumber, :DiscNumber, :DiscCount)');
+
+	return $this->insertTracksStmt;
+    }
+
     public function InsertQueue($LinnId, $Preset, $TrackSeq, $URL, $XML)
     {
 	$this->InsertQueueStmt()->bindParam(':LinnId', $LinnId);
@@ -206,7 +225,7 @@ class MusicDB extends SQLite3
 	$this->DeleteSequenceStmt()->reset();
     }
 
-    function NumberOfTracks($Preset)
+    public function NumberOfTracks($Preset)
     {
 	$this->NumberOfTracksStmt()->bindValue(":q1", $Preset);
 
@@ -225,7 +244,7 @@ class MusicDB extends SQLite3
 	return $R[0][NoTracks];
     }
 
-    function PresetURL($preset)
+    public function PresetURL($preset)
     {
 	$this->PresetURLStmt()->bindValue(":q1", $preset);
 
@@ -244,6 +263,55 @@ class MusicDB extends SQLite3
 	return AbsolutePath(ProtectPath($R[0][URI]));
     }
 
+    public function InsertAlbum($Preset, $NoTracks, $URI, $ArtistFirst, $Artist, $SortArtist, 
+	$Album, $Date, $Genre, $MusicTime, $ImageURI, $TopDirectory, $RootMenuNo)
+    {
+	$this->InsertAlbumStmt()->bindParam(':Preset', $Preset);
+	$this->InsertAlbumStmt()->bindParam(':NoTracks', $NoTracks);
+	$this->InsertAlbumStmt()->bindParam(':URI', $URI);
+	$this->InsertAlbumStmt()->bindParam(':ArtistFirst', $ArtistFirst);
+	$this->InsertAlbumStmt()->bindParam(':Artist', $Artist);
+	$this->InsertAlbumStmt()->bindParam(':SortArtist', $SortArtist);
+	$this->InsertAlbumStmt()->bindParam(':Album', $Album);
+	$this->InsertAlbumStmt()->bindParam(':Date', $Date);
+	$this->InsertAlbumStmt()->bindParam(':Genre', $Genre);
+	$this->InsertAlbumStmt()->bindParam(':MusicTime', $MusicTime);
+	$this->InsertAlbumStmt()->bindParam(':ImageURI', $ImageURI);
+	$this->InsertAlbumStmt()->bindParam(':TopDirectory', $TopDirectory);
+	$this->InsertAlbumStmt()->bindParam(':RootMenuNo', $RootMenuNo);
+
+	$result = $this->InsertAlbumStmt()->execute();
+
+	$this->InsertAlbumStmt()->reset();
+    }
+
+    public function InsertTracks($Preset, $TrackSeq, $URL, $DURATION, $TITLE, $YEAR, 
+	$AlbumArt, $ArtWork, $Genre, $Artist_Performer, $Artist_Composer, 
+	$Artist_AlbumArtist, $Artist_Conductor, $ALBUM, $TRACK_NUMBER, 
+	$DISC_NUMBER, $DISC_COUNT)
+    {
+	$this->InsertTracksStmt()->bindParam(':Preset', $Preset);
+	$this->InsertTracksStmt()->bindParam(':TrackSeq', $TrackSeq);
+	$this->InsertTracksStmt()->bindParam(':URL', $URL);
+	$this->InsertTracksStmt()->bindParam(':Duration', $DURATION);
+	$this->InsertTracksStmt()->bindParam(':Title', $TITLE);
+	$this->InsertTracksStmt()->bindParam(':Year', $YEAR);
+	$this->InsertTracksStmt()->bindParam(':AlbumArt', $AlbumArt);
+	$this->InsertTracksStmt()->bindParam(':ArtWork', $ArtWork);
+	$this->InsertTracksStmt()->bindParam(':Genre', $Genre);
+	$this->InsertTracksStmt()->bindParam(':ArtistPerformer', $Artist_Performer);
+	$this->InsertTracksStmt()->bindParam(':ArtistComposer', $Artist_Composer);
+	$this->InsertTracksStmt()->bindParam(':ArtistAlbumArtist', $Artist_AlbumArtist);
+	$this->InsertTracksStmt()->bindParam(':ArtistConductor', $Artist_Conductor);
+	$this->InsertTracksStmt()->bindParam(':Album', $ALBUM);
+	$this->InsertTracksStmt()->bindParam(':TrackNumber', $TRACK_NUMBER);
+	$this->InsertTracksStmt()->bindParam(':DiscNumber', $DISC_NUMBER);
+	$this->InsertTracksStmt()->bindParam(':DiscCount', $DISC_COUNT);
+
+	$result = $this->InsertTracksStmt()->execute();
+
+	$this->InsertTracksStmt()->reset();
+    }
 
 }
 

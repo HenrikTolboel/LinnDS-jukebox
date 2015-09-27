@@ -10,8 +10,9 @@
 
 
 require_once("setup.php");
+require_once("MusicDB.php");
 
-function Tracks(&$DB, $DIDLFile, $preset)
+function Tracks(&$musicDB, $DIDLFile, $preset)
 {
     global $NL;
 
@@ -108,28 +109,10 @@ function Tracks(&$DB, $DIDLFile, $preset)
 	// Sequence number inside playlist file
 	$TrackSeq++;
 
-	$DB[INSERT_TRACKS_STMT]->bindParam(':Preset', $preset);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':TrackSeq', $TrackSeq);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':URL', $URL);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':Duration', $DURATION);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':Title', $TITLE);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':Year', $YEAR);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':AlbumArt', $AlbumArt);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':ArtWork', $ArtWork);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':Genre', $Genre);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':ArtistPerformer', $Artist_Performer);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':ArtistComposer', $Artist_Composer);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':ArtistAlbumArtist', $Artist_AlbumArtist);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':ArtistConductor', $Artist_Conductor);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':Album', $ALBUM);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':TrackNumber', $TRACK_NUMBER);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':DiscNumber', $DISC_NUMBER);
-	$DB[INSERT_TRACKS_STMT]->bindParam(':DiscCount', $DISC_COUNT);
-
-
-	$result = $DB[INSERT_TRACKS_STMT]->execute();
-
-	$DB[INSERT_TRACKS_STMT]->reset();
+        $musicDB->InsertTracks($preset, $TrackSeq, $URL, $DURATION, $TITLE, $YEAR, 
+	    $AlbumArt, $ArtWork, $Genre, $Artist_Performer, $Artist_Composer, 
+	    $Artist_AlbumArtist, $Artist_Conductor, $ALBUM, $TRACK_NUMBER, 
+	    $DISC_NUMBER, $DISC_COUNT);
     }
 }
 ?>

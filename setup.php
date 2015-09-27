@@ -22,15 +22,16 @@ $DQ = '"';
 $DIR_DELIM = "/";
 
 $DATABASE_FILENAME = "LinnDS-jukebox.db";
-$QUEUEDB_FILENAME = "QueueDB.db";
+//$QUEUEDB_FILENAME = "QueueDB.db";
 $QUEUEDB_FILENAME = $DATABASE_FILENAME;
 
 //$manifestfile = $PRESETS_DIR ."/" . "manifest.xml";
 
 // These 2 "path" are equal on your music server. I.e. files search in the 
 // http url are found locally in the path...
-$LINN_JUKEBOX_URL = "http://192.168.0.105/musik";
-$LINN_JUKEBOX_PATH = "/musik";
+
+//$LINN_JUKEBOX_URL = "http://192.168.0.105/musik";
+//$LINN_JUKEBOX_PATH = "/musik";
 
 $LINN_JUKEBOX_URL = "http://192.168.1.12/MusicLib";
 $LINN_JUKEBOX_PATH = "/volume1/web/MusicLib";
@@ -202,6 +203,31 @@ function AbsoluteURL($Path)
     $Path = str_replace("LINN_JUKEBOX_URL", $LINN_JUKEBOX_URL, $Path);
 
     return $Path;
+}
+
+$Log_File = "";
+$LogFile = 0;
+
+function SetLogFile($Str)
+{
+    global $Log_File;
+    $Log_File = $Str;
+}
+
+function LogWrite($Str)
+{
+    global $LogFile;
+    global $Log_File;
+
+    if ($LogFile == 0 && $Log_File != "") {
+	$LogFile = fopen($Log_File, 'a');
+    }
+    // Write to log
+    //print date("D M j G:i:s T Y") . " : " . $Str . "\n";
+    if ($LogFile == 0)
+	print $Str . "\n";
+    else
+	fwrite($LogFile, $Str . "\n");
 }
 
 ?>

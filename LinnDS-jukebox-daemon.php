@@ -10,11 +10,12 @@
 */
 
 require_once("setup.php");
+require_once("MusicDB.php");
 
 // Debug write out.... Higher number 1,2,3,.. means more output
 $DEBUG = 2;
 
-$Log_file = dirname($argv[0]) . "/logfile.txt";
+SetLogFile(dirname($argv[0]) . "/logfile.txt");
 
 // Create a socket to your linn LPEC interface, and connect...
 $lpec_socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -69,8 +70,6 @@ $SubscribeType['Ds/Radio'] = -1;
 $SubscribeType['Ds/Info'] = -1;
 $SubscribeType['Ds/Time'] = -1;
 
-$LogFile = fopen($Log_file, 'a');
-
 LogWrite("############################## Restarted ######################################");
 
 function DebugWrite($level, $Str)
@@ -79,128 +78,6 @@ function DebugWrite($level, $Str)
 
     if ($DEBUG >= $level)
 	LogWrite("DEBUG:$level: " . $Str);
-}
-
-function LogWrite($Str)
-{
-    global $LogFile;
-    global $Queue;
-    // Write to log
-    //print date("D M j G:i:s T Y") . " : " . $Str . "\n";
-    //print $Str . "\n";
-    fwrite($LogFile, $Str . "\n");
-    //print_r($Queue);
-}
-
-function CreateDatabase($DatabaseFileName)
-{
-    $DB = array();
-    $DB[FILENAME] = $DatabaseFileName;
-    $DB[DATABASE] = new SQLite3($DB[FILENAME], SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
-
-    $DB[DATABASE]->exec('CREATE TABLE IF NOT EXISTS Queue (LinnId INTEGER, Preset INTEGER, TrackSeq INTEGER, URL STRING, XML STRING)');
-    $DB[DATABASE]->exec('CREATE TABLE IF NOT EXISTS State (Id STRING, Value STRING)');
-    $DB[DATABASE]->exec('CREATE TABLE IF NOT EXISTS Sequence (Seq INTEGER, LinnId INTEGER)');
-
-
-    $DB[INSERT_QUEUE_STMT] = $DB[DATABASE]->prepare('INSERT INTO Queue (LinnId, Preset, TrackSeq, URL, XML) VALUES (:LinnId, :Preset, :TrackSeq, :URL, :XML)');
-    $DB[UPDATE_QUEUE_STMT] = $DB[DATABASE]->prepare('UPDATE Queue set LinnId = :LinnId where (LinnId == :LinnId) OR (LinnId == -1 and URL == :URL)');
-    $DB[DELETE_QUEUE_STMT] = $DB[DATABASE]->prepare('DELETE FROM Queue');
-
-    $DB[INSERT_STATE_STMT] = $DB[DATABASE]->prepare('INSERT INTO State (Id, Value) VALUES (:Id, :Value)');
-    $DB[UPDATE_STATE_STMT] = $DB[DATABASE]->prepare('UPDATE State set Value = :Value WHERE Id = :Id');
-
-    $DB[INSERT_SEQUENCE_STMT] = $DB[DATABASE]->prepare('INSERT INTO Sequence (Seq, LinnId) VALUES (:Seq, :LinnId)');
-    $DB[DELETE_SEQUENCE_STMT] = $DB[DATABASE]->prepare('DELETE FROM Sequence');
-    return $DB;
-}
-
-function InsertQueueDB($DB, $LinnId, $Preset, $TrackSeq, $URL, $XML)
-{
-    $DB[INSERT_QUEUE_STMT]->bindParam(':LinnId', $LinnId);
-    $DB[INSERT_QUEUE_STMT]->bindParam(':Preset', $Preset);
-    $DB[INSERT_QUEUE_STMT]->bindParam(':TrackSeq', $TrackSeq);
-    $DB[INSERT_QUEUE_STMT]->bindParam(':URL', $URL);
-    $DB[INSERT_QUEUE_STMT]->bindParam(':XML', $XML);
-
-    $result = $DB[INSERT_QUEUE_STMT]->execute();
-
-    $r = $DB[DATABASE]->changes();
-    LogWrite("InsertQueueDB: $LinnId, $Preset, $TrackSeq, $URL -> $r");
-    $DB[INSERT_QUEUE_STMT]->reset();
-}
-
-function UpdateQueueDB($DB, $LinnId, $Preset, $TrackSeq, $URL, $XML)
-{
-    $DB[UPDATE_QUEUE_STMT]->bindParam(':LinnId', $LinnId);
-    $DB[UPDATE_QUEUE_STMT]->bindParam(':URL', $URL);
-
-    $result = $DB[UPDATE_QUEUE_STMT]->execute();
-
-    $r = $DB[DATABASE]->changes();
-    LogWrite("UpdateQueueDB: $LinnId, $Preset, $TrackSeq, $URL -> $r");
-    if ($DB[DATABASE]->changes() < 1)
-    {
-	InsertQueueDB($DB, $LinnId, $Preset, $TrackSeq, $URL, $XML);
-    }
-
-    $DB[UPDATE_QUEUE_STMT]->reset();
-}
-
-function DeleteQueueDB($DB)
-{
-    $result = $DB[DELETE_QUEUE_STMT]->execute();
-
-    $r = $DB[DATABASE]->changes();
-    LogWrite("DeleteQueueDB: -> $r");
-
-    $DB[DELETE_QUEUE_STMT]->reset();
-}
-
-function SetStateDB($DB, $Id, $Value)
-{
-    $DB[UPDATE_STATE_STMT]->bindParam(':Id', $Id);
-    $DB[UPDATE_STATE_STMT]->bindParam(':Value', $Value);
-
-    $result = $DB[UPDATE_STATE_STMT]->execute();
-
-    $r = $DB[DATABASE]->changes();
-    LogWrite("SetStateDB: $Id, $Value -> $r");
-    if ($DB[DATABASE]->changes() < 1)
-    {
-	$DB[INSERT_STATE_STMT]->bindParam(':Id', $Id);
-	$DB[INSERT_STATE_STMT]->bindParam(':Value', $Value);
-
-	$result = $DB[INSERT_STATE_STMT]->execute();
-
-	$r = $DB[DATABASE]->changes();
-	LogWrite("SetStateDB-Insert: $Id, $Value -> $r");
-	$DB[INSERT_STATE_STMT]->reset();
-    }
-
-    $DB[UPDATE_STATE_STMT]->reset();
-}
-
-function InsertSequenceDB($DB, $Seq, $LinnId)
-{
-    $DB[INSERT_SEQUENCE_STMT]->bindParam(':Seq', $Seq);
-    $DB[INSERT_SEQUENCE_STMT]->bindParam(':LinnId', $LinnId);
-
-    $result = $DB[INSERT_SEQUENCE_STMT]->execute();
-
-    $r = $DB[DATABASE]->changes();
-    LogWrite("InsertSequenceDB: $Seq, $LinnId -> $r");
-    $DB[INSERT_SEQUENCE_STMT]->reset();
-}
-
-function DeleteSequenceDB($DB)
-{
-    $result = $DB[DELETE_SEQUENCE_STMT]->execute();
-
-    $r = $DB[DATABASE]->changes();
-    LogWrite("DeleteSequenceDB: -> $r");
-
-    $DB[DELETE_SEQUENCE_STMT]->reset();
 }
 
 function strposall($haystack,$needle)
@@ -324,55 +201,6 @@ function Send($Str)
     return $Res;
 }
 
-function PresetURL($preset)
-{
-    global $DATABASE_FILENAME;
-
-    $db = new SQLite3($DATABASE_FILENAME);
-    $stmt = $db->prepare("SELECT URI FROM Album WHERE Preset == :q1");
-    $stmt->bindValue(":q1", $preset);
-
-    $result = $stmt->execute();
-
-    $R = array();
-    $i = 0;
-
-    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-	$R[$i] = $row;
-	$i++;
-    }
-
-    $stmt->close();
-    $db->close();
-
-    return AbsolutePath(ProtectPath($R[0][URI]));
-}
-
-
-function NumberOfTracks($Preset)
-{
-    global $DATABASE_FILENAME;
-
-    $db = new SQLite3($DATABASE_FILENAME);
-    $stmt = $db->prepare("SELECT NoTracks FROM Album WHERE Preset == :q1");
-    $stmt->bindValue(":q1", $Preset);
-
-    $result = $stmt->execute();
-
-    $R = array();
-    $i = 0;
-
-    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-	$R[$i] = $row;
-	$i++;
-    }
-
-    $stmt->close();
-    $db->close();
-
-    return $R[0][NoTracks];
-}
-
 function PrepareXML($xml)
 {
     $xml = AbsoluteURL($xml); // late binding of http server
@@ -382,12 +210,12 @@ function PrepareXML($xml)
     return $xml;
 }
 
-function InsertDIDL_list($DB, $Preset, $TrackSeq, $AfterId)
+function InsertDIDL_list($musicDB, $Preset, $TrackSeq, $AfterId)
 {
     global $State;
     global $NL;
 
-    $DIDL_URL = PresetURL($Preset);
+    $DIDL_URL = $musicDB->PresetURL($Preset);
     $Res = true;
     LogWrite("InsertDIDL_list: " . $DIDL_URL . ", " . $TrackSeq . ", " . $AfterId);
 
@@ -399,14 +227,14 @@ function InsertDIDL_list($DB, $Preset, $TrackSeq, $AfterId)
     $DIDLs = $xml->xpath('//didl:DIDL-Lite');
 
     if ($TrackSeq == 0) {
-	InsertQueueDB($DB, -1, $Preset, 1, PrepareXML($URLs[0][0]), PrepareXML($DIDLs[0]->asXML()));
+	$musicDB->InsertQueue(-1, $Preset, 1, PrepareXML($URLs[0][0]), PrepareXML($DIDLs[0]->asXML()));
 	if (Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[0][0]) . "\" \"" . PrepareXML($DIDLs[0]->asXML()) . "\"") == false)
 	    $Res = false;
 	if (Play() == false)
 	    $Res = false;
 	for ($i = 1; $i < sizeof($URLs); $i++)
 	{
-	    InsertQueueDB($DB, -1, $Preset, $i+1, PrepareXML($URLs[$i][0]), PrepareXML($DIDLs[$i]->asXML()));
+	    $musicDB->InsertQueue(-1, $Preset, $i+1, PrepareXML($URLs[$i][0]), PrepareXML($DIDLs[$i]->asXML()));
 	    if (Send("ACTION Ds/Playlist 1 Insert \"%NewId%\" \"" . PrepareXML($URLs[$i][0]) . "\" \"" . PrepareXML($DIDLs[$i]->asXML()) . "\"") == false)
 	    {
 		$Res = false;
@@ -416,26 +244,26 @@ function InsertDIDL_list($DB, $Preset, $TrackSeq, $AfterId)
     else
     {
 	$No = $TrackSeq -1;
-	InsertQueueDB($DB, -1, $Preset, $TrackSeq, PrepareXML($URLs[$No][0]), PrepareXML($DIDLs[$No]->asXML()));
+	$musicDB->InsertQueue(-1, $Preset, $TrackSeq, PrepareXML($URLs[$No][0]), PrepareXML($DIDLs[$No]->asXML()));
 	if (Send("ACTION Ds/Playlist 1 Insert \"" . $AfterId . "\" \"" . PrepareXML($URLs[$No][0]) . "\" \"" . PrepareXML($DIDLs[$No]->asXML()) . "\"") == false)
 	    $Res = false;
 	if (Play() == false)
 	    $Res = false;
     }
-    IncrRevNoDB($DB);
+    IncrRevNo($musicDB);
     return $Res;
 }
 
-function CheckPlaylist($DB)
+function CheckPlaylist($musicDB)
 {
     global $State;
 
     $Res = true;
-    DeleteSequenceDB($DB);
+    $musicDB->DeleteSequence();
     $seq = 0;
     foreach ($State['IdArray'] as $value)
     {
-	InsertSequenceDB($DB, $seq, $value);
+	$musicDB->InsertSequence($seq, $value);
 	$seq++;
 	if (! isset($State['PlaylistURLs'][$value]))
 	{
@@ -443,7 +271,7 @@ function CheckPlaylist($DB)
 		$Res = false;
 	}
     }
-    IncrRevNoDB($DB);
+    IncrRevNo($musicDB);
     return $Res;
 }
 
@@ -476,14 +304,14 @@ function ReadBlockFromSocket($read_sock)
     return $res;
 }
 
-function DeleteAll($DB)
+function DeleteAll($musicDB)
 {
     global $State;
 
     $Res = true;
     if (Send("ACTION Ds/Playlist 1 DeleteAll") == false)
 	$Res = false;
-    DeleteQueueDB($DB);
+    $musicDB->DeleteQueue();
     $State['PlaylistURLs'] = array();
     $State['PlaylistXMLs'] = array();
     $State['IdArray'] = array('0');
@@ -492,12 +320,12 @@ function DeleteAll($DB)
     return $Res;
 }
 
-function IncrRevNoDB($DB)
+function IncrRevNo($musicDB)
 {
     global $State;
 
     $State['RevNo'] = $State['RevNo'] + 1;
-    SetStateDB($DB, "RevNo", $State['RevNo']);
+    $musicDB->SetState("RevNo", $State['RevNo']);
 
 }
 
@@ -557,9 +385,10 @@ LogWrite("LinnDS-jukebox-daemon starts...");
 // add the listening socket to this list
 $clients = array($new_client_socket, $lpec_socket);
 
-$DB = CreateDatabase($QUEUEDB_FILENAME);
+$musicDB = new MusicDB();
+IncrRevNo($musicDB);
+$musicDB->close();
 
-IncrRevNoDB($DB);
 $Continue = true;
 while ($Continue) {
 $read = $clients;  // reset list to all sockets
@@ -682,7 +511,9 @@ if (!empty($data)) {
 	    //$State['PlaylistXMLs'][$F[0]] = htmlspecialchars_decode($D[1]);
 	    $State['PlaylistURLs'][$F[0]] = $D[0];
 	    $State['PlaylistXMLs'][$F[0]] = $D[1];
-	    UpdateQueueDB($DB, $F[0], -1, -1, $D[0], $D[1]);
+	    $musicDB = new MusicDB();
+	    $musicDB->UpdateQueue($F[0], -1, -1, $D[0], $D[1]);
+	    $musicDB->close();
 	}
 	elseif (strpos($front, "ACTION Ds/Playlist 1 Insert ") !== false) {
 	    //ACTION Ds/Playlist 1 Insert \"(\d+)\" \"([[:ascii:]]+?)\" \"([[:ascii:]]+?)\"
@@ -693,7 +524,9 @@ if (!empty($data)) {
 	    $State['NewId'] = $D[0];
 	    $State['PlaylistURLs'][$State['NewId']] = $F[1];
 	    $State['PlaylistXMLs'][$State['NewId']] = $F[2];
-	    UpdateQueueDB($DB, $D[0], -1, -1, $F[1], $F[2]);
+	    $musicDB = new MusicDB();
+	    $musicDB->UpdateQueue($D[0], -1, -1, $F[1], $F[2]);
+	    $musicDB->close();
 	}
 	elseif (strpos($front, "ACTION Ds/Playlist 1 IdArray") !== false) {
 	    //ACTION Ds/Playlist 1 IdArray
@@ -704,7 +537,9 @@ if (!empty($data)) {
 	    $State['IdArray_Token'] = $D[0];
 	    $State['IdArray_base64'] = $D[1];
 	    $State['IdArray'] = unpack("N*", base64_decode($D[1]));
-	    CheckPlaylist($DB);
+	    $musicDB = new MusicDB();
+	    CheckPlaylist($musicDB);
+	    $musicDB->close();
 	}
 
 	Send("");
@@ -741,7 +576,9 @@ if (!empty($data)) {
 	   if (strpos($data, "Standby ") !== false)
 	   {
 	      $State['Standby'] = $E[Standby];
-	      SetStateDB($DB, "Standby", $E[Standby]);
+	      $musicDB = new MusicDB();
+	      $musicDB->SetState("Standby", $E[Standby]);
+	      $musicDB->close();
 	   }
 	   if (strpos($data, "ProductUrl ") !== false)
 	   {
@@ -776,18 +613,24 @@ if (!empty($data)) {
 	   if (strpos($data, "TransportState ") !== false)
 	   {
 	      $State['TransportState'] = $E[TransportState];
-	      SetStateDB($DB, "TransportState", $E[TransportState]);
+	      $musicDB = new MusicDB();
+	      $musicDB->SetState("TransportState", $E[TransportState]);
+	      $musicDB->close();
 	   }
 	   if (strpos($data, "Id ") !== false)
 	   {
 	      $State['Id'] = $E[Id];
-	      SetStateDB($DB, "LinnId", $E[Id]);
+	      $musicDB = new MusicDB();
+	      $musicDB->SetState("LinnId", $E[Id]);
+	      $musicDB->close();
 	   }
 	   if (strpos($data, "IdArray ") !== false)
 	   {
 	      $State['IdArray_base64'] = $E[IdArray];
 	      $State['IdArray'] = unpack("N*", base64_decode($State['IdArray_base64']));
-	      CheckPlaylist($DB);
+	      $musicDB = new MusicDB();
+	      CheckPlaylist($musicDB);
+	      $musicDB->close();
 	   }
 	   if (strpos($data, "Shuffle ") !== false)
 	   {
@@ -824,12 +667,16 @@ if (!empty($data)) {
 	   if (strpos($data, "Volume ") !== false)
 	   {
 	      $State['Volume'] = $E[Volume];
-	      SetStateDB($DB, "Volume", $E[Volume]);
+	      $musicDB = new MusicDB();
+	      $musicDB->SetState("Volume", $E[Volume]);
+	      $musicDB->close();
 	   }
 	   if (strpos($data, "Mute ") !== false)
 	   {
 	      $State['Mute'] = $E[Mute];
-	      SetStateDB($DB, "Mute", $E[Mute]);
+	      $musicDB = new MusicDB();
+	      $musicDB->SetState("Mute", $E[Mute]);
+	      $musicDB->close();
 	   }
 	   $DataHandled = true;
 	}
@@ -875,10 +722,12 @@ if (!empty($data)) {
 	    if (Stop() == false)
 		$Continue = false;
 
-	    if (DeleteAll($DB) == false)
+	    $musicDB = new MusicDB();
+	    if (DeleteAll($musicDB) == false)
 		$Continue = false;
-	    if (InsertDIDL_list($DB, $JukeBoxPlay, $JukeBoxTrack, 0) == false)
+	    if (InsertDIDL_list($musicDB, $JukeBoxPlay, $JukeBoxTrack, 0) == false)
 		$Continue = false;
+	    $musicDB->close();
 
 	    //Send("ACTION Ds/Jukebox 3 SetCurrentPreset \"" . $JukeBoxPlay . "\"");
 
@@ -897,8 +746,10 @@ if (!empty($data)) {
 	    if (SelectPlaylist() == false)
 		$Continue = false;
 
-	    if (InsertDIDL_list($DB, $JukeBoxPlay, $JukeBoxTrack, $State['Id']) == false)
+	    $musicDB = new MusicDB();
+	    if (InsertDIDL_list($musicDB, $JukeBoxPlay, $JukeBoxTrack, $State['Id']) == false)
 		$Continue = false;
+	    $musicDB->close();
 
 	    if (Play() == false)
 		$Continue = false;
@@ -921,8 +772,10 @@ if (!empty($data)) {
 	    if (SelectPlaylist() == false)
 		$Continue = false;
 
-	    if (InsertDIDL_list($DB, $JukeBoxPlay, $JukeBoxTrack, end($State['IdArray'])) == false)
+	    $musicDB = new MusicDB();
+	    if (InsertDIDL_list($musicDB, $JukeBoxPlay, $JukeBoxTrack, end($State['IdArray'])) == false)
 		$Continue = false;
+	    $musicDB->close();
 
 
 	    if (Play() == false)
@@ -945,26 +798,29 @@ if (!empty($data)) {
 		if (SelectPlaylist() == false)
 		    $Continue = false;
 
+	        $musicDB = new MusicDB();
 		if ($State['TransportState'] == "Stopped")
 		{
-		    if (DeleteAll($DB) == false)
+		    if (DeleteAll($musicDB) == false)
 			$Continue = false;
 		}
 
 		for ($i = 0; $i < 50; $i++) {
 		    $RandomPreset = rand($JukeBoxFirstAlbum, $JukeBoxLastAlbum);
-		    $RandomTrack = rand(1, NumberOfTracks($RandomPreset));
+		    $RandomTrack = rand(1, $musicDB->NumberOfTracks($RandomPreset));
 		    if ($i == 0)
 		    {
-			if (InsertDIDL_list($DB, $RandomPreset, $RandomTrack, end($State['IdArray'])) == false)
+			if (InsertDIDL_list($musicDB, $RandomPreset, $RandomTrack, end($State['IdArray'])) == false)
 			    $Continue = false;
 		    }
 		    else
 		    {
-			if (InsertDIDL_list($DB, $RandomPreset, $RandomTrack, "%NewId%") == false)
+			if (InsertDIDL_list($musicDB, $RandomPreset, $RandomTrack, "%NewId%") == false)
 			    $Continue = false;
 		    }
 		}
+
+		$musicDB->close();
 
 		if (Play() == false)
 		    $Continue = false;

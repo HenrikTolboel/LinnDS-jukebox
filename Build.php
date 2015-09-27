@@ -926,6 +926,12 @@ function CreateDatabase($DatabaseFileName)
 
     $DB[DATABASE]->exec('CREATE TABLE IF NOT EXISTS Album (Preset INTEGER, NoTracks INTEGER, URI STRING, ArtistFirst STRING, SortArtist STRING, Artist STRING, Album STRING, Date STRING, Genre STRING, MusicTime INTEGER, ImageURI STRING, TopDirectory STRING, RootMenuNo INTEGER)');
 
+    // Tables used in LinnDS-jukebox-daemon.php
+    $DB[DATABASE]->exec('CREATE TABLE IF NOT EXISTS Queue (LinnId INTEGER, Preset INTEGER, TrackSeq INTEGER, URL STRING, XML STRING)');
+    $DB[DATABASE]->exec('CREATE TABLE IF NOT EXISTS State (Id STRING, Value STRING)');
+    $DB[DATABASE]->exec('CREATE TABLE IF NOT EXISTS Sequence (Seq INTEGER, LinnId INTEGER)');
+
+    // Prepare statemens
     $DB[INSERT_URIINDEX_STMT] = $DB[DATABASE]->prepare('INSERT INTO Album (Preset, NoTracks, URI, ArtistFirst, SortArtist, Artist, Album, Date, Genre, MusicTime, ImageURI, TopDirectory, RootMenuNo) VALUES  (:Preset, :NoTracks, :URI, :ArtistFirst, :SortArtist, :Artist, :Album, :Date, :Genre, :MusicTime, :ImageURI, :TopDirectory, :RootMenuNo)');
 
     $DB[INSERT_TRACKS_STMT] = $DB[DATABASE]->prepare('INSERT INTO Tracks (Preset, TrackSeq, URL, Duration, Title, Year, AlbumArt, ArtWork, Genre, ArtistPerformer, ArtistComposer, ArtistAlbumArtist, ArtistConductor, Album, TrackNumber, DiscNumber, DiscCount) VALUES  (:Preset, :TrackSeq, :URL, :Duration, :Title, :Year, :AlbumArt, :ArtWork, :Genre, :ArtistPerformer, :ArtistComposer, :ArtistAlbumArtist, :ArtistConductor, :Album, :TrackNumber, :DiscNumber, :DiscCount)');
@@ -1014,6 +1020,7 @@ function Main($DoLevel)
     copy("Transparent.gif", $AppDir . "Transparent.gif");
     copy("setup.php", $AppDir . "setup.php");
     copy("Send.php", $AppDir . "Send.php");
+    copy("MusicDB.php", $AppDir . "MusicDB.php");
     copy("QueryAlbum.php", $AppDir . "QueryAlbum.php");
     copy("QueryAlbumList.php", $AppDir . "QueryAlbumList.php");
     copy("QueryAlphabetPresent.php", $AppDir . "QueryAlphabetPresent.php");

@@ -33,11 +33,11 @@ $QUEUEDB_FILENAME = $DATABASE_FILENAME;
 //$LINN_JUKEBOX_URL = "http://192.168.0.105/musik";
 //$LINN_JUKEBOX_PATH = "/musik";
 
-$LINN_JUKEBOX_URL = "http://192.168.1.12/MusicLib";
+$LINN_JUKEBOX_URL = "http://192.168.0.11/MusicLib";
 $LINN_JUKEBOX_PATH = "/volume1/web/MusicLib";
 
 // This is where your linn is in the network.
-$LINN_HOST = "192.168.1.11";
+$LINN_HOST = "192.168.0.12";
 $LINN_PORT = 23;
 
 $IsJul = 0;

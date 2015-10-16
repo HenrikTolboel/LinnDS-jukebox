@@ -46,6 +46,7 @@ function Tracks(&$musicDB, $DIDLFile, $preset)
 				$DURATION = $b;
 			    }
 			}
+			$URL = $t;
 		    }
 		}
 		foreach ($item->children('http://purl.org/dc/elements/1.1/') as $t) {

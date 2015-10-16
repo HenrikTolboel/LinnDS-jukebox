@@ -39,6 +39,13 @@ class MusicDB extends SQLite3
 
     private function CreateTables()
     {
+	static $TablesChecked = 0;
+	if ($TablesChecked != 0)
+	    return;
+	$TablesChecked++;
+
+	LogWrite("MusicDB::CreateTables - checking existance of tables and indexes...");
+
 	$this->exec('CREATE TABLE IF NOT EXISTS Tracks (Preset INTEGER, TrackSeq INTEGER, URL STRING, Duration STRING, Title STRING, Year STRING, AlbumArt STRING, ArtWork STRING, Genre STRING, ArtistPerformer STRING, ArtistComposer STRING, ArtistAlbumArtist STRING, ArtistConductor STRING, Album STRING, TrackNumber STRING, DiscNumber STRING, DiscCount STRING)');
 
 	$this->exec('CREATE TABLE IF NOT EXISTS Album (Preset INTEGER, NoTracks INTEGER, URI STRING, ArtistFirst STRING, SortArtist STRING, Artist STRING, Album STRING, Date STRING, Genre STRING, MusicTime INTEGER, ImageURI STRING, TopDirectory STRING, RootMenuNo INTEGER)');
@@ -47,6 +54,11 @@ class MusicDB extends SQLite3
 	$this->exec('CREATE TABLE IF NOT EXISTS Queue (LinnId INTEGER, Preset INTEGER, TrackSeq INTEGER, URL STRING, XML STRING)');
 	$this->exec('CREATE TABLE IF NOT EXISTS State (Id STRING, Value STRING)');
 	$this->exec('CREATE TABLE IF NOT EXISTS Sequence (Seq INTEGER, LinnId INTEGER)');
+
+
+	// Create indexes
+	$this->exec('CREATE INDEX IF NOT EXISTS Album_idx1 ON Album (Preset)');
+	$this->exec('CREATE INDEX IF NOT EXISTS Tracks_idx1 ON Tracks (Preset, TrackSeq)');
     }
 
     function InsertQueueStmt()
@@ -325,8 +337,6 @@ function test()
 
     $musicDB->close();
 }
-test();
-
-
-
+//test();
+//test();
 ?>

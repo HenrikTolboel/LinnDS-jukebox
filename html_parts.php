@@ -2,13 +2,38 @@
 /*!
 * LinnDS-jukebox
 *
-* Copyright (c) 2012-2013 Henrik Tolbøl, http://tolbøl.dk
+* Copyright (c) 2012-2015 Henrik Tolbøl, http://tolbøl.dk
 *
 * Licensed under the MIT license:
 * http://www.opensource.org/licenses/mit-license.php
 */
 
 require_once("setup.php");
+require_once("MusicDB.php");
+
+function MainMenuHtml($musicDB)
+{
+    global $RootMenu;
+    global $SubMenuType;
+    global $NL;
+
+    static $Str = "";
+
+    if (strlen($Str) > 0)
+	return $Str;
+
+    $Str .= '<ul id="main" data-role="listview" data-filter="false">' . $NL;
+
+    foreach ($RootMenu as $No => $Title) {
+	if ($SubMenuType[$No] != SUBMENU_TYPE_NEWEST)
+	    $Str .= '    <li><a href="#" class="menuclick" data-musik=' . "'" . '{"menu": "' . $No . '", "type": "' . SubMenuType2Str($SubMenuType[$No]) . '", "title": "' . $Title . '"}' . "'>" . $Title . '<span class="ui-li-count">' . $musicDB->NumberOfAlbumsInMenuNo($No) . '</span></a></li>' . $NL;
+	else
+	    $Str .= '    <li><a href="#" class="menuclick" data-musik=' . "'" . '{"menu": "' . $No . '", "type": "' . SubMenuType2Str($SubMenuType[$No]) . '", "title": "' . $Title . '"}' . "'>" . $Title . '</a></li>' . $NL;
+    }
+    $Str .= '</ul>' . $NL;
+
+    return $Str;
+}
 
 function playpopup_popup($id)
 {
@@ -56,9 +81,10 @@ EOT;
     return $html . $NL;
 }
 
-function KontrolPanel_panel($id)
+function KontrolPanel_panel($musicDB, $id)
 {
     global $NL;
+    $Cnt = $musicDB->NumberOfAlbumsInMenuNo(0);
     $html = <<<EOT
     <div data-role="panel" id="$id-KontrolPanelPanel" data-position="left" data-position-fixed="true">
 	<ul data-role="listview" data-theme="a" data-divider-theme="a" style="margin-top:-16px;margin-bottom:16px;" class="nav-search">
@@ -84,7 +110,7 @@ function KontrolPanel_panel($id)
 	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Control-Previous"}'>Previous</button>
 	    <button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Control-Next"}'>Next</button>
 	</div>
-	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "PlayRandomTracks", "preset": "1", "track": "1035"}'>Add 50 random tracks</button>
+	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "PlayRandomTracks", "preset": "1", "track": "$Cnt"}'>Add 50 random tracks</button>
 	<h4>Source</h4>
 	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-Playlist"}'>Playlist</button>
 	<button href="#" class="panelclick" data-mini="true" data-musik='{"action": "Source-TV"}'>TV</button>

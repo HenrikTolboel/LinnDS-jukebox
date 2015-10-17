@@ -102,6 +102,20 @@ if ($IsJul == 1)
     $SubMenuType[8] = SUBMENU_TYPE_NONE;
 }
 
+
+function SubMenuType2Str($SubMenuType)
+{
+    if ($SubMenuType == SUBMENU_TYPE_NONE)
+	$TypeStr = "none";
+    elseif ($SubMenuType == SUBMENU_TYPE_ALPHABET)
+	$TypeStr = "alphabet";
+    elseif ($SubMenuType == SUBMENU_TYPE_NEWEST)
+	$TypeStr = "newest";
+    else
+	$TypeStr == "unknown";
+    return $TypeStr;
+}
+
 // The ALPHABET submenus are ordered into these groups
 $ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#";
 $ALPHABET_SIZE = strlen($ALPHABET);

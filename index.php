@@ -10,7 +10,10 @@
 */
 
 require_once("setup.php");
+require_once("MusicDB.php");
 require_once("html_parts.php");
+
+$musicDB = new MusicDB();
 ?>
 <html>
 <head>
@@ -55,18 +58,8 @@ echo QueuePanel_button("musik");
 	</form>
 	<ul id="autocomplete" data-role="listview" data-inset="true" data-filter="true" data-input="#autocomplete-input"></ul>
 
-	<ul id="main" data-role="listview" data-filter="false">
-	    <li><a href="#" class="menuclick" data-musik='{"menu": "0", "type": "alphabet", "title": "Kunstner / Album"}'>Kunstner / Album<span class="ui-li-count">1035</span></a></li>
-	    <li><a href="#" class="menuclick" data-musik='{"menu": "1", "type": "alphabet", "title": "Linn / Album"}'>Linn / Album<span class="ui-li-count">30</span></a></li>
-	    <li><a href="#" class="menuclick" data-musik='{"menu": "2", "type": "none", "title": "Opsamlinger"}'>Opsamlinger<span class="ui-li-count">20</span></a></li>
-	    <li><a href="#" class="menuclick" data-musik='{"menu": "3", "type": "alphabet", "title": "Klassisk / Album"}'>Klassisk / Album<span class="ui-li-count">36</span></a></li>
-	    <li><a href="#" class="menuclick" data-musik='{"menu": "4", "type": "alphabet", "title": "Børn - Kunstner / Album"}'>Børn - Kunstner / Album<span class="ui-li-count">16</span></a></li>
-	    <li><a href="#" class="menuclick" data-musik='{"menu": "5", "type": "none", "title": "Børn - Opsamlinger"}'>Børn - Opsamlinger<span class="ui-li-count">10</span></a></li>
-	    <li><a href="#" class="menuclick" data-musik='{"menu": "6", "type": "none", "title": "Diverse"}'>Diverse<span class="ui-li-count">12</span></a></li>
-	    <li><a href="#" class="menuclick" data-musik='{"menu": "7", "type": "newest", "title": "Newest"}'>Newest</a></li>
-	</ul>
-
 <?php
+echo MainMenuHtml($musicDB);
 echo playpopup_popup("musik");
 ?>
 
@@ -78,7 +71,7 @@ echo playpopup_popup("musik");
 
 
 <?php
-echo KontrolPanel_panel("musik");
+echo KontrolPanel_panel($musicDB, "musik");
 ?>
 
 </div><!-- /page -->
@@ -105,7 +98,7 @@ echo AlphabetList("alphabet");
 
 
 <?php
-echo KontrolPanel_panel("alphabet");
+echo KontrolPanel_panel($musicDB, "alphabet");
 ?>
 
 </div><!-- /page -->
@@ -139,7 +132,7 @@ echo playpopup_popup("albumlist");
 
 
 <?php
-echo KontrolPanel_panel("albumlist");
+echo KontrolPanel_panel($musicDB, "albumlist");
 ?>
 
 </div><!-- /page -->
@@ -187,7 +180,7 @@ echo playpopup_popup("album");
 
 
 <?php
-echo KontrolPanel_panel("album");
+echo KontrolPanel_panel($musicDB, "album");
 ?>
 
 </div><!-- /page -->
@@ -223,7 +216,9 @@ echo queuepopup_popup("queue");
 
 
 <?php
-echo KontrolPanel_panel("queue");
+echo KontrolPanel_panel($musicDB, "queue");
+
+$musicDB->close();
 ?>
 
 </div><!-- /page -->

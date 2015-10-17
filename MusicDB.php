@@ -1,4 +1,3 @@
-#!/usr/bin/php
 <?php
 /*!
 * MusicDB
@@ -44,7 +43,7 @@ class MusicDB extends SQLite3
 	    return;
 	$TablesChecked++;
 
-	LogWrite("MusicDB::CreateTables - checking existance of tables and indexes...");
+	//LogWrite("MusicDB::CreateTables - checking existance of tables and indexes...");
 
 	$this->exec('CREATE TABLE IF NOT EXISTS Tracks (Preset INTEGER, TrackSeq INTEGER, URL STRING, Duration STRING, Title STRING, Year STRING, AlbumArt STRING, ArtWork STRING, Genre STRING, ArtistPerformer STRING, ArtistComposer STRING, ArtistAlbumArtist STRING, ArtistConductor STRING, Album STRING, TrackNumber STRING, DiscNumber STRING, DiscCount STRING)');
 
@@ -325,15 +324,40 @@ class MusicDB extends SQLite3
 	$this->InsertTracksStmt()->reset();
     }
 
+    public function NumberOfAlbumsInMenuNo($MenuNo)
+    {
+	static $A = array();
+
+	if (empty($A))
+	{
+	    $Stmt = $this->prepare('select RootMenuNo, count(RootMenuNo) from Album group by RootMenuNo');
+	    $result = $Stmt->execute();
+
+	    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+		$A[$row[RootMenuNo]] = $row["count(RootMenuNo)"];
+	    }
+
+	    //print_r($A);
+	}
+
+	return $A[$MenuNo];
+    }
+
 }
 
 
 function test()
 {
+    global $NL;
+
     $musicDB = new MusicDB();
 
     $musicDB->SetState("State1", "Value1");
     $musicDB->SetState("State2", "Value1");
+    echo $musicDB->NumberOfAlbumsInMenuNo(0) . $NL;
+    echo $musicDB->NumberOfAlbumsInMenuNo(1) . $NL;
+    echo $musicDB->NumberOfAlbumsInMenuNo(2) . $NL;
+    echo $musicDB->NumberOfAlbumsInMenuNo(3) . $NL;
 
     $musicDB->close();
 }

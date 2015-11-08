@@ -37,6 +37,10 @@ function Tracks(&$musicDB, $DIDLFile, $preset)
 	$TRACK_NUMBER = -1;
 	$DISC_NUMBER = -1;
 	$DISC_COUNT = -1;
+	$BITRATE = -1;
+	$SAMPLE_FREQUENCY = -1;
+	$BITS_PER_SAMPLE = -1;
+	$SIZE = -1;
 	foreach ($track->children('urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/') as $didl) {
 	    foreach ($didl->children() as $item) {
 		foreach ($item->children() as $t) {
@@ -44,6 +48,18 @@ function Tracks(&$musicDB, $DIDLFile, $preset)
 			foreach($t->attributes() as $a => $b) {
 			    if ($a == "duration") {
 				$DURATION = $b;
+			    }
+			    elseif ($a == "bitrate") {
+				$BITRATE = $b;
+			    }
+			    elseif ($a == "sampleFrequency") {
+				$SAMPLE_FREQUENCY = $b;
+			    }
+			    elseif ($a == "bitsPerSample") {
+				$BITS_PER_SAMPLE = $b;
+			    }
+			    elseif ($a == "size") {
+				$SIZE = $b;
 			    }
 			}
 			$URL = $t;
@@ -113,7 +129,7 @@ function Tracks(&$musicDB, $DIDLFile, $preset)
         $musicDB->InsertTracks($preset, $TrackSeq, $URL, $DURATION, $TITLE, $YEAR, 
 	    $AlbumArt, $ArtWork, $Genre, $Artist_Performer, $Artist_Composer, 
 	    $Artist_AlbumArtist, $Artist_Conductor, $ALBUM, $TRACK_NUMBER, 
-	    $DISC_NUMBER, $DISC_COUNT);
+	    $DISC_NUMBER, $DISC_COUNT, $BITRATE, $SAMPLE_FREQUENCY, $BITS_PER_SAMPLE, $SIZE);
     }
 }
 ?>

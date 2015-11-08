@@ -37,14 +37,6 @@ socket_bind($new_client_socket, 0, $port);
 // start listen for connections
 socket_listen($new_client_socket);
 
-// Queue is a queue of outstanding commands to be sent to Linn.
-// The currently executing command is still in the queue, removed when the
-// response commes.
-$Queue = array();
-// AwaitResponse tells whether we miss a response before sending next
-// command.
-$State['AwaitResponse'] = 0;
-
 // State contains the "accumulated" state of the linn device.
 $State = array();
 $State['MAX_VOLUME'] = 60;
@@ -56,6 +48,14 @@ $State['RevNo'] = 0;
 $State['PlaylistURLs'] = array();
 $State['PlaylistXMLs'] = array();
 $State['SourceName'] = array();
+
+// Queue is a queue of outstanding commands to be sent to Linn.
+// The currently executing command is still in the queue, removed when the
+// response commes.
+$Queue = array();
+// AwaitResponse tells whether we miss a response before sending next
+// command.
+$State['AwaitResponse'] = 0;
 
 // SubscribeType tells the mapping between "EVENT <digits> XXX" subscribed
 // to protokol (e.g. "Ds/Playlist")

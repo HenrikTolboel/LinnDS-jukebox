@@ -10,7 +10,7 @@
 
 require_once("setup.php");
 
-function DIDL_Song($TrackURI, $AlbumArtURI, $Artist, $Album, $Title, $Date, $Genre, $TrackNo, $Duration, $DiscNo, $DiscCount)
+function DIDL_Song($TrackURI, $AlbumArtURI, $Artist, $Album, $Title, $Date, $Genre, $TrackNo, $Duration, $DiscNo, $DiscCount, $TrackBitrate, $TrackSampleFrequency, $TrackBitsPerSample, $TrackSize)
 {
     $ext = pathinfo($TrackURI, PATHINFO_EXTENSION);
     $Artist = str_replace('"', "&quot;", $Artist);
@@ -20,6 +20,10 @@ function DIDL_Song($TrackURI, $AlbumArtURI, $Artist, $Album, $Title, $Date, $Gen
     $TRACK_URI = $TrackURI;
     $TRACK_DURATION = $Duration;
     $TRACK_PROTOCOLINFO = "http-get:*:taglib/" . $ext . ":*";
+    $TRACK_BITRATE = $TrackBitrate;
+    $TRACK_SAMPLE_FREQUENCY = $TrackSampleFrequency;
+    $TRACK_BITS_PER_SAMPLE = $TrackBitsPerSample;
+    $TRACK_SIZE = $TrackSize;
     $ALBUMART_URI = $AlbumArtURI;
     $ARTWORK_URI = $AlbumArtURI;
     $TITLE = $Title;
@@ -42,7 +46,7 @@ function DIDL_Song($TrackURI, $AlbumArtURI, $Artist, $Album, $Title, $Date, $Gen
       <item id="$ID" parentID="$PARENTID" restricted="False">
         <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">$TITLE</dc:title>
         <upnp:class xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">object.item.audioItem.musicTrack</upnp:class>
-        <res duration="$TRACK_DURATION" protocolInfo="$TRACK_PROTOCOLINFO">$TRACK_URI</res>
+        <res duration="$TRACK_DURATION" protocolInfo="$TRACK_PROTOCOLINFO" bitrate="$TRACK_BITRATE" sampleFrequency="$TRACK_SAMPLE_FREQUENCY" bitsPerSample="$TRACK_BITS_PER_SAMPLE" size="$TRACK_SIZE">$TRACK_URI</res>
         <upnp:albumArtURI xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">$ALBUMART_URI</upnp:albumArtURI>
         <upnp:artworkURI xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">$ARTWORK_URI</upnp:artworkURI>
         <upnp:genre xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">$GENRE</upnp:genre>

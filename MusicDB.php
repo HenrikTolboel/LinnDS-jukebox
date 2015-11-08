@@ -45,7 +45,7 @@ class MusicDB extends SQLite3
 
 	//LogWrite("MusicDB::CreateTables - checking existance of tables and indexes...");
 
-	$this->exec('CREATE TABLE IF NOT EXISTS Tracks (Preset INTEGER, TrackSeq INTEGER, URL STRING, Duration STRING, Title STRING, Year STRING, AlbumArt STRING, ArtWork STRING, Genre STRING, ArtistPerformer STRING, ArtistComposer STRING, ArtistAlbumArtist STRING, ArtistConductor STRING, Album STRING, TrackNumber STRING, DiscNumber STRING, DiscCount STRING)');
+	$this->exec('CREATE TABLE IF NOT EXISTS Tracks (Preset INTEGER, TrackSeq INTEGER, URL STRING, Duration STRING, Title STRING, Year STRING, AlbumArt STRING, ArtWork STRING, Genre STRING, ArtistPerformer STRING, ArtistComposer STRING, ArtistAlbumArtist STRING, ArtistConductor STRING, Album STRING, TrackNumber STRING, DiscNumber STRING, DiscCount STRING, BitRate INTEGER, SampleFrequency INTEGER, BitsPerSample STRING, Size INTEGER)');
 
 	$this->exec('CREATE TABLE IF NOT EXISTS Album (Preset INTEGER, NoTracks INTEGER, URI STRING, ArtistFirst STRING, SortArtist STRING, Artist STRING, Album STRING, Date STRING, Genre STRING, MusicTime INTEGER, ImageURI STRING, TopDirectory STRING, RootMenuNo INTEGER)');
 
@@ -143,7 +143,7 @@ class MusicDB extends SQLite3
     function InsertTracksStmt()
     {
 	if ($this->insertTracksStmt == 0)
-	    $this->insertTracksStmt = $this->prepare('INSERT INTO Tracks (Preset, TrackSeq, URL, Duration, Title, Year, AlbumArt, ArtWork, Genre, ArtistPerformer, ArtistComposer, ArtistAlbumArtist, ArtistConductor, Album, TrackNumber, DiscNumber, DiscCount) VALUES  (:Preset, :TrackSeq, :URL, :Duration, :Title, :Year, :AlbumArt, :ArtWork, :Genre, :ArtistPerformer, :ArtistComposer, :ArtistAlbumArtist, :ArtistConductor, :Album, :TrackNumber, :DiscNumber, :DiscCount)');
+	    $this->insertTracksStmt = $this->prepare('INSERT INTO Tracks (Preset, TrackSeq, URL, Duration, Title, Year, AlbumArt, ArtWork, Genre, ArtistPerformer, ArtistComposer, ArtistAlbumArtist, ArtistConductor, Album, TrackNumber, DiscNumber, DiscCount, BitRate, SampleFrequency, BitsPerSample, Size) VALUES  (:Preset, :TrackSeq, :URL, :Duration, :Title, :Year, :AlbumArt, :ArtWork, :Genre, :ArtistPerformer, :ArtistComposer, :ArtistAlbumArtist, :ArtistConductor, :Album, :TrackNumber, :DiscNumber, :DiscCount, :BitRate, :SampleFrequency, :BitsPerSample, :Size)');
 
 	return $this->insertTracksStmt;
     }
@@ -299,7 +299,7 @@ class MusicDB extends SQLite3
     public function InsertTracks($Preset, $TrackSeq, $URL, $DURATION, $TITLE, $YEAR, 
 	$AlbumArt, $ArtWork, $Genre, $Artist_Performer, $Artist_Composer, 
 	$Artist_AlbumArtist, $Artist_Conductor, $ALBUM, $TRACK_NUMBER, 
-	$DISC_NUMBER, $DISC_COUNT)
+	$DISC_NUMBER, $DISC_COUNT, $BITRATE, $SAMPLE_FREQUENCY, $BITS_PER_SAMPLE, $SIZE)
     {
 	$this->InsertTracksStmt()->bindParam(':Preset', $Preset);
 	$this->InsertTracksStmt()->bindParam(':TrackSeq', $TrackSeq);
@@ -318,6 +318,10 @@ class MusicDB extends SQLite3
 	$this->InsertTracksStmt()->bindParam(':TrackNumber', $TRACK_NUMBER);
 	$this->InsertTracksStmt()->bindParam(':DiscNumber', $DISC_NUMBER);
 	$this->InsertTracksStmt()->bindParam(':DiscCount', $DISC_COUNT);
+	$this->InsertTracksStmt()->bindParam(':BitRate', $BITRATE);
+	$this->InsertTracksStmt()->bindParam(':SampleFrequency', $SAMPLE_FREQUENCY);
+	$this->InsertTracksStmt()->bindParam(':BitsPerSample', $BITS_PER_SAMPLE);
+	$this->InsertTracksStmt()->bindParam(':Size', $SIZE);
 
 	$result = $this->InsertTracksStmt()->execute();
 

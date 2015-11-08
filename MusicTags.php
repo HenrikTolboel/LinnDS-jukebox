@@ -26,13 +26,25 @@ class MusicTags {
      
 	//print_r($FileInfo);
 
-	$this->Arr[FileFormat]   = $FileInfo[fileformat];
-	$this->Arr[FileNamePath] = $FileInfo[filenamepath];
-	$this->Arr[SampleRate]   = $FileInfo[audio][sample_rate];
-	$this->Arr[Duration]     = $FileInfo[playtime_string];
-	$this->Arr[Seconds]      = $FileInfo[playtime_seconds];
-	$this->Arr[DiscNo]       = 1;
-	$this->Arr[DiscCount]    = 1;
+	$this->Arr[FileFormat]        = $FileInfo[fileformat];
+	$this->Arr[FileNamePath]      = $FileInfo[filenamepath];
+	$this->Arr[FileSize]          = $FileInfo["filesize"];
+	$this->Arr[SampleRate]        = $FileInfo[audio][sample_rate];
+	$this->Arr[BitRate]           = $FileInfo[audio][bitrate];
+	$this->Arr[BitsPerSample]     = $FileInfo[audio][bits_per_sample];
+	$this->Arr[channels]          = $FileInfo[audio][channels];
+	$this->Arr[channelmode]       = $FileInfo[audio][channelmode];
+	$this->Arr[bitrate_mode]      = $FileInfo[audio][bitrate_mode];
+	$this->Arr[encoder]           = $FileInfo[audio][encoder];
+	$this->Arr[compression_ratio] = $FileInfo[audio][compression_ratio];
+	$this->Arr[Duration]          = $FileInfo[playtime_string];
+	$this->Arr[Seconds]           = $FileInfo[playtime_seconds];
+	$this->Arr[DiscNo]            = 1;
+	$this->Arr[DiscCount]         = 1;
+
+
+	if ($this->Arr[BitsPerSample] == "")
+	    $this->Arr[BitsPerSample] = "16";
 
 
 
@@ -120,7 +132,8 @@ class MusicTags {
 	    $this->Arr[AlbumArtURI] =  ProtectPath(RelativePath(pathinfo($this->Arr[FileNamePath], PATHINFO_DIRNAME) . "/folder.jpg"));
 	return DIDL_Song($this->Arr[TrackURI], $this->Arr[AlbumArtURI], 
 	    $this->Arr[Artist], $this->Arr[Album], $this->Arr[Title], $this->Arr[Date], $this->Arr[Genre], 
-	    $this->Arr[TrackNo], $this->Arr[Duration], $this->Arr[DiscNo], $this->Arr[DiscCount]);
+	    $this->Arr[TrackNo], $this->Arr[Duration], $this->Arr[DiscNo], $this->Arr[DiscCount],
+	    $this->Arr[BitRate], $this->Arr[SampleRate], $this->Arr[BitsPerSample], $this->Arr[FileSize]);
     }
 }
 
@@ -131,6 +144,7 @@ function Test_MusicTags($FileName)
     echo "Test_MusicTags: " . $FileName .$NL . $NL;
     $t = new MusicTags($FileName);
     $t->dump();
+    echo $t->getDIDL() . $NL;
 }
 
 //Test_MusicTags("test_music/file.flac");

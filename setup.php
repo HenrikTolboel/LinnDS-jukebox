@@ -40,7 +40,7 @@ $LINN_JUKEBOX_PATH = "/volume1/web/MusicLib";
 $LINN_HOST = "192.168.0.12";
 $LINN_PORT = 23;
 
-$IsJul = 0;
+$IsJul = 1;
 
 $BUILD_PATH1 = "/Volumes/MacDATA/Users/henrik/nobackup/MusicLib";
 $BUILD_PATH = "/Users/henrik/nobackup/MusicLib";
@@ -225,7 +225,10 @@ $LogFile = 0;
 function SetLogFile($Str)
 {
     global $Log_File;
+    global $LogFile;
+
     $Log_File = $Str;
+    $LogFile = 0;
 }
 
 function LogWrite($Str)

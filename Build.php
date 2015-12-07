@@ -980,6 +980,12 @@ function Main($DoLevel)
     copy("actions.js", $AppDir . "actions.js");
     copy("musik.css", $AppDir . "musik.css");
     copy("LinnDS-jukebox-daemon.php", $AppDir . "LinnDS-jukebox-daemon.php");
+    copy("ServerState.php", $AppDir . "ServerState.php");
+    copy("LPECClientSocket.php", $AppDir . "LPECClientSocket.php");
+    copy("LinnDSClientSocket.php", $AppDir . "LinnDSClientSocket.php");
+    copy("StringUtils.php", $AppDir . "StringUtils.php");
+    copy("SocketServer.php", $AppDir . "SocketServer.php");
+    copy("LinnDS-jukebox-daemon-old.php", $AppDir . "LinnDS-jukebox-daemon-old.php");
     copy("S98linn_lpec", $AppDir . "S98linn_lpec");
     copy("Transparent.gif", $AppDir . "Transparent.gif");
     copy("setup.php", $AppDir . "setup.php");

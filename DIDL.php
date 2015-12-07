@@ -10,10 +10,11 @@
 
 require_once("setup.php");
 
-function DIDL_Song($TrackURI, $AlbumArtURI, $Artist, $Album, $Title, $Date, $Genre, $TrackNo, $Duration, $DiscNo, $DiscCount, $TrackBitrate, $TrackSampleFrequency, $TrackBitsPerSample, $TrackSize)
+function DIDL_Song($TrackURI, $AlbumArtURI, $Artist, $AlbumArtist, $Album, $Title, $Date, $Genre, $TrackNo, $Duration, $DiscNo, $DiscCount, $TrackBitrate, $TrackSampleFrequency, $TrackBitsPerSample, $TrackSize)
 {
     $ext = pathinfo($TrackURI, PATHINFO_EXTENSION);
     $Artist = str_replace('"', "&quot;", $Artist);
+    $AlbumArtist = str_replace('"', "&quot;", $AlbumArtist);
     $Album = str_replace('"', "&quot;", $Album);
     $Title = str_replace('"', "&quot;", $Title);
 
@@ -27,18 +28,17 @@ function DIDL_Song($TrackURI, $AlbumArtURI, $Artist, $Album, $Title, $Date, $Gen
     $ALBUMART_URI = $AlbumArtURI;
     $ARTWORK_URI = $AlbumArtURI;
     $TITLE = $Title;
-    $ARTIST_PERFORMER =	$Artist;
     $GENRE = $Genre;
     $ARTIST_PERFORMER = $Artist;
     $ARTIST_COMPOSER = "Unknown";
-    $ARTIST_ALBUMARTIST = "Unknown";
+    $ARTIST_ALBUMARTIST = $AlbumArtist;
     $ARTIST_CONDUCTOR = "Unknown";
-    $ALBUM = $Date ."/" . $Album;
+    $ALBUM = $Date . "/" . $Album;
     $TRACKNO = $TrackNo;
     $DATE = $Date;
     $DISC_NO = $DiscNo;
     $DISC_COUNT = $DiscCount;
-    $PARENTID = $Artist . "+" . $Album . "+" . $Date;
+    $PARENTID = $AlbumArtist . "+" . $Album . "+" . $Date;
     $ID = $PARENTID . "/" .$TrackNo;
 
     $DIDL = <<<EOT

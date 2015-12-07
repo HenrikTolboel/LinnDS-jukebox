@@ -17,7 +17,7 @@ $PORT = 9050;
 
 $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 socket_connect($socket, $HOST, $PORT);
-$string = socket_read($socket, 10000); // Remove connection info sent from server...
+//$string = socket_read($socket, 10000); // Remove connection info sent from server...
 
 $track = 0;
 if (isset($_GET["track"]) && !empty($_GET["track"])) {

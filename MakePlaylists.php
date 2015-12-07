@@ -105,6 +105,8 @@ function PlayListFromDir($Dir, &$Key, &$Playlist, &$Info)
 	    $Artist = str_replace("/", ",", $it->current()->Artist());
 	    $ARTIST = $it->current()->Artist();
 	}
+	$AlbumArtist = str_replace("/", ",", $it->current()->AlbumArtist());
+	$ALBUMARTIST = $it->current()->AlbumArtist();
 	$Album = str_replace("/", ",", $it->current()->Album());
 	$ALBUM = $it->current()->Album();
 	$Date = $it->current()->Date();
@@ -138,11 +140,14 @@ function PlayListFromDir($Dir, &$Key, &$Playlist, &$Info)
 	$GENRE = str_replace('"', "&quot;", $GENRE);
 	$ARTIST = str_replace('"', "&quot;", $ARTIST);
 	$Artist = str_replace('"', "&quot;", $Artist);
+	$ALBUMARTIST = str_replace('"', "&quot;", $ALBUMARTIST);
+	$AlbumArtist = str_replace('"', "&quot;", $AlbumArtist);
 
 	$Info = <<<EOT
 <?xml version="1.0" encoding="UTF-8"?>
 <Info>
   <Artist>$ARTIST</Artist>
+  <AlbumArtist>$ALBUMARTIST</AlbumArtist>
   <Album>$ALBUM</Album>
   <Date>$DATE</Date>
   <Genre>$GENRE</Genre>

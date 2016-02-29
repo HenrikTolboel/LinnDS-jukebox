@@ -134,6 +134,7 @@ function PlayListFromDir($Dir, &$Key, &$Playlist, &$Info)
 	$ALBUM = str_replace("&", "&amp;", $ALBUM);
 	$GENRE = str_replace("&", "&amp;", $GENRE);
 	$ARTIST = str_replace("&", "&amp;", $ARTIST);
+	$ALBUMARTIST = str_replace("&", "&amp;", $ALBUMARTIST);
 
 	$ART = str_replace('"', "&quot;", $ART);
 	$ALBUM = str_replace('"', "&quot;", $ALBUM);

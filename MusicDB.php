@@ -24,6 +24,7 @@ class MusicDB extends SQLite3
 
     private $numberOfTracksStmt = 0;
     private $presetURLStmt = 0;
+    private $CheckURLExistStmt = 0;
 
     private $insertAlbumStmt = 0;
     private $insertTracksStmt = 0;
@@ -47,7 +48,8 @@ class MusicDB extends SQLite3
 
 	$this->exec('CREATE TABLE IF NOT EXISTS Tracks (Preset INTEGER, TrackSeq INTEGER, URL STRING, Duration STRING, Title STRING, Year STRING, AlbumArt STRING, ArtWork STRING, Genre STRING, ArtistPerformer STRING, ArtistComposer STRING, ArtistAlbumArtist STRING, ArtistConductor STRING, Album STRING, TrackNumber STRING, DiscNumber STRING, DiscCount STRING, BitRate INTEGER, SampleFrequency INTEGER, BitsPerSample STRING, Size INTEGER)');
 
-	$this->exec('CREATE TABLE IF NOT EXISTS Album (Preset INTEGER, NoTracks INTEGER, URI STRING, ArtistFirst STRING, SortArtist STRING, Artist STRING, Album STRING, Date STRING, Genre STRING, MusicTime INTEGER, ImageURI STRING, TopDirectory STRING, RootMenuNo INTEGER)');
+	// Preset is an alias of the rowid field in the Album table.
+	$this->exec('CREATE TABLE IF NOT EXISTS Album (Preset INTEGER PRIMARY KEY ASC, NoTracks INTEGER, URI STRING, ArtistFirst STRING, SortArtist STRING, Artist STRING, Album STRING, Date STRING, Genre STRING, MusicTime INTEGER, ImageURI STRING, TopDirectory STRING, RootMenuNo INTEGER)');
 
 	// Tables used in LinnDS-jukebox-daemon.php
 	$this->exec('CREATE TABLE IF NOT EXISTS Queue (LinnId INTEGER, Preset INTEGER, TrackSeq INTEGER, URL STRING, XML STRING)');
@@ -57,6 +59,7 @@ class MusicDB extends SQLite3
 
 	// Create indexes
 	$this->exec('CREATE INDEX IF NOT EXISTS Album_idx1 ON Album (Preset)');
+	$this->exec('CREATE UNIQUE INDEX IF NOT EXISTS Album_idx2 ON Album (URI)');
 	$this->exec('CREATE INDEX IF NOT EXISTS Tracks_idx1 ON Tracks (Preset, TrackSeq)');
     }
 
@@ -130,6 +133,15 @@ class MusicDB extends SQLite3
 	    $this->presetURLStmt = $this->prepare('SELECT URI FROM Album WHERE Preset == :q1');
 
 	return $this->presetURLStmt;
+    }
+
+    function CheckURLExistStmt()
+    {
+	if ($this->CheckURLExistStmt == 0)
+	    $this->CheckURLExistStmt = $this->prepare('SELECT rowid FROM Album WHERE URI == :q1 LIMIT 1');
+	    //$this->CheckURLExistStmt = $this->prepare('SELECT EXISTS(SELECT rowid FROM Album WHERE URI == :q1 LIMIT 1)');
+
+	return $this->CheckURLExistStmt;
     }
 
     function InsertAlbumStmt()
@@ -274,6 +286,25 @@ class MusicDB extends SQLite3
 	return AbsolutePath(ProtectPath($R[0][URI]));
     }
 
+    public function CheckURLExist($uri)
+    {
+	$this->CheckURLExistStmt()->bindValue(":q1", $uri);
+
+	$result = $this->CheckURLExistStmt()->execute();
+
+	$r = $result->fetchArray(SQLITE3_ASSOC);
+	//print_r($r);
+
+	if (!empty($r))
+	    $Res = $r[Preset];
+	else
+	    $Res = false;
+
+	$this->CheckURLExistStmt()->reset();
+
+	return $Res;
+    }
+
     public function InsertAlbum($Preset, $NoTracks, $URI, $ArtistFirst, $Artist, $SortArtist, 
 	$Album, $Date, $Genre, $MusicTime, $ImageURI, $TopDirectory, $RootMenuNo)
     {
@@ -293,7 +324,11 @@ class MusicDB extends SQLite3
 
 	$result = $this->InsertAlbumStmt()->execute();
 
+	$rowid = $this->lastInsertRowID();
+
 	$this->InsertAlbumStmt()->reset();
+
+	return $rowid;
     }
 
     public function InsertTracks($Preset, $TrackSeq, $URL, $DURATION, $TITLE, $YEAR, 
@@ -325,7 +360,11 @@ class MusicDB extends SQLite3
 
 	$result = $this->InsertTracksStmt()->execute();
 
+	$rowid = $this->lastInsertRowID();
+
 	$this->InsertTracksStmt()->reset();
+
+	return $rowid;
     }
 
     public function NumberOfAlbumsInMenuNo($MenuNo)
@@ -347,6 +386,11 @@ class MusicDB extends SQLite3
 	return $A[$MenuNo];
     }
 
+    public function MaxPreset() {
+	$result = $this->prepare('SELECT MAX(Preset) as max from Album')->execute()->fetchArray();
+	//print_r($result);
+	return $result['max'];
+    }
 }
 
 

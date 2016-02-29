@@ -44,7 +44,8 @@ interface ListeningSocketInterface
 
     public function processClient($socket); // Read from socket and process received message via Client
 
-    public function SendAll($message); // Send message to all clients
+    //public function SendAll($message); // Send message to all clients
+    public function Send($message); // Send message to all clients
 }
 
 
@@ -258,7 +259,8 @@ class ListeningSocket implements ListeningSocketInterface
 	    $this->removeClient($client); // disconnected
     }
 
-    public function SendAll($message)
+    //public function SendAll($message)
+    public function Send($message)
     {
 	foreach ($this->clients as $client)
 	{

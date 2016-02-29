@@ -13,6 +13,7 @@ require_once("setup.php");
 require_once("SocketServer.php");
 require_once("LinnDSClientSocket.php");
 require_once("LPECClientSocket.php");
+//require_once("wsListeningSocket.php");
 require_once("ServerState.php");
 
 
@@ -31,6 +32,24 @@ class LinnDSListeningSocket extends ListeningSocket
     }
 
 }
+
+/*
+class LinnDSwsListeningSocket extends wsListeningSocket
+{
+    private $lPECListeningSocket;
+
+    public function setLPECListeningSocket($LPEC)
+    {
+	$this->lPECListeningSocket = $LPEC;
+    }
+
+    public function getLPECListeningSocket()
+    {
+	return $this->lPECListeningSocket;
+    }
+
+}
+ */
 
 class LPECListeningSocket extends ListeningSocket
 {
@@ -102,13 +121,18 @@ $LS1 = new LPECListeningSocket($LINN_HOST, $LINN_PORT, 'LPECClientSocket', $serv
 $LS2 = new LinnDSListeningSocket(0, 9050, 'LinnDSClientSocket', $serverState, 30000);
 $LS2->setLPECListeningSocket($LS1);
 
+//$LS3 = new LinnDSwsListeningSocket(0, 9051, 'LinnDSClientSocket', $serverState, 30000);
+//$LS3->setLPECListeningSocket($LS1);
+
 //$LS1->dump();
 //$LS2->dump();
+//$LS3->dump();
 
 $SS = new SocketServer();
 
 $SS->addListeningSocket($LS1);
 $SS->addListeningSocket($LS2);
+//$SS->addListeningSocket($LS3);
 
 LogWrite("LinnDS-jukebox-daemon starts...");
 try {

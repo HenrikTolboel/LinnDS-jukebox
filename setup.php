@@ -43,7 +43,8 @@ $LINN_PORT = 23;
 $IsJul = 1;
 
 $BUILD_PATH1 = "/Volumes/MacDATA/Users/henrik/nobackup/MusicLib";
-$BUILD_PATH = "/Users/henrik/nobackup/MusicLib";
+$BUILD_PATH2 = "/Users/henrik/nobackup/MusicLib";
+$BUILD_PATH = "/Volumes/web/MusicLib";
 
 // These directories are scanned for ".dpl" files
 // Each directory maps into one of the RootMenu entries.
@@ -142,8 +143,10 @@ function RelativePath($Path)
     global $LINN_JUKEBOX_URL;
     global $BUILD_PATH;
     global $BUILD_PATH1;
+    global $BUILD_PATH2;
 
     $Path = str_replace("/Users/henrik/Documents", "LINN_JUKEBOX_URL", $Path);
+    $Path = str_replace("$BUILD_PATH2", "LINN_JUKEBOX_URL", $Path);
     $Path = str_replace("$BUILD_PATH1", "LINN_JUKEBOX_URL", $Path);
     $Path = str_replace("$BUILD_PATH", "LINN_JUKEBOX_URL", $Path);
     return $Path;
@@ -154,8 +157,10 @@ function RelativeBuildPath($Path)
     global $LINN_JUKEBOX_URL;
     global $BUILD_PATH;
     global $BUILD_PATH1;
+    global $BUILD_PATH2;
 
     $Path = str_replace("/Users/henrik/Documents", "BUILD_PATH", $Path);
+    $Path = str_replace("$BUILD_PATH2", "BUILD_PATH", $Path);
     $Path = str_replace("$BUILD_PATH1", "BUILD_PATH", $Path);
     $Path = str_replace("$BUILD_PATH", "BUILD_PATH", $Path);
     return $Path;
@@ -173,6 +178,8 @@ function ProtectPath($Path)
     $Path = str_replace("e%CC%81", "%C3%A9", $Path); // é encoded wrong
     $Path = str_replace("U%CC%88", "%C3%9C", $Path); // Ü encoded wrong
     $Path = str_replace("u%CC%88", "%C3%BC", $Path); // ü encoded wrong
+    $Path = str_replace("a%CC%88", "%C3%A4", $Path); // ä encoded wrong
+    $Path = str_replace("o%CC%88", "%C3%B6", $Path); // ô encoded wrong
     $Path = str_replace("XXXplusXXX", "+", $Path);
     //http://www.w3schools.com/tags/ref_urlencode.asp
     //echo "ProtectPath-res: " . $Path . $NL;

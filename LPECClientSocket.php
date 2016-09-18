@@ -176,6 +176,7 @@ class LPECClientSocket extends ClientSocket
 	    $Res = false;
 	$musicDB->DeleteQueue();
 	$this->getState()->deleteAll();
+	$this->IncrRevNo($musicDB);
 	return $Res;
     }
 

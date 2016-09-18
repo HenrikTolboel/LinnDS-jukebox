@@ -51,9 +51,9 @@ function BuildSelect($words, $mode)
 	//echo "key: $key, value: $value\n";
 
 	if ($mode == SINGLE_TRACKS_ONLY)
-	    $Add = "(Title LIKE :q$key OR Album LIKE :q$key OR ArtistPerformer LIKE :q$key)";
+	    $Add = "(Title LIKE :q$key OR Album LIKE :q$key OR ArtistPerformer LIKE :q$key OR ArtistAlbumArtist LIKE :q$key)";
 	else
-	    $Add = "(Album LIKE :q$key OR ArtistPerformer LIKE :q$key)";
+	    $Add = "(Album LIKE :q$key OR ArtistPerformer LIKE :q$key OR ArtistAlbumArtist LIKE :q$key)";
 
 	if ($first) {
 	    $SelectStmt .= "$Add";

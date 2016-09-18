@@ -175,7 +175,7 @@ $(function() {
 		if (first) {
 		    $("img.album").attr("src", val.AlbumArt);
 		    $("#album-title").html("Album");
-		    $("#album-artist").html(val.ArtistPerformer);
+		    $("#album-artist").html(val.ArtistAlbumArtist);
 		    $("#album-album").html(val.Album + " (" + val.Year + ")");
 
 		    first = false;
@@ -391,11 +391,11 @@ $(function() {
 
 	html += '<h3>';
 
-	if (values.Artist == "Various")
+	if (values.Artist == "Various Artists")
 	{
 	    html += values.Album;
 	    html += '</h3>';
-	    html += '<p>' + ' (' + values.Year + ')</p>';  
+	    html += '<p>' + ' (' + values.Date + ')</p>';  
 	    html += '</a>';
 	}
 	else
@@ -424,8 +424,11 @@ $(function() {
 
 	html += '<h3>';
 
+	var Performer = "";
+	if (values.ArtistAlbumArtist !== values.ArtistPerformer)
+	    Performer = " (" + values.ArtistPerformer + ")";
 	html += values.TrackNumber + '. ';
-	html += values.Title;
+	html += values.Title + Performer;
 	html += '</h3>';
 	html += '<p>' + values.Duration + '</p>';  
 	html += '</a>';
@@ -460,7 +463,7 @@ $(function() {
 
 	html += '<h3>';
 
-	if (values.ArtistPerformer == "Various")
+	if (values.ArtistPerformer == "Various Artists")
 	{
 	    html += values.Album;
 	    html += '</h3>';

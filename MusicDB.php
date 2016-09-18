@@ -46,27 +46,29 @@ class MusicDB extends SQLite3
 
 	//LogWrite("MusicDB::CreateTables - checking existance of tables and indexes...");
 
-	$this->exec('CREATE TABLE IF NOT EXISTS Tracks (Preset INTEGER, TrackSeq INTEGER, URL STRING, Duration STRING, Title STRING, Year STRING, AlbumArt STRING, ArtWork STRING, Genre STRING, ArtistPerformer STRING, ArtistComposer STRING, ArtistAlbumArtist STRING, ArtistConductor STRING, Album STRING, TrackNumber STRING, DiscNumber STRING, DiscCount STRING, BitRate INTEGER, SampleFrequency INTEGER, BitsPerSample STRING, Size INTEGER)');
+	$this->exec('CREATE TABLE IF NOT EXISTS Tracks (AlbumKey STRING, Preset INTEGER, TrackSeq INTEGER, URL STRING, Duration STRING, Title STRING, Year STRING, AlbumArt STRING, ArtWork STRING, Genre STRING, ArtistPerformer STRING, ArtistComposer STRING, ArtistAlbumArtist STRING, ArtistConductor STRING, Album STRING, TrackNumber STRING, DiscNumber STRING, DiscCount STRING, BitRate INTEGER, SampleFrequency INTEGER, BitsPerSample STRING, Size INTEGER)');
 
 	// Preset is an alias of the rowid field in the Album table.
-	$this->exec('CREATE TABLE IF NOT EXISTS Album (Preset INTEGER PRIMARY KEY ASC, NoTracks INTEGER, URI STRING, ArtistFirst STRING, SortArtist STRING, Artist STRING, Album STRING, Date STRING, Genre STRING, MusicTime INTEGER, ImageURI STRING, TopDirectory STRING, RootMenuNo INTEGER)');
+	$this->exec('CREATE TABLE IF NOT EXISTS Album (Key STRING, Preset INTEGER PRIMARY KEY ASC, NoTracks INTEGER, URI STRING, ArtistFirst STRING, SortArtist STRING, Artist STRING, Album STRING, Date STRING, Genre STRING, MusicTime INTEGER, ImageURI STRING, TopDirectory STRING, RootMenuNo INTEGER)');
 
 	// Tables used in LinnDS-jukebox-daemon.php
-	$this->exec('CREATE TABLE IF NOT EXISTS Queue (LinnId INTEGER, Preset INTEGER, TrackSeq INTEGER, URL STRING, XML STRING)');
+	$this->exec('CREATE TABLE IF NOT EXISTS Queue (LinnId INTEGER, AlbumKey STRING, Preset INTEGER, TrackSeq INTEGER, URL STRING, XML STRING)');
 	$this->exec('CREATE TABLE IF NOT EXISTS State (Id STRING, Value STRING)');
 	$this->exec('CREATE TABLE IF NOT EXISTS Sequence (Seq INTEGER, LinnId INTEGER)');
 
 
 	// Create indexes
-	$this->exec('CREATE INDEX IF NOT EXISTS Album_idx1 ON Album (Preset)');
-	$this->exec('CREATE UNIQUE INDEX IF NOT EXISTS Album_idx2 ON Album (URI)');
-	$this->exec('CREATE INDEX IF NOT EXISTS Tracks_idx1 ON Tracks (Preset, TrackSeq)');
+	$this->exec('CREATE INDEX IF NOT EXISTS Album_idx1 ON Album (Key)');
+	$this->exec('CREATE INDEX IF NOT EXISTS Album_idx2 ON Album (Preset)');
+	$this->exec('CREATE UNIQUE INDEX IF NOT EXISTS Album_idx3 ON Album (URI)');
+	$this->exec('CREATE INDEX IF NOT EXISTS Tracks_idx1 ON Tracks (AlbumKey, TrackSeq)');
+	$this->exec('CREATE INDEX IF NOT EXISTS Tracks_idx2 ON Tracks (Preset, TrackSeq)');
     }
 
     function InsertQueueStmt()
     {
 	if ($this->insertQueueStmt == 0)
-	    $this->insertQueueStmt = $this->prepare('INSERT INTO Queue (LinnId, Preset, TrackSeq, URL, XML) VALUES (:LinnId, :Preset, :TrackSeq, :URL, :XML)');
+	    $this->insertQueueStmt = $this->prepare('INSERT INTO Queue (LinnId, AlbumKey, Preset, TrackSeq, URL, XML) VALUES (:LinnId, :AlbumKey, :Preset, :TrackSeq, :URL, :XML)');
 
 	return $this->insertQueueStmt;
     }
@@ -147,7 +149,7 @@ class MusicDB extends SQLite3
     function InsertAlbumStmt()
     {
 	if ($this->insertAlbumStmt == 0)
-	    $this->insertAlbumStmt = $this->prepare('INSERT INTO Album (Preset, NoTracks, URI, ArtistFirst, SortArtist, Artist, Album, Date, Genre, MusicTime, ImageURI, TopDirectory, RootMenuNo) VALUES  (:Preset, :NoTracks, :URI, :ArtistFirst, :SortArtist, :Artist, :Album, :Date, :Genre, :MusicTime, :ImageURI, :TopDirectory, :RootMenuNo)');
+	    $this->insertAlbumStmt = $this->prepare('INSERT INTO Album (Key, Preset, NoTracks, URI, ArtistFirst, SortArtist, Artist, Album, Date, Genre, MusicTime, ImageURI, TopDirectory, RootMenuNo) VALUES  (:Key, :Preset, :NoTracks, :URI, :ArtistFirst, :SortArtist, :Artist, :Album, :Date, :Genre, :MusicTime, :ImageURI, :TopDirectory, :RootMenuNo)');
 
 	return $this->insertAlbumStmt;
     }
@@ -155,14 +157,15 @@ class MusicDB extends SQLite3
     function InsertTracksStmt()
     {
 	if ($this->insertTracksStmt == 0)
-	    $this->insertTracksStmt = $this->prepare('INSERT INTO Tracks (Preset, TrackSeq, URL, Duration, Title, Year, AlbumArt, ArtWork, Genre, ArtistPerformer, ArtistComposer, ArtistAlbumArtist, ArtistConductor, Album, TrackNumber, DiscNumber, DiscCount, BitRate, SampleFrequency, BitsPerSample, Size) VALUES  (:Preset, :TrackSeq, :URL, :Duration, :Title, :Year, :AlbumArt, :ArtWork, :Genre, :ArtistPerformer, :ArtistComposer, :ArtistAlbumArtist, :ArtistConductor, :Album, :TrackNumber, :DiscNumber, :DiscCount, :BitRate, :SampleFrequency, :BitsPerSample, :Size)');
+	    $this->insertTracksStmt = $this->prepare('INSERT INTO Tracks (AlbumKey, Preset, TrackSeq, URL, Duration, Title, Year, AlbumArt, ArtWork, Genre, ArtistPerformer, ArtistComposer, ArtistAlbumArtist, ArtistConductor, Album, TrackNumber, DiscNumber, DiscCount, BitRate, SampleFrequency, BitsPerSample, Size) VALUES  (:AlbumKey, :Preset, :TrackSeq, :URL, :Duration, :Title, :Year, :AlbumArt, :ArtWork, :Genre, :ArtistPerformer, :ArtistComposer, :ArtistAlbumArtist, :ArtistConductor, :Album, :TrackNumber, :DiscNumber, :DiscCount, :BitRate, :SampleFrequency, :BitsPerSample, :Size)');
 
 	return $this->insertTracksStmt;
     }
 
-    public function InsertQueue($LinnId, $Preset, $TrackSeq, $URL, $XML)
+    public function InsertQueue($LinnId, $AlbumKey, $Preset, $TrackSeq, $URL, $XML)
     {
 	$this->InsertQueueStmt()->bindParam(':LinnId', $LinnId);
+	$this->InsertQueueStmt()->bindParam(':AlbumKey', $AlbumKey);
 	$this->InsertQueueStmt()->bindParam(':Preset', $Preset);
 	$this->InsertQueueStmt()->bindParam(':TrackSeq', $TrackSeq);
 	$this->InsertQueueStmt()->bindParam(':URL', $URL);
@@ -171,11 +174,11 @@ class MusicDB extends SQLite3
 	$result = $this->InsertQueueStmt()->execute();
 
 	$r = $this->changes();
-	LogWrite("InsertQueue: $LinnId, $Preset, $TrackSeq, $URL -> $r");
+	LogWrite("InsertQueue: $LinnId, $AlbumKey, $Preset, $TrackSeq, $URL -> $r");
 	$this->InsertQueueStmt()->reset();
     }
 
-    public function UpdateQueue($LinnId, $Preset, $TrackSeq, $URL, $XML)
+    public function UpdateQueue($LinnId, $AlbumKey, $Preset, $TrackSeq, $URL, $XML)
     {
 	$this->UpdateQueueStmt()->bindParam(':LinnId', $LinnId);
 	$this->UpdateQueueStmt()->bindParam(':URL', $URL);
@@ -183,10 +186,10 @@ class MusicDB extends SQLite3
 	$result = $this->UpdateQueueStmt()->execute();
 
 	$r = $this->changes();
-	LogWrite("UpdateQueue: $LinnId, $Preset, $TrackSeq, $URL -> $r");
+	LogWrite("UpdateQueue: $LinnId, $AlbumKey, $Preset, $TrackSeq, $URL -> $r");
 	if ($this->changes() < 1)
 	{
-	    $this->InsertQueue($LinnId, $Preset, $TrackSeq, $URL, $XML);
+	    $this->InsertQueue($LinnId, $AlbumKey, $Preset, $TrackSeq, $URL, $XML);
 	}
 
 	$this->UpdateQueueStmt()->reset();
@@ -305,9 +308,10 @@ class MusicDB extends SQLite3
 	return $Res;
     }
 
-    public function InsertAlbum($Preset, $NoTracks, $URI, $ArtistFirst, $Artist, $SortArtist, 
+    public function InsertAlbum($Key, $Preset, $NoTracks, $URI, $ArtistFirst, $Artist, $SortArtist, 
 	$Album, $Date, $Genre, $MusicTime, $ImageURI, $TopDirectory, $RootMenuNo)
     {
+	$this->InsertAlbumStmt()->bindParam(':Key', $Key);
 	$this->InsertAlbumStmt()->bindParam(':Preset', $Preset);
 	$this->InsertAlbumStmt()->bindParam(':NoTracks', $NoTracks);
 	$this->InsertAlbumStmt()->bindParam(':URI', $URI);
@@ -331,11 +335,12 @@ class MusicDB extends SQLite3
 	return $rowid;
     }
 
-    public function InsertTracks($Preset, $TrackSeq, $URL, $DURATION, $TITLE, $YEAR, 
+    public function InsertTracks($AlbumKey, $Preset, $TrackSeq, $URL, $DURATION, $TITLE, $YEAR, 
 	$AlbumArt, $ArtWork, $Genre, $Artist_Performer, $Artist_Composer, 
 	$Artist_AlbumArtist, $Artist_Conductor, $ALBUM, $TRACK_NUMBER, 
 	$DISC_NUMBER, $DISC_COUNT, $BITRATE, $SAMPLE_FREQUENCY, $BITS_PER_SAMPLE, $SIZE)
     {
+	$this->InsertTracksStmt()->bindParam(':AlbumKey', $AlbumKey);
 	$this->InsertTracksStmt()->bindParam(':Preset', $Preset);
 	$this->InsertTracksStmt()->bindParam(':TrackSeq', $TrackSeq);
 	$this->InsertTracksStmt()->bindParam(':URL', $URL);

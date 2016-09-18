@@ -12,7 +12,7 @@
 require_once("setup.php");
 require_once("MusicDB.php");
 
-function Tracks(&$musicDB, $DIDLFile, $preset)
+function Tracks(&$musicDB, $DIDLFile, $AlbumKey, $preset)
 {
     global $NL;
 
@@ -126,7 +126,7 @@ function Tracks(&$musicDB, $DIDLFile, $preset)
 	// Sequence number inside playlist file
 	$TrackSeq++;
 
-        $musicDB->InsertTracks($preset, $TrackSeq, $URL, $DURATION, $TITLE, $YEAR, 
+        $musicDB->InsertTracks($AlbumKey, $preset, $TrackSeq, $URL, $DURATION, $TITLE, $YEAR, 
 	    $AlbumArt, $ArtWork, $Genre, $Artist_Performer, $Artist_Composer, 
 	    $Artist_AlbumArtist, $Artist_Conductor, $ALBUM, $TRACK_NUMBER, 
 	    $DISC_NUMBER, $DISC_COUNT, $BITRATE, $SAMPLE_FREQUENCY, $BITS_PER_SAMPLE, $SIZE);

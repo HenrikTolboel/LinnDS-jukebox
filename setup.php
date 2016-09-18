@@ -40,7 +40,7 @@ $LINN_JUKEBOX_PATH = "/volume1/web/MusicLib";
 $LINN_HOST = "192.168.0.12";
 $LINN_PORT = 23;
 
-$IsJul = 1;
+$IsJul = 0;
 
 $BUILD_PATH1 = "/Volumes/MacDATA/Users/henrik/nobackup/MusicLib";
 $BUILD_PATH2 = "/Users/henrik/nobackup/MusicLib";

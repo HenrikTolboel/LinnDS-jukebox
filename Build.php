@@ -406,8 +406,8 @@ function Main($DoLevel)
 		    if ($ext == "xml")
 		    {
 			$didl = new DIDL_Album($it->getPathName(), $RootMenuNo);
-			$exist = $musicDB->CheckURLExist($didl->URI());
-			if ($exist === false)
+			$rowid = $musicDB->CheckURLExist($didl->URI());
+			if ($rowid === false)
 			{
 			    $rowid = Make_Album($didl, $musicDB);
 			    Make_Tracks($didl, $musicDB);
@@ -415,7 +415,7 @@ function Main($DoLevel)
 			}
 			else
 			{
-			    $didl->SetSequenceNo($exist);
+			    $didl->SetSequenceNo($rowid);
 			}
 
 			CollectFolderImgs($didl);
